@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: finns
+  datasource:
+    url: jdbc:h2:file:./data/aitome;MODE=PostgreSQL;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  flyway:
+    enabled: false
+  web:
+    resources:
+      cache:
+        period: 1h
+server:
+  port: 8080
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        same-site: lax
+      timeout: 7d
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

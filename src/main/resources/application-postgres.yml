@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: ${FINNS_DB_URL:jdbc:postgresql://127.0.0.1:5432/finns}
+    username: ${FINNS_DB_USERNAME:finns_app}
+    password: ${FINNS_DB_PASSWORD}
+    hikari:
+      maximum-pool-size: ${FINNS_DB_POOL_MAX:10}
+      minimum-idle: ${FINNS_DB_POOL_MIN:2}
+      connection-timeout: 5000
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
+server:
+  error:
+    include-message: never
+
+finns:
+  migration:
+    h2:
+      enabled: ${FINNS_H2_MIGRATION_ENABLED:false}
+      dry-run: ${FINNS_H2_MIGRATION_DRY_RUN:false}
+      url: ${FINNS_H2_SOURCE_URL:jdbc:h2:file:./data/aitome;MODE=PostgreSQL;DB_CLOSE_ON_EXIT=FALSE}
+      source-file: ${FINNS_H2_SOURCE_FILE:data/aitome.mv.db}
