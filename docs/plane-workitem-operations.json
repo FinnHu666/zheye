@@ -1,0 +1,95 @@
+{
+  "revision": 1,
+  "status": "executed_and_readback_verified",
+  "operations": [
+    {
+      "operation": "W01",
+      "task": "conversation",
+      "version": "0.7.0",
+      "payload": {
+        "action": "create",
+        "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "name": "FINNS 0.7.0｜多轮 AI 沟通与主动确认",
+        "description_stripped": "目标产品版本：0.7.0；当前已发布基线：0.6.0。\n当前阶段：G1：C01–C07 剩余范围待冻结；新原型待制作。\n范围：连续讨论、每轮关键追问、可纠正摘要；作者明确确认才进入问卷。采用已确认 A 页面内聊天和离开保护，不恢复完整聊天；保留本人 Key、直接问卷、用量及取消/迟到/失败保护。\n验收：纠正方向更新摘要；AI 建议不能直接跳问卷；失败保留输入；确认快照与候选接受边界有效。\n流程：确认需求→具体原型确认→概设/详设及接口/验收映射→授权实施→测试/验收→授权发布。\n证据路径：docs/iterations/0.7.0/PLAN.md、REQUIREMENTS.md；docs/delivery-progress.json 中 conversation。路径是本地仓库入口，不是外部可访问链接。\n历史来源：INBOX-2；直接归属 FINNS。\n排除：公开发布/公众评分、共享数据、复杂角色、任意脚本与自动部署；不改变已发布功能。\n下一步：完成对应同步检查点，明确剩余参数及具体原型；当前未实施/未验收/未发布。",
+        "state": "5b7d9df4-8ce4-40be-b110-83515a957a2a",
+        "priority": "none"
+      }
+    },
+    {
+      "operation": "W02",
+      "task": "views",
+      "version": "0.7.0",
+      "payload": {
+        "action": "create",
+        "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "name": "FINNS 0.7.0｜首页全站累计浏览量",
+        "description_stripped": "目标产品版本：0.7.0；当前已发布基线：0.6.0。\n当前阶段：功能方向已评审；G2 原型待制作，统计参数待明确。\n范围：持久累计计数、统计起点、去重及失败/未知展示；页面/弹层与窗口口径待原型细化。\n验收：并发/重复不多计；刷新及重启保留累计；真实零、未知和失败可区分。\n流程：确认需求→具体原型确认→概设/详设及接口/验收映射→授权实施→测试/验收→授权发布。\n证据路径：docs/iterations/0.7.0/PLAN.md、REQUIREMENTS.md；docs/delivery-progress.json 中 views。路径是本地仓库入口，不是外部可访问链接。\n历史来源：INBOX-3；直接归属 FINNS。\n排除：公开发布/公众评分、共享数据、复杂角色、任意脚本与自动部署；不改变已发布功能。\n下一步：完成对应同步检查点，明确剩余参数及具体原型；当前未实施/未验收/未发布。",
+        "state": "3f40f9d8-2245-4ee5-9686-252bcbde4751",
+        "priority": "none"
+      }
+    },
+    {
+      "operation": "W03",
+      "task": "access",
+      "version": "0.7.0",
+      "payload": {
+        "action": "create",
+        "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "name": "FINNS 0.7.0｜简单管理员与受限访问",
+        "description_stripped": "目标产品版本：0.7.0；当前已发布基线：0.6.0。\n当前阶段：功能方向已评审；G2 原型待制作，权限参数待明确。\n范围：以简单用户资格控制受限页面、导航、直达与 API，支持撤销与操作记录；具体范围及初始化待设计。\n验收：未授权账号及直达/API 拒绝；撤销生效；CSRF、多账号和审计验证；不扩大私人 Key/草稿/工具访问。\n流程：确认需求→具体原型确认→概设/详设及接口/验收映射→授权实施→测试/验收→授权发布。\n证据路径：docs/iterations/0.7.0/PLAN.md、REQUIREMENTS.md；docs/delivery-progress.json 中 access。路径是本地仓库入口，不是外部可访问链接。\n历史来源：INBOX-4；直接归属 FINNS。\n排除：公开发布/公众评分、共享数据、复杂角色、任意脚本与自动部署；不改变已发布功能。\n下一步：完成对应同步检查点，明确剩余参数及具体原型；当前未实施/未验收/未发布。",
+        "state": "3f40f9d8-2245-4ee5-9686-252bcbde4751",
+        "priority": "none"
+      }
+    },
+    {
+      "operation": "W04",
+      "task": "rating",
+      "version": "0.8.0",
+      "payload": {
+        "action": "create",
+        "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "name": "FINNS 0.8.0｜自定义评价模块与独立榜单复用",
+        "description_stripped": "目标产品版本：0.8.0；当前已发布基线：0.6.0。\n当前阶段：功能方向已评审；G2 原型待制作；字段/量表/参与/生命周期参数待明确。\n范围：作者自定义实体/字段/候选/筛选，地域可选；对象与评价分层，评分审核及透明红黑榜；收藏/复制配置产生独立空榜单，不带对象/评分/原权限。\n验收：无代码新增非租房类型并关闭地域；后端拒绝非法及越权数据；提交/审核/撤回仅计有效版本；副本与来源独立，HTML 隔离保持。\n流程：确认需求→具体原型确认→概设/详设及接口/验收映射→授权实施→测试/验收→授权发布。\n证据路径：docs/iterations/0.8.0/PLAN.md、REQUIREMENTS.md；docs/delivery-progress.json 中 rating。路径是本地仓库入口，不是外部可访问链接。\n历史来源：无；内部 REQ-018；直接归属 FINNS。\n排除：公开发布/公众评分、共享数据、复杂角色、任意脚本与自动部署；不改变已发布功能。\n下一步：完成对应同步检查点，明确剩余参数及具体原型；当前未实施/未验收/未发布。",
+        "state": "3f40f9d8-2245-4ee5-9686-252bcbde4751",
+        "priority": "none"
+      }
+    },
+    {
+      "operation": "W05",
+      "task": "rental",
+      "version": "0.8.0",
+      "payload": {
+        "action": "create",
+        "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "name": "FINNS 0.8.0｜租房专题私人验证",
+        "description_stripped": "目标产品版本：0.8.0；当前已发布基线：0.6.0。\n当前阶段：功能方向已评审；G2 原型待制作；首城/素材待提供；依赖 W04 与 0.7.0 访问基础。\n范围：租前、找房、看房、签约、入住和退租方法与踩坑内容；地区/来源/经验/待核实分明；使用可配置评价模块；只做私人草稿，并验证一个非地域案例。\n验收：保存刷新及手机阅读恢复；无评分仍可读；公开列表无私人稿；跨账号拒绝；来源及待补充标识明确。\n流程：确认需求→具体原型确认→概设/详设及接口/验收映射→授权实施→测试/验收→授权发布。\n证据路径：docs/iterations/0.8.0/PLAN.md、REQUIREMENTS.md；docs/delivery-progress.json 中 rental。路径是本地仓库入口，不是外部可访问链接。\n历史来源：无；内部 REQ-017；直接归属 FINNS。\n排除：公开发布/公众评分、共享数据、复杂角色、任意脚本与自动部署；不改变已发布功能。\n下一步：完成对应同步检查点，明确剩余参数及具体原型；当前未实施/未验收/未发布。",
+        "state": "3f40f9d8-2245-4ee5-9686-252bcbde4751",
+        "priority": "none"
+      }
+    },
+    {
+      "operation": "W06",
+      "action": "cycle.manage_workitems",
+      "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+      "cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "add_created_by": [
+        "W01",
+        "W02",
+        "W03"
+      ],
+      "remove_ids": []
+    },
+    {
+      "operation": "W07",
+      "action": "cycle.manage_workitems",
+      "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+      "cycle_id": "74c326cb-9864-4405-89ed-8e1675483486",
+      "add_created_by": [
+        "W04",
+        "W05"
+      ],
+      "remove_ids": []
+    }
+  ],
+  "receipt": "docs/plane-workitem-receipt.json"
+}

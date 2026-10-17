@@ -1,0 +1,15 @@
+{
+  "operation": "G01",
+  "date": "2026-10-13",
+  "approval": "用户明确回复：确认 G01，写入指南；差异修订1",
+  "writes": 1,
+  "page_id": "290eb0a0-82dc-4dc6-8f9c-b1eb028d49d9",
+  "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+  "name": "Plane 项目组织指南｜模块、任务、周期与发布",
+  "created_at": "2026-10-13T15:38:19.161441Z",
+  "content_verified": true,
+  "project_list_verified": true,
+  "prior_pages_preserved": true,
+  "access": 0,
+  "project_page_count": 2
+}

@@ -7,13 +7,25 @@ description: 在 FINNS 的 Java 与 Vue 项目中记录需求、实施功能或�
 
 这是随项目保存的 skill 源文件。由根目录 AGENTS.md 引导读取，不依赖个人记忆或全局安装。仅规划时输出可执行方案，不实施业务变化。
 
+需求排期、原型评审、开发交付、Plane 同步或 AI 产物归档时，同时按 [finns-delivery-workflow](../finns-delivery-workflow/SKILL.md) 执行阶段门禁、逐项远程确认和过程记录。本文件保留技术基线与验证要求，交付 skill 保留阶段及产物规范；只维护各自的权威规则，避免两套重复流程。普通技术问答不因此连接 Plane 或生成迭代文件。
+
+## 需求评审通过后的必做检查
+
+FINNS 的新需求评审通过后，**先处理 Plane 同步检查点，再开始实际产品原型制作**。AI 主动列出待登记/更新的需求及具体差异，按 [同步节点规则](../finns-delivery-workflow/references/plane-sync.md) 发起所需授权和逐项写入确认，不等待用户再次追问是否已经同步。需求评审通过只批准产品范围，不代替远程写入确认。
+
+检查点的正常结果是“已同步并回读”或“核对后无需变更”；用户明确暂缓/不使用 Plane 或明确要求在连接失败时先继续，可记录待补同步后进入原型。无答复不等于延期批准。准备原型任务书可继续，但不得把它写成实际制作已开始，也不能用“没有写入确认”静默跳过同步检查点。后续范围或管理状态变化再处理对应差异，不对无变更重复索要确认。
+
 ## 建立本轮边界
+
+需求汇总/排期/需规更新先按 [产品版本路线图](../../../docs/RELEASE_ROADMAP.md) 组织：当前已发布版本与目标版本分开；每个纳入当前迭代的功能有明确产品版本，并在 `docs/iterations/<version>/PLAN.md` 和 `REQUIREMENTS.md` 维护。对外用“FINNS <产品版本>｜能力”标题；REQ ID 只内部追踪，文档使用修订号，不能将“15”或文档“1.0”当作产品版本。尚未采纳/明确暂停的项记录状态和原因，不编造已批准版本。规划不提前修改四处发布版本或写入远程对象。
 
 读项目根目录 AGENTS.md、VERSION、CHANGELOG.md 和相关源码。读 docs/NEXT_ITERATION_PLAN.md 的对应需求；接手先读 docs/AI_HANDOFF.md。先检查 Git 状态，目录不是仓库时如实记录，不把没有 Git 当作没有用户改动。
 
 用需求 ID 表达本轮目标、可观察验收条件和排除项。区分用户明确要求与方案假设。简单修复无需扩写整套设计；跨数据模型、路由或身份边界的变化先补充方案决定。
 
 ## 统一协作与状态协议
+
+接手、继续和跨阶段前，按交付 skill 的 [进度检查](../finns-delivery-workflow/references/progress-check.md) 输出当前证据与下一步。技术执行不得绕过未满足门禁；纯问答不机械运行流程。
 
 先识别本轮模式，不能把“记录/规划”默认为实施授权：
 
@@ -46,8 +58,8 @@ description: 在 FINNS 的 Java 与 Vue 项目中记录需求、实施功能或�
 - 身份与个人数据：正常登录/退出、未登录、用户 A 访问 B、会话过期；涉及 Cookie 写请求还要验证 CSRF 策略。
 - 数据库：在目标 PostgreSQL 验证建库迁移、重复启动、约束、分页和恢复；H2 测试通过不能代替 PostgreSQL 验证。
 - PostgreSQL 写入集成测试使用 `scripts/test-postgres.ps1 -DatabaseName <isolated-database>`；脚本只允许 `finns_test_*` 或 `finns_restore_check_*`、仅连接 `127.0.0.1`，拒绝对 `finns` 主库运行。测试数据保留在指定隔离库，不自动 drop。
-- 使用现有 scripts/test.ps1、scripts/package.ps1；发版前先构建 frontend，因为当前 package.ps1 不构建 Vue。
-- 当前 PowerShell 脚本可能未传播原生命令失败状态，需检查 npm/Maven 的真实退出码及结果；完善脚本时显式检查 LASTEXITCODE。
+- 使用现有 scripts/test.ps1、scripts/package.ps1；当前 package.ps1 已先构建 Vue 再 Maven 打包，不再沿用“打包脚本不构建前端”的旧结论。
+- 运行 PowerShell 脚本时检查 npm/Maven 的真实退出码及结果；修改脚本须显式检查 LASTEXITCODE，不能仅凭最后一行成功文字判断。
 - 不以界面成功提示替代服务端持久化证据，不用实现文字匹配测试替代行为测试。
 
 ## 记录与交接

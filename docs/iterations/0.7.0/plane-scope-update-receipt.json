@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-14",
+  "approval": "用户逐项回复确认 U10、确认 U11；对应差异修订1、需规修订3",
+  "writes": 2,
+  "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+  "cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+  "cycle_count": 3,
+  "cycle_associations_verified": true,
+  "operations": [
+    {
+      "operation": "U10",
+      "identifier": "FINNS-10",
+      "id": "02da68ea-0375-4776-8e26-68c20fbe64c6",
+      "verified": true,
+      "updated_at": "2026-10-14T15:54:47.777107Z",
+      "protected_fields_verified": [
+        "name",
+        "state",
+        "assignees",
+        "labels",
+        "priority",
+        "start_date",
+        "target_date",
+        "cycle_id",
+        "project",
+        "parent",
+        "is_draft",
+        "estimate_point"
+      ]
+    },
+    {
+      "operation": "U11",
+      "identifier": "FINNS-11",
+      "id": "7f0caa7b-5ae5-4980-8aa0-55edcb67d375",
+      "verified": true,
+      "updated_at": "2026-10-14T15:54:50.250616Z",
+      "protected_fields_verified": [
+        "name",
+        "state",
+        "assignees",
+        "labels",
+        "priority",
+        "start_date",
+        "target_date",
+        "cycle_id",
+        "project",
+        "parent",
+        "is_draft",
+        "estimate_point"
+      ]
+    }
+  ],
+  "business_changes": false
+}

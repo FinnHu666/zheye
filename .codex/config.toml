@@ -1,0 +1,8 @@
+# Project-scoped Plane Cloud MCP connection.
+# Codex loads this file only after the repository is trusted.
+[mcp_servers.plane]
+url = "https://mcp.plane.so/http/mcp"
+enabled = true
+default_tools_approval_mode = "writes"
+startup_timeout_sec = 30
+tool_timeout_sec = 90

@@ -1,0 +1,4 @@
+interface:
+  display_name: "FINNS 交付流程"
+  short_description: "规范 FINNS 的需求、原型、开发验收、Plane 同步与 AI 产物交接"
+  default_prompt: "使用 $finns-delivery-workflow 按本轮授权推进 FINNS 需求，检查阶段门禁，整理产物并核对 Plane 同步差异。"

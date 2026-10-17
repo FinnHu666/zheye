@@ -1,0 +1,751 @@
+{
+  "schema_version": 1,
+  "project": {
+    "name": "FINNS",
+    "plane_project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+    "last_remote_check": "2026-10-14，FINNS-10/11需规修订3正文更新/保护字段及周期关联回读完成",
+    "cycles": {
+      "0.7.0": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "0.8.0": "74c326cb-9864-4405-89ed-8e1675483486"
+    }
+  },
+  "tasks": [
+    {
+      "id": "conversation",
+      "version": "0.7.0",
+      "gates": [
+        {
+          "id": "G0",
+          "status": "pass",
+          "next_action": "按阶段门禁核对 G0 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/PLAN.md",
+              "sha256": "89ae30680ac2272300983acd5908b499f09c42160e2d16e8b266c41f9ae08508"
+            }
+          ]
+        },
+        {
+          "id": "G1",
+          "status": "pending",
+          "next_action": "核对 C01–C07 剩余范围，沿用聊天方案 A",
+          "user_action": "确认剩余沟通范围，勿重复选择聊天恢复",
+          "reason": "恢复边界已确认；剩余沟通范围未冻结"
+        },
+        {
+          "id": "PLANE",
+          "status": "pass",
+          "next_action": "发生范围或状态差异时按授权重新核对同步",
+          "user_action": "当前无需重复批准已完成 W01–W07",
+          "evidence": [
+            {
+              "path": "docs/plane-workitem-receipt.json",
+              "sha256": "ee1db2b4d638208322b2c99d770fd2c750964285f91962e9b6f43329fbca4a5d"
+            }
+          ],
+          "reason": "已按确认清单创建及关联，并回读验证"
+        },
+        {
+          "id": "G2",
+          "status": "pending",
+          "next_action": "按已确认方向制作具体可体验原型，展示参数、主路径及失败/适配状态",
+          "user_action": "原型形成后确认具体版本和范围；参数随原型核对",
+          "reason": "对应新功能原型尚未制作/确认"
+        },
+        {
+          "id": "G3",
+          "status": "pending",
+          "next_action": "按阶段门禁核对 G3 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容"
+        },
+        {
+          "id": "G4",
+          "status": "pending",
+          "next_action": "按阶段门禁核对 G4 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容"
+        },
+        {
+          "id": "G5",
+          "status": "pending",
+          "next_action": "按阶段门禁核对 G5 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容"
+        },
+        {
+          "id": "G6",
+          "status": "pending",
+          "next_action": "按阶段门禁核对 G6 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容"
+        },
+        {
+          "id": "G7",
+          "status": "pending",
+          "next_action": "按阶段门禁核对 G7 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容"
+        },
+        {
+          "id": "G8",
+          "status": "pending",
+          "next_action": "按阶段门禁核对 G8 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容"
+        },
+        {
+          "id": "G9",
+          "status": "pending",
+          "next_action": "按阶段门禁核对 G9 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容"
+        }
+      ],
+      "plane_workitem": {
+        "id": "3a39aade-af87-40f6-8944-32dc87895c20",
+        "identifier": "FINNS-9",
+        "state": "5b7d9df4-8ce4-40be-b110-83515a957a2a",
+        "cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063"
+      }
+    },
+    {
+      "id": "views",
+      "version": "0.7.0",
+      "gates": [
+        {
+          "id": "G0",
+          "status": "pass",
+          "next_action": "按阶段门禁核对 G0 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/PLAN.md",
+              "sha256": "89ae30680ac2272300983acd5908b499f09c42160e2d16e8b266c41f9ae08508"
+            }
+          ]
+        },
+        {
+          "id": "G1",
+          "status": "pass",
+          "next_action": "按阶段门禁核对 G1 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/SCOPE_CHANGE_2026-10-14.md",
+              "sha256": "f53771a857f1a9d66e853a44bc7b514c3f72d1c4d0a7fd1f8715afde35ed0e99"
+            },
+            {
+              "path": "docs/iterations/0.7.0/REQUIREMENTS.md",
+              "sha256": "86e07d9424e45e9ba57d78a832d9b2b18f3bd42bc79323452c6c359cc50d13d8"
+            }
+          ],
+          "reason": "用户明确更新本项方向；具体参数仍待原型细化；2026-10-15 需规修订 4 按已确认原型细化同一方向，复核后更新哈希"
+        },
+        {
+          "id": "PLANE",
+          "status": "pass",
+          "next_action": "后续范围/管理状态变化时再处理差异，不重复执行 U10/U11",
+          "user_action": "无需重复批准本次同步；下一步原型形成后确认具体版本和范围",
+          "reason": "U10/U11按需规修订3逐项确认、更新及回读完成",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/plane-scope-update-receipt.json",
+              "sha256": "ae41ed3cbd6ef463b6d0704e11c00109f430d307b662783a34ca22255fa51da4"
+            }
+          ]
+        },
+        {
+          "id": "G2",
+          "status": "pass",
+          "next_action": "进入 G3 概要设计",
+          "user_action": "无需操作",
+          "reason": "用户确认原型 R2（DECISIONS D13）；证据文件因后续追加 R3/D14 更新哈希，R2 确认内容未变",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/DECISIONS.md",
+              "sha256": "7c197210f843dea2604853828f0e599ad7fea2dec08d3bf4f7ab64576de4433e"
+            },
+            {
+              "path": "docs/iterations/0.7.0/PROTOTYPE_SITE_ACCESS.md",
+              "sha256": "ed8e4659353e981e9244c909857e2415387fb9e91372e79303c09cc9ec30aa65"
+            }
+          ]
+        },
+        {
+          "id": "G3",
+          "status": "pass",
+          "next_action": "进入 G4",
+          "user_action": "无需操作",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/DESIGN_SITE_ACCESS.md",
+              "sha256": "bdb1b6e12c2e599e76a18a9ae0aba0688555ea539a1f129ad2e06ef455151fe3"
+            },
+            {
+              "path": "docs/iterations/0.7.0/DECISIONS.md",
+              "sha256": "7c197210f843dea2604853828f0e599ad7fea2dec08d3bf4f7ab64576de4433e"
+            }
+          ],
+          "reason": "概要设计修订 2 定稿：用户确认原型 R4 与首位管理员方式（DECISIONS D15/D16）"
+        },
+        {
+          "id": "G4",
+          "status": "pass",
+          "next_action": "—",
+          "user_action": "无需操作",
+          "reason": "契约修订 2 定稿；用户授权实施 B1–B6（DECISIONS D17）",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/CONTRACT_SITE_ACCESS.md",
+              "sha256": "69ddf90eb57fc2ee715272460bb910a59d38e5ee564ecd6a5910ef63eaec8297"
+            },
+            {
+              "path": "docs/iterations/0.7.0/DECISIONS.md",
+              "sha256": "7c197210f843dea2604853828f0e599ad7fea2dec08d3bf4f7ab64576de4433e"
+            }
+          ]
+        },
+        {
+          "id": "G5",
+          "status": "pass",
+          "next_action": "—",
+          "user_action": "无需操作",
+          "reason": "B1–B6 已实施；文件范围与契约偏差见实施记录 §1/§2",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/IMPLEMENTATION_SITE_ACCESS.md",
+              "sha256": "1f58daa9054f83f9c87145b47ea2e79212fb6f0a368420c3d0cf2e40ed103c81"
+            }
+          ]
+        },
+        {
+          "id": "G6",
+          "status": "pass",
+          "next_action": "—",
+          "user_action": "无需操作",
+          "reason": "H2 58/58、PostgreSQL 隔离库 58/58、前端 30/30 与构建、M01 升级/回退演练、真实应用浏览器检查；未验项列于实施记录 §4",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/IMPLEMENTATION_SITE_ACCESS.md",
+              "sha256": "1f58daa9054f83f9c87145b47ea2e79212fb6f0a368420c3d0cf2e40ed103c81"
+            }
+          ]
+        },
+        {
+          "id": "G7",
+          "status": "pass",
+          "next_action": "进入 G8（需发布授权）",
+          "user_action": "无需操作；发布需另行授权并提供生产管理员邮箱等信息",
+          "reason": "用户验收通过（DECISIONS D19）；V1/A1 按反馈修改并复核，A2 暂不处理",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/ACCEPTANCE_SITE_ACCESS.md",
+              "sha256": "c6a1008322c7f82bacc2ef5ef0c9c0274bceaba28960e7cc5f5d40e24b716893"
+            },
+            {
+              "path": "docs/iterations/0.7.0/DECISIONS.md",
+              "sha256": "7c197210f843dea2604853828f0e599ad7fea2dec08d3bf4f7ab64576de4433e"
+            }
+          ]
+        },
+        {
+          "id": "G8",
+          "status": "pass",
+          "next_action": "G9：交接收尾；首位管理员生效、Git 与 Plane 另行处理",
+          "user_action": "注册所提供的管理员邮箱后告知以重启 8080；决定演示账户处理、Git 提交范围、Plane 状态与 U17",
+          "reason": "用户授权发布（DECISIONS D20）；四处版本 0.7.0、备份并恢复校验、迁移演练、8080 部署与发布后核对通过",
+          "evidence": [
+            {
+              "path": "docs/RELEASE_0.7.0.md",
+              "sha256": "b4f460b25b1d0de099b87917e961405aea1f8a536a2d0cccc0d9d0b097a3c3bc"
+            },
+            {
+              "path": "docs/iterations/0.7.0/DECISIONS.md",
+              "sha256": "7c197210f843dea2604853828f0e599ad7fea2dec08d3bf4f7ab64576de4433e"
+            }
+          ]
+        },
+        {
+          "id": "G9",
+          "status": "pending",
+          "next_action": "管理员生效后复核管理页面；按授权处理 Git 与 Plane",
+          "user_action": "见 G8",
+          "reason": "首位管理员尚未生效；Git/Plane 待确认"
+        }
+      ],
+      "plane_workitem": {
+        "id": "02da68ea-0375-4776-8e26-68c20fbe64c6",
+        "identifier": "FINNS-10",
+        "state": "3f40f9d8-2245-4ee5-9686-252bcbde4751",
+        "cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063"
+      }
+    },
+    {
+      "id": "access",
+      "version": "0.7.0",
+      "gates": [
+        {
+          "id": "G0",
+          "status": "pass",
+          "next_action": "按阶段门禁核对 G0 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/PLAN.md",
+              "sha256": "89ae30680ac2272300983acd5908b499f09c42160e2d16e8b266c41f9ae08508"
+            }
+          ]
+        },
+        {
+          "id": "G1",
+          "status": "pass",
+          "next_action": "按阶段门禁核对 G1 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/SCOPE_CHANGE_2026-10-14.md",
+              "sha256": "f53771a857f1a9d66e853a44bc7b514c3f72d1c4d0a7fd1f8715afde35ed0e99"
+            },
+            {
+              "path": "docs/iterations/0.7.0/REQUIREMENTS.md",
+              "sha256": "86e07d9424e45e9ba57d78a832d9b2b18f3bd42bc79323452c6c359cc50d13d8"
+            }
+          ],
+          "reason": "用户明确更新本项方向；具体参数仍待原型细化；2026-10-15 需规修订 4 按已确认原型细化同一方向，复核后更新哈希"
+        },
+        {
+          "id": "PLANE",
+          "status": "pass",
+          "next_action": "后续范围/管理状态变化时再处理差异，不重复执行 U10/U11",
+          "user_action": "无需重复批准本次同步；下一步原型形成后确认具体版本和范围",
+          "reason": "U10/U11按需规修订3逐项确认、更新及回读完成",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/plane-scope-update-receipt.json",
+              "sha256": "ae41ed3cbd6ef463b6d0704e11c00109f430d307b662783a34ca22255fa51da4"
+            }
+          ]
+        },
+        {
+          "id": "G2",
+          "status": "pass",
+          "next_action": "进入 G3 概要设计",
+          "user_action": "无需操作",
+          "reason": "用户确认原型 R3（DECISIONS D14），R2 已于 D13 确认",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/DECISIONS.md",
+              "sha256": "7c197210f843dea2604853828f0e599ad7fea2dec08d3bf4f7ab64576de4433e"
+            },
+            {
+              "path": "docs/iterations/0.7.0/PROTOTYPE_SITE_ACCESS.md",
+              "sha256": "ed8e4659353e981e9244c909857e2415387fb9e91372e79303c09cc9ec30aa65"
+            }
+          ]
+        },
+        {
+          "id": "G3",
+          "status": "pass",
+          "next_action": "进入 G4",
+          "user_action": "无需操作",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/DESIGN_SITE_ACCESS.md",
+              "sha256": "bdb1b6e12c2e599e76a18a9ae0aba0688555ea539a1f129ad2e06ef455151fe3"
+            },
+            {
+              "path": "docs/iterations/0.7.0/DECISIONS.md",
+              "sha256": "7c197210f843dea2604853828f0e599ad7fea2dec08d3bf4f7ab64576de4433e"
+            }
+          ],
+          "reason": "概要设计修订 2 定稿：用户确认原型 R4 与首位管理员方式（DECISIONS D15/D16）"
+        },
+        {
+          "id": "G4",
+          "status": "pass",
+          "next_action": "—",
+          "user_action": "无需操作",
+          "reason": "契约修订 2 定稿；用户授权实施 B1–B6（DECISIONS D17）",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/CONTRACT_SITE_ACCESS.md",
+              "sha256": "69ddf90eb57fc2ee715272460bb910a59d38e5ee564ecd6a5910ef63eaec8297"
+            },
+            {
+              "path": "docs/iterations/0.7.0/DECISIONS.md",
+              "sha256": "7c197210f843dea2604853828f0e599ad7fea2dec08d3bf4f7ab64576de4433e"
+            }
+          ]
+        },
+        {
+          "id": "G5",
+          "status": "pass",
+          "next_action": "—",
+          "user_action": "无需操作",
+          "reason": "B1–B6 已实施；文件范围与契约偏差见实施记录 §1/§2",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/IMPLEMENTATION_SITE_ACCESS.md",
+              "sha256": "1f58daa9054f83f9c87145b47ea2e79212fb6f0a368420c3d0cf2e40ed103c81"
+            }
+          ]
+        },
+        {
+          "id": "G6",
+          "status": "pass",
+          "next_action": "—",
+          "user_action": "无需操作",
+          "reason": "H2 58/58、PostgreSQL 隔离库 58/58、前端 30/30 与构建、M01 升级/回退演练、真实应用浏览器检查；未验项列于实施记录 §4",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/IMPLEMENTATION_SITE_ACCESS.md",
+              "sha256": "1f58daa9054f83f9c87145b47ea2e79212fb6f0a368420c3d0cf2e40ed103c81"
+            }
+          ]
+        },
+        {
+          "id": "G7",
+          "status": "pass",
+          "next_action": "进入 G8（需发布授权）",
+          "user_action": "无需操作；发布需另行授权并提供生产管理员邮箱等信息",
+          "reason": "用户验收通过（DECISIONS D19）；V1/A1 按反馈修改并复核，A2 暂不处理",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/ACCEPTANCE_SITE_ACCESS.md",
+              "sha256": "c6a1008322c7f82bacc2ef5ef0c9c0274bceaba28960e7cc5f5d40e24b716893"
+            },
+            {
+              "path": "docs/iterations/0.7.0/DECISIONS.md",
+              "sha256": "7c197210f843dea2604853828f0e599ad7fea2dec08d3bf4f7ab64576de4433e"
+            }
+          ]
+        },
+        {
+          "id": "G8",
+          "status": "pass",
+          "next_action": "G9：交接收尾；首位管理员生效、Git 与 Plane 另行处理",
+          "user_action": "注册所提供的管理员邮箱后告知以重启 8080；决定演示账户处理、Git 提交范围、Plane 状态与 U17",
+          "reason": "用户授权发布（DECISIONS D20）；四处版本 0.7.0、备份并恢复校验、迁移演练、8080 部署与发布后核对通过",
+          "evidence": [
+            {
+              "path": "docs/RELEASE_0.7.0.md",
+              "sha256": "b4f460b25b1d0de099b87917e961405aea1f8a536a2d0cccc0d9d0b097a3c3bc"
+            },
+            {
+              "path": "docs/iterations/0.7.0/DECISIONS.md",
+              "sha256": "7c197210f843dea2604853828f0e599ad7fea2dec08d3bf4f7ab64576de4433e"
+            }
+          ]
+        },
+        {
+          "id": "G9",
+          "status": "pending",
+          "next_action": "管理员生效后复核管理页面；按授权处理 Git 与 Plane",
+          "user_action": "见 G8",
+          "reason": "首位管理员尚未生效；Git/Plane 待确认"
+        }
+      ],
+      "plane_workitem": {
+        "id": "7f0caa7b-5ae5-4980-8aa0-55edcb67d375",
+        "identifier": "FINNS-11",
+        "state": "3f40f9d8-2245-4ee5-9686-252bcbde4751",
+        "cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063"
+      }
+    },
+    {
+      "id": "rating",
+      "version": "0.8.0",
+      "gates": [
+        {
+          "id": "G0",
+          "status": "pass",
+          "next_action": "按阶段门禁核对 G0 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.8.0/PLAN.md",
+              "sha256": "01a0076fcd747e626c4302ae854da3613903d23d380f4aa2600cf3dc4838b39c"
+            }
+          ]
+        },
+        {
+          "id": "G1",
+          "status": "pass",
+          "next_action": "按阶段门禁核对 G1 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容",
+          "evidence": [
+            {
+              "path": "docs/requirements/FINNS-REQ-015-018_REVIEW_R3_APPROVED.md",
+              "sha256": "2636794e74b2a96c435ce6bf383d77e4ca1698f46ca14f947111a9bc1d813bc3"
+            }
+          ]
+        },
+        {
+          "id": "PLANE",
+          "status": "pass",
+          "next_action": "发生范围或状态差异时按授权重新核对同步",
+          "user_action": "当前无需重复批准已完成 W01–W07",
+          "reason": "已按确认清单创建及关联，并回读验证",
+          "evidence": [
+            {
+              "path": "docs/plane-workitem-receipt.json",
+              "sha256": "ee1db2b4d638208322b2c99d770fd2c750964285f91962e9b6f43329fbca4a5d"
+            }
+          ]
+        },
+        {
+          "id": "G2",
+          "status": "pending",
+          "next_action": "按已确认方向制作具体可体验原型，展示参数、主路径及失败/适配状态",
+          "user_action": "原型形成后确认具体版本和范围；参数随原型核对",
+          "reason": "对应新功能原型尚未制作/确认"
+        },
+        {
+          "id": "G3",
+          "status": "pending",
+          "next_action": "按阶段门禁核对 G3 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容"
+        },
+        {
+          "id": "G4",
+          "status": "pending",
+          "next_action": "按阶段门禁核对 G4 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容"
+        },
+        {
+          "id": "G5",
+          "status": "pending",
+          "next_action": "按阶段门禁核对 G5 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容"
+        },
+        {
+          "id": "G6",
+          "status": "pending",
+          "next_action": "按阶段门禁核对 G6 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容"
+        },
+        {
+          "id": "G7",
+          "status": "pending",
+          "next_action": "按阶段门禁核对 G7 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容"
+        },
+        {
+          "id": "G8",
+          "status": "pending",
+          "next_action": "按阶段门禁核对 G8 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容"
+        },
+        {
+          "id": "G9",
+          "status": "pending",
+          "next_action": "按阶段门禁核对 G9 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容"
+        }
+      ],
+      "plane_workitem": {
+        "id": "437a89e5-6a28-4a3d-8943-72fccc0a7c10",
+        "identifier": "FINNS-12",
+        "state": "3f40f9d8-2245-4ee5-9686-252bcbde4751",
+        "cycle_id": "74c326cb-9864-4405-89ed-8e1675483486"
+      }
+    },
+    {
+      "id": "rental",
+      "version": "0.8.0",
+      "gates": [
+        {
+          "id": "G0",
+          "status": "pass",
+          "next_action": "按阶段门禁核对 G0 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.8.0/PLAN.md",
+              "sha256": "01a0076fcd747e626c4302ae854da3613903d23d380f4aa2600cf3dc4838b39c"
+            }
+          ]
+        },
+        {
+          "id": "G1",
+          "status": "pass",
+          "next_action": "按阶段门禁核对 G1 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容",
+          "evidence": [
+            {
+              "path": "docs/requirements/FINNS-REQ-015-018_REVIEW_R3_APPROVED.md",
+              "sha256": "2636794e74b2a96c435ce6bf383d77e4ca1698f46ca14f947111a9bc1d813bc3"
+            }
+          ]
+        },
+        {
+          "id": "PLANE",
+          "status": "pass",
+          "next_action": "发生范围或状态差异时按授权重新核对同步",
+          "user_action": "当前无需重复批准已完成 W01–W07",
+          "reason": "已按确认清单创建及关联，并回读验证",
+          "evidence": [
+            {
+              "path": "docs/plane-workitem-receipt.json",
+              "sha256": "ee1db2b4d638208322b2c99d770fd2c750964285f91962e9b6f43329fbca4a5d"
+            }
+          ]
+        },
+        {
+          "id": "G2",
+          "status": "pending",
+          "next_action": "按已确认方向制作具体可体验原型，展示参数、主路径及失败/适配状态",
+          "user_action": "原型形成后确认具体版本和范围；参数随原型核对",
+          "reason": "对应新功能原型尚未制作/确认"
+        },
+        {
+          "id": "G3",
+          "status": "pending",
+          "next_action": "按阶段门禁核对 G3 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容"
+        },
+        {
+          "id": "G4",
+          "status": "pending",
+          "next_action": "按阶段门禁核对 G4 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容"
+        },
+        {
+          "id": "G5",
+          "status": "pending",
+          "next_action": "按阶段门禁核对 G5 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容"
+        },
+        {
+          "id": "G6",
+          "status": "pending",
+          "next_action": "按阶段门禁核对 G6 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容"
+        },
+        {
+          "id": "G7",
+          "status": "pending",
+          "next_action": "按阶段门禁核对 G7 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容"
+        },
+        {
+          "id": "G8",
+          "status": "pending",
+          "next_action": "按阶段门禁核对 G8 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容"
+        },
+        {
+          "id": "G9",
+          "status": "pending",
+          "next_action": "按阶段门禁核对 G9 的输入、范围及产物",
+          "user_action": "由 AI 核对已有授权，缺少产品决定时列明具体待确认内容"
+        }
+      ],
+      "plane_workitem": {
+        "id": "ebe2ab64-d189-4740-9526-6ce30d96a633",
+        "identifier": "FINNS-13",
+        "state": "3f40f9d8-2245-4ee5-9686-252bcbde4751",
+        "cycle_id": "74c326cb-9864-4405-89ed-8e1675483486"
+      }
+    },
+    {
+      "id": "daily-quotes",
+      "requirement_id": "FINNS-REQ-019",
+      "version": "未分配",
+      "target_version": null,
+      "gates": [
+        {
+          "id": "G0",
+          "status": "pass",
+          "next_action": "保留已记录意图及未分配版本决定，后续进入 G1 评估",
+          "user_action": "本轮无需操作，需求已记录",
+          "reason": "已按用户指令记录，不分配产品版本",
+          "evidence": [
+            {
+              "path": "docs/requirements/FINNS-REQ-019_DAILY_QUOTES.md",
+              "sha256": "f02b6f117b1eca5652dba18ea4231d9d7b3397f3adf44ef18a0f928c952aa85d"
+            }
+          ]
+        },
+        {
+          "id": "G1",
+          "status": "pending",
+          "next_action": "后续获授权时细化名言来源、每日随机规则及展示范围；当前不排期",
+          "user_action": "本轮无需补充；日后决定评审时再确认待决事项",
+          "reason": "用户要求先记录且暂不分版；详细范围及验收草案尚未评审"
+        },
+        {
+          "id": "PLANE",
+          "status": "pending",
+          "next_action": "用户明确要求操作 Plane 后实时核对 FINNS 项目、去重与具体差异；逐项确认再写入回读",
+          "user_action": "如需同步，明确授权 Plane 核对，并确认具体写操作",
+          "reason": "本轮未获明确 Plane 指令，未核对或写入；不关联版本周期"
+        },
+        {
+          "id": "G2",
+          "status": "pending",
+          "next_action": "仅在后续获授权且前置门禁满足时推进本阶段；本轮止于需求记录",
+          "user_action": "本轮无需操作；决定继续评估或开发时再确认具体范围",
+          "reason": "仅登记需求，尚未评审、原型、设计、实施或验收"
+        },
+        {
+          "id": "G3",
+          "status": "pending",
+          "next_action": "仅在后续获授权且前置门禁满足时推进本阶段；本轮止于需求记录",
+          "user_action": "本轮无需操作；决定继续评估或开发时再确认具体范围",
+          "reason": "仅登记需求，尚未评审、原型、设计、实施或验收"
+        },
+        {
+          "id": "G4",
+          "status": "pending",
+          "next_action": "仅在后续获授权且前置门禁满足时推进本阶段；本轮止于需求记录",
+          "user_action": "本轮无需操作；决定继续评估或开发时再确认具体范围",
+          "reason": "仅登记需求，尚未评审、原型、设计、实施或验收"
+        },
+        {
+          "id": "G5",
+          "status": "pending",
+          "next_action": "仅在后续获授权且前置门禁满足时推进本阶段；本轮止于需求记录",
+          "user_action": "本轮无需操作；决定继续评估或开发时再确认具体范围",
+          "reason": "仅登记需求，尚未评审、原型、设计、实施或验收"
+        },
+        {
+          "id": "G6",
+          "status": "pending",
+          "next_action": "仅在后续获授权且前置门禁满足时推进本阶段；本轮止于需求记录",
+          "user_action": "本轮无需操作；决定继续评估或开发时再确认具体范围",
+          "reason": "仅登记需求，尚未评审、原型、设计、实施或验收"
+        },
+        {
+          "id": "G7",
+          "status": "pending",
+          "next_action": "仅在后续获授权且前置门禁满足时推进本阶段；本轮止于需求记录",
+          "user_action": "本轮无需操作；决定继续评估或开发时再确认具体范围",
+          "reason": "仅登记需求，尚未评审、原型、设计、实施或验收"
+        },
+        {
+          "id": "G8",
+          "status": "pending",
+          "next_action": "仅在后续获授权且前置门禁满足时推进本阶段；本轮止于需求记录",
+          "user_action": "本轮无需操作；决定继续评估或开发时再确认具体范围",
+          "reason": "仅登记需求，尚未评审、原型、设计、实施或验收"
+        },
+        {
+          "id": "G9",
+          "status": "pending",
+          "next_action": "仅在后续获授权且前置门禁满足时推进本阶段；本轮止于需求记录",
+          "user_action": "本轮无需操作；决定继续评估或开发时再确认具体范围",
+          "reason": "仅登记需求，尚未评审、原型、设计、实施或验收"
+        }
+      ]
+    }
+  ],
+  "required_gates": [
+    "G0",
+    "G1",
+    "PLANE",
+    "G2",
+    "G3",
+    "G4",
+    "G5",
+    "G6",
+    "G7",
+    "G8",
+    "G9"
+  ]
+}
