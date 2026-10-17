@@ -1,5 +1,9 @@
 package com.aitome.user;
 
+import com.aitome.access.AccessContext;
+import com.aitome.access.AccessService;
+import com.aitome.access.Permission;
+import com.aitome.access.PublicEndpoint;
 import com.aitome.common.ApiExceptionHandler.ApiProblem;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,21 +22,25 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
+@PublicEndpoint("登录流程；/me 自行要求登录")
 public class AuthController {
     public static final String USER_ID = "USER_ID";
     private final UserRepository users;
     private final BCryptPasswordEncoder encoder;
     private final CookieCsrfTokenRepository csrfTokens;
+    private final AccessService access;
 
-    public AuthController(UserRepository users, BCryptPasswordEncoder encoder, CookieCsrfTokenRepository csrfTokens) {
-        this.users = users; this.encoder = encoder; this.csrfTokens = csrfTokens;
+    public AuthController(UserRepository users, BCryptPasswordEncoder encoder, CookieCsrfTokenRepository csrfTokens, AccessService access) {
+        this.users = users; this.encoder = encoder; this.csrfTokens = csrfTokens; this.access = access;
     }
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public Map<String, Object> register(@Valid @RequestBody RegisterRequest request, HttpSession session, HttpServletRequest servletRequest, HttpServletResponse response) {
         if (users.existsByEmailIgnoreCase(request.email())) throw new ApiProblem(HttpStatus.CONFLICT, "该邮箱已注册");
-        UserAccount user = users.save(new UserAccount(request.email(), encoder.encode(request.password()), request.displayName()));
+        UserAccount account = new UserAccount(request.email(), encoder.encode(request.password()), request.displayName());
+        account.assignRole(access.defaultRole().id()); // 角色只由服务端分配，请求中的任何角色字段都被忽略
+        UserAccount user = users.save(account);
         rotateSession(session, servletRequest); session.setAttribute(USER_ID, user.getId()); refreshCsrf(servletRequest, response);
         return view(user);
     }
@@ -70,6 +78,11 @@ public class AuthController {
     private Map<String, Object> view(UserAccount user) {
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("id", user.getId()); result.put("email", user.getEmail()); result.put("displayName", user.getDisplayName());
+        AccessContext context = access.forUser(user.getId());
+        if (context != null) {
+            result.put("role", Map.of("code", context.roleCode(), "name", context.roleName()));
+            result.put("permissions", context.permissions().stream().map(Permission::code).toList());
+        }
         return result;
     }
 

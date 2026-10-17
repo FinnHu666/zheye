@@ -1,5 +1,8 @@
 package com.aitome.vps;
 
+import com.aitome.access.Permission;
+import com.aitome.access.RequirePermission;
+import com.aitome.access.PublicEndpoint;
 import com.aitome.user.AuthController;
 import com.aitome.user.UserAccount;
 import com.aitome.user.UserRepository;
@@ -15,8 +18,8 @@ import java.util.List;
 public class VpsController {
     private final VpsRepository recommendations;private final UserRepository users;
     public VpsController(VpsRepository recommendations,UserRepository users){this.recommendations=recommendations;this.users=users;}
-    @GetMapping public List<VpsRecommendation> list(){return recommendations.findTop12ByOrderByScoreDesc();}
-    @PostMapping @ResponseStatus(HttpStatus.CREATED)
+    @GetMapping @PublicEndpoint("公开内容") public List<VpsRecommendation> list(){return recommendations.findTop12ByOrderByScoreDesc();}
+    @PostMapping @ResponseStatus(HttpStatus.CREATED) @RequirePermission(Permission.POST_CREATE)
     public VpsRecommendation create(@Valid @RequestBody VpsRequest request,HttpSession session){
         UserAccount user=AuthController.requireUser(session,users);
         return recommendations.save(new VpsRecommendation(request.provider(),request.planName(),request.region(),request.cpu(),request.memoryGb(),request.storageGb(),request.monthlyPrice(),request.score(),request.description(),user.getDisplayName()));

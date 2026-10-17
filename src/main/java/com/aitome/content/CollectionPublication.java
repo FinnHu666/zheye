@@ -15,5 +15,7 @@ public class CollectionPublication {
     @Column(name = "schema_version", nullable = false) private int schemaVersion;
     @Column(nullable = false, columnDefinition = "text") private String document;
     @Column(name = "updated_at", nullable = false) private Instant updatedAt;
+    /** 公开版本的可见范围；所有公开查询按它过滤。 */
+    @Column(nullable = false, length = 12) private String visibility = "PUBLIC";
     protected CollectionPublication() {}
 }

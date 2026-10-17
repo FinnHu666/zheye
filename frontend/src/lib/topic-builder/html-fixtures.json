@@ -1,0 +1,59 @@
+[
+  {
+    "name": "timeline",
+    "valid": true,
+    "source": "<style>.route{border-left:2px solid green}@media(max-width:400px){.route{padding:8px}}</style><ol class=\"route\"><li>看房前</li><li>看房时</li></ol>"
+  },
+  {
+    "name": "details",
+    "valid": true,
+    "source": "<details><summary>如何准备？</summary><p>记录预算与租期。</p></details>"
+  },
+  {
+    "name": "script",
+    "valid": false,
+    "source": "<script>alert(1)</script><p>内容</p>"
+  },
+  {
+    "name": "event",
+    "valid": false,
+    "source": "<p onclick=\"alert(1)\">内容</p>"
+  },
+  {
+    "name": "external-image",
+    "valid": false,
+    "source": "<img src=\"https://example.com/a.png\">"
+  },
+  {
+    "name": "external-link",
+    "valid": false,
+    "source": "<a href=\"https://example.com\">链接</a>"
+  },
+  {
+    "name": "css-url",
+    "valid": false,
+    "source": "<style>p{background:url(https://example.com)}</style><p>内容</p>"
+  },
+  {
+    "name": "css-import",
+    "valid": false,
+    "source": "<style>@import 'https://example.com';</style><p>内容</p>"
+  },
+  {
+    "name": "iframe",
+    "valid": false,
+    "source": "<iframe srcdoc=\"test\"></iframe>"
+  },
+  { "name": "svg", "valid": false, "source": "<svg><text>test</text></svg>" },
+  { "name": "empty", "valid": false, "source": "<style>p{color:red}</style>" },
+  {
+    "name": "escaped-url",
+    "valid": false,
+    "source": "<style>p{background:u\\72l(https://example.com)}</style><p>内容</p>"
+  },
+  {
+    "name": "escaped-import",
+    "valid": false,
+    "source": "<style>@\\69 mport 'https://example.com';</style><p>内容</p>"
+  }
+]

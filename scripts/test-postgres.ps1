@@ -1,7 +1,9 @@
 param(
     [Parameter(Mandatory = $true)]
     [ValidatePattern('^finns_(test|restore_check)_[a-z0-9_]+$')]
-    [string]$DatabaseName
+    [string]$DatabaseName,
+    [ValidateRange(1024,65535)]
+    [int]$Port = 5432
 )
 
 $ErrorActionPreference = 'Stop'
@@ -12,7 +14,7 @@ if (-not (Test-Path -LiteralPath $psql)) {
     throw "PostgreSQL psql not found: $psql. Set FINNS_POSTGRES_HOME to the extracted pgsql directory."
 }
 
-$databaseOwner = & $psql --no-psqlrc -h 127.0.0.1 -p 5432 -U postgres -d postgres -tAc "SELECT pg_get_userbyid(datdba) FROM pg_database WHERE datname='$DatabaseName'"
+$databaseOwner = & $psql --no-psqlrc -h 127.0.0.1 -p $Port -U postgres -d postgres -tAc "SELECT pg_get_userbyid(datdba) FROM pg_database WHERE datname='$DatabaseName'"
 if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect the local PostgreSQL test database.' }
 if (-not $databaseOwner) { throw "Test database does not exist: $DatabaseName" }
 if ($databaseOwner.Trim() -ne 'finns_app') { throw "Refusing test database not owned by finns_app: $DatabaseName" }
@@ -30,7 +32,7 @@ foreach ($name in $environmentNames) {
 
 try {
     $env:SPRING_PROFILES_ACTIVE = 'postgres'
-    $env:FINNS_DB_URL = "jdbc:postgresql://127.0.0.1:5432/$DatabaseName"
+    $env:FINNS_DB_URL = "jdbc:postgresql://127.0.0.1:$Port/$DatabaseName"
     $env:FINNS_DB_USERNAME = 'finns_app'
     $env:FINNS_DB_PASSWORD = ''
     $env:FINNS_H2_MIGRATION_ENABLED = 'false'

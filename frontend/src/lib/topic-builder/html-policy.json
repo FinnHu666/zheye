@@ -1,0 +1,14 @@
+{
+  "rendererVersion": 1,
+  "tags": "div section article main header footer aside nav span p h1 h2 h3 h4 h5 h6 strong b em i u s small mark sub sup br hr ol ul li dl dt dd blockquote pre code figure figcaption table caption thead tbody tfoot tr th td details summary a img",
+  "attributes": "class id style title lang dir role aria-label aria-labelledby aria-describedby aria-hidden tabindex open start reversed value colspan rowspan scope headers width height alt loading",
+  "maxLength": 60000,
+  "maxDepth": 40,
+  "maxNodes": 2000,
+  "maxHtmlBlocks": 20,
+  "maxBlocks": 50,
+  "maxFileBytes": 131072,
+  "minFrameHeight": 120,
+  "maxFrameHeight": 1200,
+  "maxDocumentBytes": 4194304
+}

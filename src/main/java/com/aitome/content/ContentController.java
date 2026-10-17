@@ -1,5 +1,9 @@
 package com.aitome.content;
 
+import com.aitome.access.Permission;
+import com.aitome.access.RequirePermission;
+import com.aitome.access.PublicEndpoint;
+import com.aitome.access.AccessService;
 import com.aitome.common.ApiExceptionHandler.ApiProblem;
 import com.aitome.user.AuthController;
 import com.aitome.user.UserAccount;
@@ -26,12 +30,13 @@ public class ContentController {
     private final UserRepository users;
     private final JdbcTemplate jdbc;
     private final CollectionPublicationService publications;
+    private final AccessService access;
 
-    public ContentController(ContentPostRepository posts, CommentRepository comments, CollectionRepository collections, UserRepository users, JdbcTemplate jdbc, CollectionPublicationService publications) {
-        this.posts = posts; this.comments = comments; this.collections = collections; this.users = users; this.jdbc = jdbc; this.publications = publications;
+    public ContentController(ContentPostRepository posts, CommentRepository comments, CollectionRepository collections, UserRepository users, JdbcTemplate jdbc, CollectionPublicationService publications, AccessService access) {
+        this.posts = posts; this.comments = comments; this.collections = collections; this.users = users; this.jdbc = jdbc; this.publications = publications; this.access = access;
     }
 
-    @GetMapping("/posts")
+    @GetMapping("/posts") @PublicEndpoint("公开内容") 
     public PostPage posts(@RequestParam(required = false) ContentPost.Type type,
                           @RequestParam(defaultValue = "0") int page,
                           @RequestParam(defaultValue = "20") int size) {
@@ -45,18 +50,18 @@ public class ContentController {
         return new PostPage(items, safePage, safeSize, result.getTotalElements());
     }
 
-    @GetMapping("/posts/{id}") public ContentPost post(@PathVariable Long id) { return requirePost(id); }
+    @GetMapping("/posts/{id}") @PublicEndpoint("公开内容") public ContentPost post(@PathVariable Long id) { return requirePost(id); }
 
-    @PostMapping("/posts") @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/posts") @ResponseStatus(HttpStatus.CREATED) @RequirePermission(Permission.POST_CREATE)
     public ContentPost create(@Valid @RequestBody PostRequest request, HttpSession session) {
         UserAccount user = AuthController.requireUser(session, users);
         return posts.save(new ContentPost(request.type(), request.title(), request.summary(), request.body(), user.getId(), user.getDisplayName()));
     }
 
-    @PostMapping("/posts/{id}/like") @Transactional
+    @PostMapping("/posts/{id}/like") @Transactional @RequirePermission(Permission.POST_INTERACT)
     public ContentPost like(@PathVariable Long id) { ContentPost post = requirePost(id); post.like(); return post; }
 
-    @GetMapping("/posts/{id}/comments")
+    @GetMapping("/posts/{id}/comments") @PublicEndpoint("公开内容")
     public CommentPage comments(@PathVariable Long id,
                                 @RequestParam(defaultValue = "0") int page,
                                 @RequestParam(defaultValue = "20") int size) {
@@ -67,40 +72,41 @@ public class ContentController {
         return new CommentPage(items, safePage, safeSize, comments.countByPostId(id));
     }
 
-    @PostMapping("/posts/{id}/comments") @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/posts/{id}/comments") @ResponseStatus(HttpStatus.CREATED) @RequirePermission(Permission.POST_INTERACT)
     public Comment comment(@PathVariable Long id, @Valid @RequestBody CommentRequest request, HttpSession session) {
         requirePost(id);
         UserAccount user = AuthController.requireUser(session, users);
         return comments.save(new Comment(id, user.getId(), user.getDisplayName(), request.body()));
     }
 
-    @GetMapping("/collections")
+    @GetMapping("/collections") @PublicEndpoint("公开专题；受限专题按权限过滤")
     public CollectionPage collections(@RequestParam(defaultValue = "0") int page,
-                                      @RequestParam(defaultValue = "20") int size) {
+                                      @RequestParam(defaultValue = "20") int size, jakarta.servlet.http.HttpServletRequest request) {
+        boolean restricted = access.current(request).has(com.aitome.access.Permission.CONTENT_RESTRICTED);
         int safePage = Math.max(0, Math.min(page, 10_000));
         int safeSize = Math.max(1, Math.min(size, 50));
         long offset = (long) safePage * safeSize;
         List<CollectionView> items = jdbc.query(
                 "select c.id,p.name,p.description,p.owner_name,p.updated_at,p.item_count " +
-                        "from community_collections c join collection_publications p on p.collection_id=c.id where c.status='PUBLISHED' order by p.updated_at desc,c.id desc limit ? offset ?",
+                        "from community_collections c join collection_publications p on p.collection_id=c.id where c.status='PUBLISHED' and (p.visibility='PUBLIC' or ?) order by p.updated_at desc,c.id desc limit ? offset ?",
                 (rs, row) -> new CollectionView(rs.getLong("id"), rs.getString("name"), rs.getString("description"), rs.getString("owner_name"), rs.getInt("item_count"), rs.getTimestamp("updated_at").toInstant()),
-                safeSize, offset);
-        Long total = jdbc.queryForObject("select count(*) from community_collections c join collection_publications p on p.collection_id=c.id where c.status='PUBLISHED'", Long.class);
+                restricted, safeSize, offset);
+        Long total = jdbc.queryForObject("select count(*) from community_collections c join collection_publications p on p.collection_id=c.id where c.status='PUBLISHED' and (p.visibility='PUBLIC' or ?)", Long.class, restricted);
         return new CollectionPage(items, safePage, safeSize, total == null ? 0 : total);
     }
 
-    @GetMapping("/collections/{id}")
-    public CollectionView collectionDetail(@PathVariable Long id) {
-        var outline = publications.read(id);
+    @GetMapping("/collections/{id}") @PublicEndpoint("公开专题；受限专题按权限拒绝")
+    public CollectionView collectionDetail(@PathVariable Long id, jakarta.servlet.http.HttpServletRequest request) {
+        var outline = publications.read(id, access.current(request));
         var c = outline.collection();
         return new CollectionView(id,c.name(),c.description(),c.ownerName(),outline.sections().stream().mapToInt(s -> s.entries().size()).sum(),c.updatedAt());
     }
 
-    @GetMapping("/collections/{id}/posts")
+    @GetMapping("/collections/{id}/posts") @PublicEndpoint("公开专题；受限专题按权限拒绝")
     public CollectionPostsPage collectionPosts(@PathVariable Long id,
                                                @RequestParam(defaultValue = "0") int page,
-                                               @RequestParam(defaultValue = "20") int size) {
-        var outline = publications.read(id);
+                                               @RequestParam(defaultValue = "20") int size, jakarta.servlet.http.HttpServletRequest request) {
+        var outline = publications.read(id, access.current(request));
         int safePage = Math.max(0, Math.min(page, 10_000));
         int safeSize = Math.max(1, Math.min(size, 50));
         List<CollectionWorkspaceController.PublicEntry> entries = outline.sections().stream().flatMap(s -> s.entries().stream())
@@ -113,7 +119,7 @@ public class ContentController {
         return new CollectionPostsPage(items,safePage,safeSize,entries.size());
     }
 
-    @PostMapping("/collections") @ResponseStatus(HttpStatus.CREATED) @Transactional
+    @PostMapping("/collections") @ResponseStatus(HttpStatus.CREATED) @Transactional @RequirePermission(Permission.COLLECTION_MANAGE)
     public CollectionView collection(@Valid @RequestBody CollectionRequest request, HttpSession session) {
         UserAccount user = AuthController.requireUser(session, users);
         CommunityCollection saved = collections.save(new CommunityCollection(request.name(), request.description(), user.getDisplayName(), user.getId(), CommunityCollection.Format.CUSTOM, CommunityCollection.Status.DRAFT, "", ""));

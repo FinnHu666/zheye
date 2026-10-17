@@ -1,5 +1,7 @@
 package com.aitome.content;
 
+import com.aitome.access.Permission;
+import com.aitome.access.RequirePermission;
 import com.aitome.common.ApiExceptionHandler.ApiProblem;
 import com.aitome.user.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,6 +17,7 @@ import java.util.regex.*;
 import static com.aitome.content.CollectionWorkspaceController.*;
 
 @RestController
+@RequirePermission(Permission.COLLECTION_MANAGE)
 public class CollectionImportController {
     private final CollectionWorkspaceController workspace;
     private final CollectionRepository collections;

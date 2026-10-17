@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.aitome</groupId>
     <artifactId>finns</artifactId>
-    <version>0.5.1</version>
+    <version>0.7.0</version>
     <name>FINNS</name>
     <description>一个简洁、快速的技术内容社区基站</description>
     <properties>
@@ -18,6 +18,11 @@
         <flyway.version>10.20.1</flyway.version>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.23.2</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -63,6 +68,14 @@
         </dependency>
     </dependencies>
     <build>
+        <resources>
+            <resource><directory>src/main/resources</directory></resource>
+            <resource>
+                <directory>frontend/src/lib/topic-builder</directory>
+                <targetPath>topic-builder</targetPath>
+                <includes><include>html-policy.json</include><include>html-fixtures.json</include></includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

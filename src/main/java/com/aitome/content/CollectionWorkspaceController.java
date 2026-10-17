@@ -1,5 +1,9 @@
 package com.aitome.content;
 
+import com.aitome.access.Permission;
+import com.aitome.access.RequirePermission;
+import com.aitome.access.PublicEndpoint;
+import com.aitome.access.AccessService;
 import com.aitome.common.ApiExceptionHandler.ApiProblem;
 import com.aitome.user.AuthController;
 import com.aitome.user.UserAccount;
@@ -23,6 +27,7 @@ import java.time.Instant;
 import java.util.*;
 
 @RestController
+@RequirePermission(Permission.COLLECTION_MANAGE)
 public class CollectionWorkspaceController {
     private static final int MAX_SECTIONS = 50;
     private static final int MAX_ENTRIES = 500;
@@ -31,8 +36,10 @@ public class CollectionWorkspaceController {
     private final UserRepository users;
     private final JdbcTemplate jdbc;
     private final CollectionPublicationService publications;
+    private final AccessService access;
 
-    public CollectionWorkspaceController(CollectionRepository collections, ContentPostRepository posts, UserRepository users, JdbcTemplate jdbc, CollectionPublicationService publications) {
+    public CollectionWorkspaceController(CollectionRepository collections, ContentPostRepository posts, UserRepository users, JdbcTemplate jdbc, CollectionPublicationService publications, AccessService access) {
+        this.access = access;
         this.collections = collections;
         this.posts = posts;
         this.users = users;
@@ -74,15 +81,21 @@ public class CollectionWorkspaceController {
     @Transactional
     public DraftDocument saveDraft(@PathVariable long id, @Valid @RequestBody SaveDraftRequest request, HttpSession session) {
         UserAccount user = currentUser(session);
+        owned(id, user.getId());
+        String wanted = request.visibility();
+        if (wanted != null && !List.of("PUBLIC", "RESTRICTED").contains(wanted)) throw bad("可见范围不正确");
+        // 设为受限需要“阅读受限专题”权限；已受限的专题，作者失去权限后仍可保持或改为公开
+        if ("RESTRICTED".equals(wanted) && !"RESTRICTED".equals(visibilityOf(id)) && !canRestrict(session))
+            throw new ApiProblem(HttpStatus.FORBIDDEN, "当前角色不能把专题设为受限");
         return saveDocument(id, request, user.getId());
     }
 
     public DraftDocument saveDocument(long id, SaveDraftRequest request, long userId) {
         OwnedCollection owned = owned(id, userId);
         validateDocument(request, userId);
-        int updated = jdbc.update("update community_collections set name=?,description=?,format=?,audience=?,goal=?,updated_at=current_timestamp,revision=revision+1 where id=? and owner_id=? and revision=?",
+        int updated = jdbc.update("update community_collections set name=?,description=?,format=?,audience=?,goal=?,visibility=coalesce(?,visibility),updated_at=current_timestamp,revision=revision+1 where id=? and owner_id=? and revision=?",
                 request.name().trim(), cleanOptional(request.description()), request.format().name(), cleanOptional(request.audience()), cleanOptional(request.goal()),
-                id, userId, request.revision());
+                request.visibility(), id, userId, request.revision());
         if (updated == 0) throw new ApiProblem(HttpStatus.CONFLICT, "专题已在其他页面更新，请刷新后重试（当前版本 " + owned.revision() + "）");
 
         jdbc.update("delete from collection_entries where collection_id=?", id);
@@ -102,6 +115,8 @@ public class CollectionWorkspaceController {
         UserAccount user = currentUser(session);
         OwnedCollection row = owned(id, user.getId());
         jdbc.queryForObject("select id from community_collections where id=? for update", Long.class, id);
+        if ("RESTRICTED".equals(visibilityOf(id)) && !"RESTRICTED".equals(publishedVisibilityOf(id)) && !canRestrict(session))
+            throw new ApiProblem(HttpStatus.FORBIDDEN, "当前角色不能发布受限专题");
         DraftDocument document = draft(id, user.getId());
         List<String> problems = publishProblems(document);
         if (!problems.isEmpty()) throw bad(String.join("；", problems));
@@ -129,8 +144,9 @@ public class CollectionWorkspaceController {
     }
 
     @GetMapping("/api/collections/{id}/outline")
-    public PublicOutline outline(@PathVariable long id) {
-        return publications.read(id);
+    @PublicEndpoint("公开专题；受限专题按权限拒绝")
+    public PublicOutline outline(@PathVariable long id, jakarta.servlet.http.HttpServletRequest request) {
+        return publications.read(id, access.current(request));
     }
 
     @GetMapping("/api/me/collections/{id}/preview")
@@ -163,7 +179,8 @@ public class CollectionWorkspaceController {
         OwnedCollection row = owned(id, userId);
         List<SectionView> sections = sectionViews(id, true);
         return new DraftDocument(row.id(), row.name(), row.description(), row.format(), row.status(), row.audience(), row.goal(),
-                row.ownerName(), row.revision(), row.updatedAt(), row.publishedAt(), sections);
+                row.ownerName(), row.revision(), row.updatedAt(), row.publishedAt(), sections, visibilityOf(id),
+                row.status() == CommunityCollection.Status.PUBLISHED ? publishedVisibilityOf(id) : null);
     }
 
     private OwnedCollection owned(long id, long userId) {
@@ -175,6 +192,8 @@ public class CollectionWorkspaceController {
         if (rows.isEmpty()) throw new ApiProblem(HttpStatus.NOT_FOUND, "专题不存在");
         OwnedCollection row = rows.get(0);
         if (!Objects.equals(row.ownerId(), userId)) throw new ApiProblem(HttpStatus.FORBIDDEN, "只能管理自己创建的专题");
+        if ("BUILDER".equals(jdbc.queryForObject("select editor_type from community_collections where id=?", String.class, id)))
+            throw new ApiProblem(HttpStatus.CONFLICT, "请在 AI 专题工作台管理私人草稿；首轮暂不支持发布或转换");
         return row;
     }
 
@@ -279,6 +298,9 @@ public class CollectionWorkspaceController {
     }
 
     private UserAccount currentUser(HttpSession session) { return AuthController.requireUser(session, users); }
+    private boolean canRestrict(HttpSession session) { return access.resolve(session).has(com.aitome.access.Permission.CONTENT_RESTRICTED); }
+    private String visibilityOf(long id) { return jdbc.queryForObject("select visibility from community_collections where id=?", String.class, id); }
+    private String publishedVisibilityOf(long id) { return jdbc.query("select visibility from collection_publications where collection_id=?", (rs, n) -> rs.getString(1), id).stream().findFirst().orElse(null); }
     private ApiProblem bad(String message) { return new ApiProblem(HttpStatus.BAD_REQUEST, message); }
     private boolean blank(String value) { return value == null || value.trim().isEmpty(); }
     private String cleanRequired(String value, String message) { if (blank(value)) throw bad(message); return value.trim(); }
@@ -295,7 +317,12 @@ public class CollectionWorkspaceController {
                                    @Size(max = 260) String description,
                                    @NotNull CommunityCollection.Format format,
                                    @Size(max = 160) String audience, @Size(max = 300) String goal,
-                                   @NotNull @Size(max = MAX_SECTIONS) List<SectionInput> sections) {}
+                                   @NotNull @Size(max = MAX_SECTIONS) List<SectionInput> sections,
+                                   /** PUBLIC/RESTRICTED；为空表示保持当前值（导入等内部调用）。 */ String visibility) {
+        public SaveDraftRequest(long revision, String name, String description, CommunityCollection.Format format, String audience, String goal, List<SectionInput> sections) {
+            this(revision, name, description, format, audience, goal, sections, null);
+        }
+    }
     public record SectionInput(Long id, @NotBlank @Size(max = 80) String title, @Size(max = 500) String description,
                                @NotNull List<EntryInput> entries) {}
     public record EntryInput(Long id, @NotNull CollectionEntry.Kind kind, @Size(max = 160) String title,
@@ -307,7 +334,8 @@ public class CollectionWorkspaceController {
                                    String goal, long revision, Instant updatedAt, Instant publishedAt) {}
     public record DraftDocument(long id, String name, String description, CommunityCollection.Format format,
                                 CommunityCollection.Status status, String audience, String goal, String ownerName,
-                                long revision, Instant updatedAt, Instant publishedAt, List<SectionView> sections) {}
+                                long revision, Instant updatedAt, Instant publishedAt, List<SectionView> sections,
+                                String visibility, String publishedVisibility) {}
     public record SectionView(long id, String title, String description, int sortOrder, List<EntryView> entries) {}
     public record EntryView(long id, CollectionEntry.Kind kind, int sortOrder, String title, String annotation,
                             String body, Long postId, String postTitle, String externalUrl) {}

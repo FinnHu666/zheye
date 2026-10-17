@@ -1,5 +1,6 @@
 package com.aitome.tools;
 
+import com.aitome.access.PublicEndpoint;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/private/tools")
+@PublicEndpoint("本地工具使用独立私人密钥，不随任何角色开放")
 public class LocalToolsController {
     private final String key;
     private final String roots;

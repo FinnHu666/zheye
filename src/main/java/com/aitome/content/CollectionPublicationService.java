@@ -1,5 +1,7 @@
 package com.aitome.content;
 
+import com.aitome.access.AccessContext;
+import com.aitome.access.Permission;
 import com.aitome.common.ApiExceptionHandler.ApiProblem;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,15 +38,23 @@ public class CollectionPublicationService {
         PublicOutline outline = capture(id);
         try {
             jdbc.update("delete from collection_publications where collection_id=?", id);
-            jdbc.update("insert into collection_publications(collection_id,name,description,owner_name,item_count,schema_version,document,updated_at) values(?,?,?,?,?,1,?,?)",
+            String visibility = jdbc.queryForObject("select visibility from community_collections where id=?", String.class, id);
+            jdbc.update("insert into collection_publications(collection_id,name,description,owner_name,item_count,schema_version,document,updated_at,visibility) values(?,?,?,?,?,1,?,?,?)",
                 id, outline.collection().name(), outline.collection().description(), outline.collection().ownerName(),
-                outline.sections().stream().mapToInt(s -> s.entries().size()).sum(), json.writeValueAsString(outline), java.sql.Timestamp.from(outline.collection().updatedAt()));
+                outline.sections().stream().mapToInt(s -> s.entries().size()).sum(), json.writeValueAsString(outline), java.sql.Timestamp.from(outline.collection().updatedAt()), visibility);
         } catch (JsonProcessingException e) { throw new IllegalStateException("Cannot serialize publication", e); }
     }
 
-    public PublicOutline read(long id) {
-        List<String> documents = jdbc.query("select p.document from collection_publications p join community_collections c on c.id=p.collection_id where c.id=? and c.status='PUBLISHED'", (rs, n) -> rs.getString(1), id);
-        if (documents.isEmpty()) throw new ApiProblem(HttpStatus.NOT_FOUND, "专题不存在");
+    /** 读取公开版本；受限专题对无权限者拒绝（未登录 401，已登录 403）。 */
+    public PublicOutline read(long id, AccessContext viewer) {
+        List<String[]> rows = jdbc.query("select p.document,p.visibility from collection_publications p join community_collections c on c.id=p.collection_id where c.id=? and c.status='PUBLISHED'",
+                (rs, n) -> new String[]{rs.getString(1), rs.getString(2)}, id);
+        if (rows.isEmpty()) throw new ApiProblem(HttpStatus.NOT_FOUND, "专题不存在");
+        if ("RESTRICTED".equals(rows.get(0)[1]) && !viewer.has(Permission.CONTENT_RESTRICTED)) {
+            if (viewer.isGuest()) throw new ApiProblem(HttpStatus.UNAUTHORIZED, "这是受限专题，请先登录后再访问");
+            throw new ApiProblem(HttpStatus.FORBIDDEN, "当前角色无权阅读这个专题");
+        }
+        List<String> documents = List.of(rows.get(0)[0]);
         try {
             PublicOutline outline = json.readValue(documents.get(0), PublicOutline.class);
             // Frozen cards never expose data for a reference that has since become unavailable.

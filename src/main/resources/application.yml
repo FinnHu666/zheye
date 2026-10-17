@@ -28,3 +28,9 @@ management:
     web:
       exposure:
         include: health
+finns:
+  access:
+    # 首位管理员：启动时若没有任何能管理角色的用户，把该邮箱对应的账户设为管理员（FINNS-11）
+    bootstrap-admin-email: ${FINNS_BOOTSTRAP_ADMIN_EMAIL:}
+    # 操作记录按日期筛选时使用的时区
+    audit-zone: ${FINNS_AUDIT_ZONE:Asia/Shanghai}

@@ -13,6 +13,8 @@ public class UserAccount {
     @Column(nullable = false, length = 40) private String displayName;
     @Column(nullable = false, length = 500) private String bio = "";
     @Column(nullable = false, updatable = false) private Instant createdAt = Instant.now();
+    /** 单一角色（FINNS-11）。只由服务端分配；PostgreSQL 中为 not null，由 V12 迁移补齐现有用户。 */
+    @Column(name = "role_id") private Long roleId;
 
     protected UserAccount() {}
     public UserAccount(String email, String passwordHash, String displayName) {
@@ -25,4 +27,6 @@ public class UserAccount {
     public String getBio() { return bio; }
     public Instant getCreatedAt() { return createdAt; }
     public void updateProfile(String displayName, String bio) { this.displayName = displayName; this.bio = bio; }
+    public Long getRoleId() { return roleId; }
+    public void assignRole(Long roleId) { this.roleId = roleId; }
 }

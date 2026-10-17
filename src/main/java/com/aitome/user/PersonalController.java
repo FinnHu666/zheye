@@ -1,5 +1,8 @@
 package com.aitome.user;
 
+import com.aitome.access.Permission;
+import com.aitome.access.RequirePermission;
+import com.aitome.access.AccessService;
 import com.aitome.common.ApiExceptionHandler.ApiProblem;
 import com.aitome.content.*;
 import jakarta.servlet.http.HttpSession;
@@ -25,15 +28,18 @@ public class PersonalController {
     private final CollectionRepository collections;
     private final JdbcTemplate jdbc;
     private final EntityManager entityManager;
+    private final AccessService access;
 
-    public PersonalController(UserRepository users, ContentPostRepository posts, CollectionRepository collections, JdbcTemplate jdbc, EntityManager entityManager) {
-        this.users = users; this.posts = posts; this.collections = collections; this.jdbc = jdbc; this.entityManager = entityManager;
+    public PersonalController(UserRepository users, ContentPostRepository posts, CollectionRepository collections, JdbcTemplate jdbc, EntityManager entityManager, AccessService access) {
+        this.users = users; this.posts = posts; this.collections = collections; this.jdbc = jdbc; this.entityManager = entityManager; this.access = access;
     }
 
     @GetMapping("/profile")
+    @RequirePermission(Permission.PROFILE_MANAGE)
     public ProfileView profile(HttpSession session) { return profileOf(currentUser(session)); }
 
     @RequestMapping(path = "/profile", method = {RequestMethod.PUT, RequestMethod.PATCH})
+    @RequirePermission(Permission.PROFILE_MANAGE)
     @Transactional
     public ProfileView updateProfile(@Valid @RequestBody ProfileRequest request, HttpSession session) {
         UserAccount user = currentUser(session);
@@ -42,6 +48,7 @@ public class PersonalController {
     }
 
     @GetMapping("/posts")
+    @RequirePermission(Permission.PROFILE_MANAGE)
     public PageView<ContentPostSummary> myPosts(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size, HttpSession session) {
         int safeSize = Math.max(1, Math.min(size, 50));
         int safePage = Math.max(0, Math.min(page, 10_000));
@@ -50,27 +57,32 @@ public class PersonalController {
     }
 
     @GetMapping("/collections")
-    public PageView<CollectionView> myCollections(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size, HttpSession session) {
+    @RequirePermission(Permission.COLLECTION_MANAGE)
+    public PageView<CollectionView> myCollections(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size, @RequestParam(required=false) String editorType, HttpSession session) {
+        if(editorType!=null&&!List.of("OUTLINE","BUILDER").contains(editorType))throw new ApiProblem(HttpStatus.BAD_REQUEST,"编辑器类型不支持");
         int safeSize = Math.max(1, Math.min(size, 50));
         int safePage = Math.max(0, Math.min(page, 10_000));
-        List<CollectionView> rows = jdbc.query("select c.id,c.name,c.description,c.owner_name,c.updated_at,c.format,c.status,c.revision,count(ce.id) as item_count from community_collections c left join collection_entries ce on ce.collection_id=c.id where c.owner_id=? group by c.id order by c.updated_at desc,c.id desc limit ? offset ?",
-                (rs, row) -> new CollectionView(rs.getLong("id"), rs.getString("name"), rs.getString("description"), rs.getString("owner_name"), rs.getInt("item_count"), rs.getTimestamp("updated_at").toInstant(), rs.getString("format"), rs.getString("status"), rs.getLong("revision")),
-                currentUser(session).getId(), safeSize + 1, (long) safePage * safeSize);
+        List<CollectionView> rows = jdbc.query("select c.id,c.name,c.description,c.owner_name,c.updated_at,c.format,c.status,c.revision,c.editor_type,case when c.editor_type='BUILDER' then c.item_count else count(ce.id) end as item_count from community_collections c left join collection_entries ce on ce.collection_id=c.id where c.owner_id=? and (? = '' or c.editor_type=?) group by c.id order by c.updated_at desc,c.id desc limit ? offset ?",
+                (rs, row) -> new CollectionView(rs.getLong("id"), rs.getString("name"), rs.getString("description"), rs.getString("owner_name"), rs.getInt("item_count"), rs.getTimestamp("updated_at").toInstant(), rs.getString("format"), rs.getString("status"), rs.getLong("revision"), rs.getString("editor_type")),
+                currentUser(session).getId(), editorType==null?"":editorType, editorType==null?"":editorType, safeSize + 1, (long) safePage * safeSize);
         return page(rows, safePage, safeSize);
     }
 
     @GetMapping("/collections/selected")
+    @RequirePermission(Permission.SELECTION_MANAGE)
     public SelectionView selected(HttpSession session) {
         UserAccount user = currentUser(session);
         return selectionView(user.getId());
     }
 
     @PutMapping("/collections/selected/{collectionId}")
+    @RequirePermission(Permission.SELECTION_MANAGE)
     @Transactional
     public SelectionView addSelected(@PathVariable long collectionId, HttpSession session) {
         UserAccount user = currentUser(session);
         CommunityCollection selectedCollection = collections.findById(collectionId).orElseThrow(() -> new ApiProblem(HttpStatus.NOT_FOUND, "专题不存在"));
-        if (selectedCollection.getStatus() != CommunityCollection.Status.PUBLISHED || jdbc.queryForObject("select count(*) from collection_publications where collection_id=?",Integer.class,collectionId)==0) throw new ApiProblem(HttpStatus.NOT_FOUND, "专题不存在");
+        // 受限专题对无权限者表现为不存在，避免泄漏
+        if (selectedCollection.getStatus() != CommunityCollection.Status.PUBLISHED || jdbc.queryForObject("select count(*) from collection_publications where collection_id=? and (visibility='PUBLIC' or ?)",Integer.class,collectionId,canReadRestricted(session))==0) throw new ApiProblem(HttpStatus.NOT_FOUND, "专题不存在");
         long version = lockPreference(user.getId());
         Integer exists = jdbc.queryForObject("select count(*) from user_collection_selections where user_id=? and collection_id=?", Integer.class, user.getId(), collectionId);
         if (exists == null || exists == 0) {
@@ -84,6 +96,7 @@ public class PersonalController {
     }
 
     @DeleteMapping("/collections/selected/{collectionId}")
+    @RequirePermission(Permission.SELECTION_MANAGE)
     @Transactional
     public SelectionView removeSelected(@PathVariable long collectionId, HttpSession session) {
         UserAccount user = currentUser(session);
@@ -98,6 +111,7 @@ public class PersonalController {
     }
 
     @PatchMapping("/collections/selected/order")
+    @RequirePermission(Permission.SELECTION_MANAGE)
     @Transactional
     public SelectionView reorder(@Valid @RequestBody ReorderRequest request, HttpSession session) {
         UserAccount user = currentUser(session);
@@ -113,6 +127,7 @@ public class PersonalController {
     }
 
     @PutMapping("/collections/{collectionId}/posts/{postId}")
+    @RequirePermission(Permission.POST_INTERACT)
     @Transactional
     public CollectionView addPost(@PathVariable long collectionId, @PathVariable long postId, HttpSession session, @RequestParam long revision) {
         UserAccount user = currentUser(session);
@@ -141,6 +156,7 @@ public class PersonalController {
     }
 
     @DeleteMapping("/collections/{collectionId}/posts/{postId}")
+    @RequirePermission(Permission.POST_INTERACT)
     @Transactional
     public CollectionView removePost(@PathVariable long collectionId, @PathVariable long postId, HttpSession session, @RequestParam long revision) {
         UserAccount user = currentUser(session);
@@ -158,6 +174,7 @@ public class PersonalController {
     private CommunityCollection ownedCollection(long collectionId, Long userId) {
         CommunityCollection collection = collections.findById(collectionId).orElseThrow(() -> new ApiProblem(HttpStatus.NOT_FOUND, "专题不存在"));
         if (!Objects.equals(collection.getOwnerId(), userId)) throw new ApiProblem(HttpStatus.FORBIDDEN, "只能管理自己创建的专题");
+        if (collection.getEditorType() == CommunityCollection.EditorType.BUILDER) throw new ApiProblem(HttpStatus.CONFLICT, "请使用 AI 专题工作台编辑模块");
         return collection;
     }
 
@@ -187,17 +204,20 @@ public class PersonalController {
         long version;
         try { version = jdbc.queryForObject("select version from user_collection_preferences where user_id=?", Long.class, userId); }
         catch (EmptyResultDataAccessException missing) { version = 0; }
-        List<SelectedCollection> rows = jdbc.query("select c.id,p.name,p.description,p.owner_name,c.created_at,p.updated_at,s.sort_order,p.item_count as post_count from user_collection_selections s join community_collections c on c.id=s.collection_id join collection_publications p on p.collection_id=c.id where s.user_id=? and c.status='PUBLISHED' order by s.sort_order", (rs, row) ->
-                new SelectedCollection(rs.getLong("id"), rs.getString("name"), rs.getString("description"), rs.getString("owner_name"), rs.getInt("post_count"), rs.getInt("sort_order")), userId);
+        List<SelectedCollection> rows = jdbc.query("select c.id,p.name,p.description,p.owner_name,c.created_at,p.updated_at,s.sort_order,p.item_count as post_count from user_collection_selections s join community_collections c on c.id=s.collection_id join collection_publications p on p.collection_id=c.id where s.user_id=? and c.status='PUBLISHED' and (p.visibility='PUBLIC' or ?) order by s.sort_order", (rs, row) ->
+                new SelectedCollection(rs.getLong("id"), rs.getString("name"), rs.getString("description"), rs.getString("owner_name"), rs.getInt("post_count"), rs.getInt("sort_order")), userId, canReadRestricted(userId));
         return new SelectionView(version, rows);
     }
 
     private CollectionView collectionView(CommunityCollection row) {
         Integer count = jdbc.queryForObject("select count(*) from collection_entries where collection_id=?", Integer.class, row.getId());
-        return new CollectionView(row.getId(), row.getName(), row.getDescription(), row.getOwnerName(), count == null ? 0 : count, row.getUpdatedAt(), row.getFormat().name(), row.getStatus().name(), row.getRevision());
+        return new CollectionView(row.getId(), row.getName(), row.getDescription(), row.getOwnerName(), count == null ? 0 : count, row.getUpdatedAt(), row.getFormat().name(), row.getStatus().name(), row.getRevision(), row.getEditorType().name());
     }
 
     private UserAccount currentUser(HttpSession session) { return AuthController.requireUser(session, users); }
+    private boolean canReadRestricted(HttpSession session) { return access.resolve(session).has(com.aitome.access.Permission.CONTENT_RESTRICTED); }
+    /** 自选关系保留；权限恢复后受限专题重新出现。 */
+    private boolean canReadRestricted(long userId) { var context = access.forUser(userId); return context != null && context.has(com.aitome.access.Permission.CONTENT_RESTRICTED); }
     private ProfileView profileOf(UserAccount user) {
         Integer selectedCount = jdbc.queryForObject("select count(*) from user_collection_selections where user_id=?", Integer.class, user.getId());
         return new ProfileView(user.getId(), user.getEmail(), user.getDisplayName(), user.getBio(), user.getCreatedAt(),
@@ -211,7 +231,7 @@ public class PersonalController {
     public record ProfileRequest(@NotBlank @Size(max = 40) String displayName, @Size(max = 500) String bio) {}
     public record ProfileView(Long id, String email, String displayName, String bio, java.time.Instant createdAt, long postCount, long collectionCount, int selectedCollectionCount) {}
     public record PageView<T>(List<T> items, int page, int size, boolean hasMore) {}
-    public record CollectionView(Long id, String name, String description, String ownerName, int itemCount, java.time.Instant updatedAt, String format, String status, long revision) {}
+    public record CollectionView(Long id, String name, String description, String ownerName, int itemCount, java.time.Instant updatedAt, String format, String status, long revision, String editorType) {}
     public record SelectedCollection(Long id, String name, String description, String ownerName, int itemCount, int sortOrder) {}
     public record SelectionView(long version, List<SelectedCollection> items) {}
     public record ReorderRequest(long version, @Size(max = 1000) List<Long> collectionIds) {}

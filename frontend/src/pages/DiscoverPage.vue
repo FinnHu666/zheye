@@ -2,6 +2,8 @@
 import { onMounted, ref, computed, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { api, dateLabel } from '../lib/api'
+import { latestVisitTotal } from '../lib/siteVisit'
+import { can } from '../lib/session'
 const emit = defineEmits(['write', 'toast'])
 const props = defineProps({ user: { type: Object, default: null } })
 const route = useRoute()
@@ -15,6 +17,8 @@ const filteredPosts = computed(() => posts.value)
 const hasMorePosts = computed(() => posts.value.length < postsTotal.value)
 const hasMoreComments = computed(() => comments.value.length < commentsTotal.value)
 const displayCount = value => Number.isFinite(value) ? numberFormatter.format(value) : '—'
+// 全站累计访问次数（不是独立人数）；读取失败显示“—”，不显示 0。
+const visitTotal = computed(() => siteStats.value?.visits ? Math.max(siteStats.value.visits.total, latestVisitTotal.value ?? 0) : null)
 const loadPosts = async (reset = false) => {
   if (!reset && (postsLoadingMore.value || !hasMorePosts.value)) return
   const page = reset ? 0 : postsPage.value + 1
@@ -134,18 +138,18 @@ const comment = async () => {
 onMounted(() => { loadPosts(true); loadStats() })
 </script>
 <template>
-  <section class="hero"><div class="eyebrow"><span class="pulse"></span> 为创造者准备的开放社区</div><h1>记录思考，连接<br /><em>每一种可能。</em></h1><p>分享技术洞见，发起真诚讨论，和有趣的人一起搭建属于我们的知识宇宙。</p><div class="hero-actions"><button class="btn btn-primary btn-large" @click="emit('write')">分享你的故事 <span>→</span></button><a class="text-link" href="#content">随便逛逛 <span>↓</span></a></div><div class="hero-stats" aria-live="polite"><div><strong>{{ displayCount(siteStats?.creatorCount) }}</strong><span>创作者</span></div><i></i><div><strong>{{ displayCount(siteStats?.contentCount) }}</strong><span>公开内容</span></div><i></i><div><strong>{{ displayCount(siteStats?.collectionCount) }}</strong><span>专题目录</span></div></div></section>
+  <section class="hero"><div class="eyebrow"><span class="pulse"></span> 为创造者准备的开放社区</div><h1>记录思考，连接<br /><em>每一种可能。</em></h1><p>分享技术洞见，发起真诚讨论，和有趣的人一起搭建属于我们的知识宇宙。</p><div class="hero-actions"><button class="btn btn-primary btn-large" @click="emit('write')">分享你的故事 <span>→</span></button><a class="text-link" href="#content">随便逛逛 <span>↓</span></a></div><div class="hero-stats" aria-live="polite"><div><strong>{{ displayCount(siteStats?.creatorCount) }}</strong><span>创作者</span></div><i></i><div><strong>{{ displayCount(siteStats?.contentCount) }}</strong><span>公开内容</span></div><i></i><div><strong>{{ displayCount(siteStats?.collectionCount) }}</strong><span>专题目录</span></div><i></i><div><strong>{{ displayCount(visitTotal) }}</strong><span>累计访问</span></div></div></section>
   <section id="content" class="section content-section"><div class="section-heading"><div><span class="kicker">DISCOVER</span><h2>今日值得阅读</h2></div><div class="tabs" role="tablist" aria-label="筛选文章话题"><button class="tab" :class="{ active: filter === 'ALL' }" role="tab" :aria-selected="filter === 'ALL'" @click="changeFilter('ALL')">全部</button><button class="tab" :class="{ active: filter === 'ARTICLE' }" role="tab" :aria-selected="filter === 'ARTICLE'" @click="changeFilter('ARTICLE')">文章</button><button class="tab" :class="{ active: filter === 'TOPIC' }" role="tab" :aria-selected="filter === 'TOPIC'" @click="changeFilter('TOPIC')">话题</button></div></div><div class="posts-grid"><div v-if="postsLoading && !filteredPosts.length" class="loading">正在收集好内容…</div><div v-else-if="!filteredPosts.length && !postsError" class="empty-state">这个分类还没有内容，来发布第一篇吧。</div><article v-for="post in filteredPosts" :key="post.id" class="post-card" tabindex="0" @click="openPost(post)" @keydown.enter="openPost(post)"><span class="post-tag">{{ post.type === 'ARTICLE' ? '深度文章' : '社区话题' }}</span><h3>{{ post.title }}</h3><p>{{ post.summary }}</p><div class="post-meta"><span><i class="avatar">{{ post.authorName.slice(0, 1) }}</i>{{ post.authorName }}</span><span>♡ {{ post.likes }} · {{ dateLabel(post.createdAt) }}</span></div></article></div><div v-if="postsError || hasMorePosts" class="pagination-control" aria-live="polite"><span v-if="postsTotal">已加载 {{ posts.length }} / {{ postsTotal }} 条</span><span v-if="postsError" class="form-error" role="alert">{{ postsError }}</span><button type="button" class="btn btn-outline" :disabled="postsLoading || postsLoadingMore" @click="postsError ? retryPosts() : loadPosts(false)">{{ postsError ? '重试' : postsLoadingMore ? '正在加载…' : '加载更多内容' }}</button></div></section>
   <div v-if="detail" class="overlay" @click.self="closePost">
     <section class="modal modal-detail">
       <button class="modal-close" aria-label="关闭" @click="closePost">×</button>
       <span class="post-tag">{{ detail.type === 'ARTICLE' ? '文章' : '话题' }}</span>
       <h2>{{ detail.title }}</h2>
-      <div class="detail-meta">{{ detail.authorName }} · {{ dateLabel(detail.createdAt) }} · <button class="like-button" @click="like">♡ {{ detail.likes }}</button></div>
+      <div class="detail-meta">{{ detail.authorName }} · {{ dateLabel(detail.createdAt) }} · <span v-if="user && !can('post.interact')" class="like-count">♡ {{ detail.likes }}</span><button v-else class="like-button" @click="like">♡ {{ detail.likes }}</button></div>
       <div v-if="detailLoading" class="loading">正在加载正文…</div>
       <p v-else-if="detailError" class="form-error" role="alert">{{ detailError }} <button type="button" class="btn btn-outline" @click="retryDetail">重试加载正文</button></p>
       <div v-else class="detail-body">{{ detail.body }}</div>
-      <section v-if="user" class="collection-add"><div><h3>收录到我的专题</h3><p v-if="!ownCollections.length">先创建一个专题，再整理相关内容。<RouterLink to="/me/collections">创建专题 →</RouterLink></p><form v-else @submit.prevent="addToCollection"><select v-model="selectedCollectionId" aria-label="选择专题"><option v-for="item in ownCollections" :key="item.id" :value="item.id">{{ item.name }}</option></select><button class="btn btn-outline">加入专题</button></form><span v-if="collectionMessage" class="collection-feedback" role="status">{{ collectionMessage }}</span></div></section>
+      <section v-if="user && can('post.interact')" class="collection-add"><div><h3>收录到我的专题</h3><p v-if="!ownCollections.length">先创建一个专题，再整理相关内容。<RouterLink to="/me/collections">创建专题 →</RouterLink></p><form v-else @submit.prevent="addToCollection"><select v-model="selectedCollectionId" aria-label="选择专题"><option v-for="item in ownCollections" :key="item.id" :value="item.id">{{ item.name }}</option></select><button class="btn btn-outline">加入专题</button></form><span v-if="collectionMessage" class="collection-feedback" role="status">{{ collectionMessage }}</span></div></section>
       <section class="discussion" aria-live="polite">
         <h3>讨论 <span v-if="commentsTotal">({{ commentsTotal }})</span></h3>
         <div v-if="commentsLoading && !comments.length" class="loading">正在加载讨论…</div>
@@ -154,7 +158,8 @@ onMounted(() => { loadPosts(true); loadStats() })
         <div v-for="item in comments" :key="item.id" class="comment"><strong>{{ item.authorName }}</strong><p>{{ item.body }}</p></div>
         <p v-if="commentsError && comments.length" class="empty" role="alert">{{ commentsError }} <button type="button" class="btn btn-outline" @click="retryComments">重试</button></p>
         <button v-if="hasMoreComments" type="button" class="btn btn-outline" :disabled="commentsLoading" @click="loadMoreComments">{{ commentsLoading ? '正在加载…' : '加载更多讨论' }}</button>
-        <form @submit.prevent="comment" :aria-busy="commentSending">
+        <p v-if="user && !can('post.interact')" class="empty role-note">当前角色「{{ user.role?.name }}」可以阅读讨论，但不能发表评论。</p>
+        <form v-else @submit.prevent="comment" :aria-busy="commentSending">
           <textarea v-model="commentBody" rows="2" maxlength="1000" required placeholder="登录后写下你的想法…"></textarea>
           <button class="btn btn-primary" :disabled="commentSending || !commentBody.trim()">{{ commentSending ? '正在发布…' : '参与讨论' }}</button>
         </form>
