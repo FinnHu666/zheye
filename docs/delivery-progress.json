@@ -158,7 +158,7 @@
           "evidence": [
             {
               "path": "docs/iterations/0.7.0/DECISIONS.md",
-              "sha256": "7c197210f843dea2604853828f0e599ad7fea2dec08d3bf4f7ab64576de4433e"
+              "sha256": "22b9b4b8f15d99cbc116358d0b694eccdcde8ddb8016f8a2243f358868a4f150"
             },
             {
               "path": "docs/iterations/0.7.0/PROTOTYPE_SITE_ACCESS.md",
@@ -178,7 +178,7 @@
             },
             {
               "path": "docs/iterations/0.7.0/DECISIONS.md",
-              "sha256": "7c197210f843dea2604853828f0e599ad7fea2dec08d3bf4f7ab64576de4433e"
+              "sha256": "22b9b4b8f15d99cbc116358d0b694eccdcde8ddb8016f8a2243f358868a4f150"
             }
           ],
           "reason": "概要设计修订 2 定稿：用户确认原型 R4 与首位管理员方式（DECISIONS D15/D16）"
@@ -196,7 +196,7 @@
             },
             {
               "path": "docs/iterations/0.7.0/DECISIONS.md",
-              "sha256": "7c197210f843dea2604853828f0e599ad7fea2dec08d3bf4f7ab64576de4433e"
+              "sha256": "22b9b4b8f15d99cbc116358d0b694eccdcde8ddb8016f8a2243f358868a4f150"
             }
           ]
         },
@@ -239,7 +239,7 @@
             },
             {
               "path": "docs/iterations/0.7.0/DECISIONS.md",
-              "sha256": "7c197210f843dea2604853828f0e599ad7fea2dec08d3bf4f7ab64576de4433e"
+              "sha256": "22b9b4b8f15d99cbc116358d0b694eccdcde8ddb8016f8a2243f358868a4f150"
             }
           ]
         },
@@ -252,20 +252,20 @@
           "evidence": [
             {
               "path": "docs/RELEASE_0.7.0.md",
-              "sha256": "b4f460b25b1d0de099b87917e961405aea1f8a536a2d0cccc0d9d0b097a3c3bc"
+              "sha256": "f91baa9148f6ddfd365ca4fccfa5bd86c166bbf58797b1726e8c95547994588d"
             },
             {
               "path": "docs/iterations/0.7.0/DECISIONS.md",
-              "sha256": "7c197210f843dea2604853828f0e599ad7fea2dec08d3bf4f7ab64576de4433e"
+              "sha256": "22b9b4b8f15d99cbc116358d0b694eccdcde8ddb8016f8a2243f358868a4f150"
             }
           ]
         },
         {
           "id": "G9",
           "status": "pending",
-          "next_action": "管理员生效后复核管理页面；按授权处理 Git 与 Plane",
-          "user_action": "见 G8",
-          "reason": "首位管理员尚未生效；Git/Plane 待确认"
+          "next_action": "管理员生效后复核管理页面；按用户决定推送或合并 release/0.7.0",
+          "user_action": "注册所提供的管理员邮箱后告知；决定是否推送/合并；演示账户处理",
+          "reason": "Git 已本地提交、Plane 已同步；首位管理员待本人注册后重启生效；推送/合并待决定"
         }
       ],
       "plane_workitem": {
@@ -330,7 +330,7 @@
           "evidence": [
             {
               "path": "docs/iterations/0.7.0/DECISIONS.md",
-              "sha256": "7c197210f843dea2604853828f0e599ad7fea2dec08d3bf4f7ab64576de4433e"
+              "sha256": "22b9b4b8f15d99cbc116358d0b694eccdcde8ddb8016f8a2243f358868a4f150"
             },
             {
               "path": "docs/iterations/0.7.0/PROTOTYPE_SITE_ACCESS.md",
@@ -350,7 +350,7 @@
             },
             {
               "path": "docs/iterations/0.7.0/DECISIONS.md",
-              "sha256": "7c197210f843dea2604853828f0e599ad7fea2dec08d3bf4f7ab64576de4433e"
+              "sha256": "22b9b4b8f15d99cbc116358d0b694eccdcde8ddb8016f8a2243f358868a4f150"
             }
           ],
           "reason": "概要设计修订 2 定稿：用户确认原型 R4 与首位管理员方式（DECISIONS D15/D16）"
@@ -368,7 +368,7 @@
             },
             {
               "path": "docs/iterations/0.7.0/DECISIONS.md",
-              "sha256": "7c197210f843dea2604853828f0e599ad7fea2dec08d3bf4f7ab64576de4433e"
+              "sha256": "22b9b4b8f15d99cbc116358d0b694eccdcde8ddb8016f8a2243f358868a4f150"
             }
           ]
         },
@@ -411,7 +411,7 @@
             },
             {
               "path": "docs/iterations/0.7.0/DECISIONS.md",
-              "sha256": "7c197210f843dea2604853828f0e599ad7fea2dec08d3bf4f7ab64576de4433e"
+              "sha256": "22b9b4b8f15d99cbc116358d0b694eccdcde8ddb8016f8a2243f358868a4f150"
             }
           ]
         },
@@ -424,20 +424,20 @@
           "evidence": [
             {
               "path": "docs/RELEASE_0.7.0.md",
-              "sha256": "b4f460b25b1d0de099b87917e961405aea1f8a536a2d0cccc0d9d0b097a3c3bc"
+              "sha256": "f91baa9148f6ddfd365ca4fccfa5bd86c166bbf58797b1726e8c95547994588d"
             },
             {
               "path": "docs/iterations/0.7.0/DECISIONS.md",
-              "sha256": "7c197210f843dea2604853828f0e599ad7fea2dec08d3bf4f7ab64576de4433e"
+              "sha256": "22b9b4b8f15d99cbc116358d0b694eccdcde8ddb8016f8a2243f358868a4f150"
             }
           ]
         },
         {
           "id": "G9",
           "status": "pending",
-          "next_action": "管理员生效后复核管理页面；按授权处理 Git 与 Plane",
-          "user_action": "见 G8",
-          "reason": "首位管理员尚未生效；Git/Plane 待确认"
+          "next_action": "管理员生效后复核管理页面；按用户决定推送或合并 release/0.7.0",
+          "user_action": "注册所提供的管理员邮箱后告知；决定是否推送/合并；演示账户处理",
+          "reason": "Git 已本地提交、Plane 已同步；首位管理员待本人注册后重启生效；推送/合并待决定"
         }
       ],
       "plane_workitem": {
