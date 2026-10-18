@@ -39,14 +39,15 @@ class AccessAdminTests {
 
     @BeforeEach void setUp() throws Exception {
         t = new AccessTestSupport(mvc, json, jdbc);
-        if (admin == null) admin = t.withRole("admin", "ADMIN");
+        if (admin == null) admin = t.withRole("admin", "OWNER"); // 站长拥有全部管理能力；层级规则另见 OwnerTransferTests
     }
 
-    @Test @Order(1) void onlyAdminIsManagerAndCannotBeDemoted() throws Exception {
+    @Test @Order(1) void onlyOwnerIsManagerAndCannotBeDemoted() throws Exception {
         JsonNode users = body(mvc.perform(get("/api/admin/users").session(admin.session())).andExpect(status().isOk()));
         assertEquals(1, users.path("managerCount").asLong());
-        call(patch("/api/admin/users/" + admin.id() + "/role"), Map.of("roleCode", "MEMBER", "expectedRoleCode", "ADMIN"))
-                .andExpect(status().isUnprocessableEntity()).andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("最后一位能管理角色")));
+        // 站长不能被直接调整角色（FINNS-16）；“最后一位管理者”的兜底规则见 UserStatusTests
+        call(patch("/api/admin/users/" + admin.id() + "/role"), Map.of("roleCode", "MEMBER", "expectedRoleCode", "OWNER"))
+                .andExpect(status().isForbidden()).andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("站长不能")));
     }
 
     @Test @Order(2) void usersCanBeSearchedFilteredPagedAndAssigned() throws Exception {

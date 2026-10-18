@@ -31,12 +31,13 @@ class AccessBootstrapTests {
         assertEquals("MEMBER", roleOf(founder));
 
         bootstrap.initialize();
-        assertEquals("ADMIN", roleOf(founder));
+        assertEquals("OWNER", roleOf(founder), "the configured first administrator is also the unique owner");
+        assertEquals(founder, jdbc.queryForObject("select owner_user_id from access_control_state where id=1", Long.class));
         assertEquals(1, jdbc.queryForObject("select count(*) from access_audit_log where type='ROLE_ASSIGN' and target_user_id=? and operator_name='系统初始化'", Integer.class, founder));
 
         bootstrap.initialize(); // 已有管理者：不重复写入
         assertEquals(1, jdbc.queryForObject("select count(*) from access_audit_log where operator_name='系统初始化'", Integer.class));
-        assertEquals(4, jdbc.queryForObject("select count(*) from roles", Integer.class), "seed roles are not duplicated");
+        assertEquals(5, jdbc.queryForObject("select count(*) from roles", Integer.class), "seed roles (including OWNER) are not duplicated");
     }
 
     private long registerFounder(AccessTestSupport t) throws Exception {

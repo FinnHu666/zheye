@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api } from '../../lib/api'
-import AdminNav from '../../components/AdminNav.vue'
+import AdminLayout from '../../components/AdminLayout.vue'
 
 const route = useRoute(); const router = useRouter()
 const str = (value) => typeof value === 'string' ? value : ''
@@ -11,7 +11,9 @@ const fromQuery = () => ({ q: str(route.query.q), type: str(route.query.type), r
 const filters = ref(fromQuery()); const pageIndex = ref(Number(route.query.page || 0))
 const result = ref(null); const loading = ref(true); const error = ref('')
 const roles = ref([])
-const typeLabel = { ROLE_ASSIGN: '角色分配', ROLE_PERMISSION: '权限修改', ROLE_DEFINE: '角色定义' }
+const typeLabel = { ROLE_ASSIGN: '角色分配', ROLE_PERMISSION: '权限修改', ROLE_DEFINE: '角色定义', ACCOUNT_STATUS: '账号状态', OWNER_TRANSFER: '站长转交' }
+const outcomeLabel = { SUCCESS: '成功', REJECTED: '已拒绝', FAILED: '失败' }
+const statusLabel = (value) => value === 'DISABLED' ? '停用' : '正常'
 const totalPages = computed(() => result.value ? Math.max(1, Math.ceil(result.value.total / result.value.size)) : 1)
 const filtered = computed(() => Object.values(fromQuery()).some(Boolean))
 const time = (value) => new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(value))
@@ -35,12 +37,10 @@ onMounted(async () => { load(); try { roles.value = (await api('/api/admin/roles
 </script>
 
 <template>
-  <section class="page-hero personal-hero"><span class="kicker">ADMIN</span><h1>角色<br /><em>操作记录。</em></h1><p>记录用户角色分配、角色权限修改与角色新增、改名、删除：操作者、对象、时间、前后变化和备注。</p></section>
-  <section class="section personal-section admin-section">
-    <AdminNav />
+  <AdminLayout title="操作记录" description="记录账号停用与恢复、站长转交、角色分配与权限变化：操作者、对象、时间、前后变化、原因和结果。">
     <form class="admin-toolbar audit-filters" role="search" @submit.prevent="apply">
       <label class="admin-search">关键词<input v-model="filters.q" type="search" maxlength="80" placeholder="操作者、用户、权限或备注" /></label>
-      <label>类型<select v-model="filters.type"><option value="">全部类型</option><option value="ROLE_ASSIGN">用户角色分配</option><option value="ROLE_PERMISSION">角色权限修改</option><option value="ROLE_DEFINE">新增/改名/删除角色</option></select></label>
+      <label>类型<select v-model="filters.type"><option value="">全部类型</option><option value="ACCOUNT_STATUS">账号停用与恢复</option><option value="OWNER_TRANSFER">站长身份转交</option><option value="ROLE_ASSIGN">用户角色分配</option><option value="ROLE_PERMISSION">角色权限修改</option><option value="ROLE_DEFINE">新增/改名/删除角色</option></select></label>
       <label>涉及角色<select v-model="filters.role"><option value="">全部角色</option><option v-for="r in roles" :key="r.code" :value="r.code">{{ r.name }}</option></select></label>
       <label>开始日期<input v-model="filters.from" type="date" :max="filters.to || undefined" /></label>
       <label>结束日期<input v-model="filters.to" type="date" :min="filters.from || undefined" /></label>
@@ -65,11 +65,21 @@ onMounted(async () => { load(); try { roles.value = (await api('/api/admin/roles
             <p v-if="item.action === 'CREATE'">{{ item.copyFromName ? `权限复制自「${item.copyFromName}」` : '从基本权限开始' }}</p>
             <p v-if="item.action === 'DELETE'">{{ item.movedCount ? `${item.movedCount} 位用户改为「${item.moveToName}」：${item.movedNames.join('、')}${item.movedCount > item.movedNames.length ? ' 等' : ''}` : '该角色下没有用户' }}</p>
           </template>
+          <template v-else-if="item.type === 'ACCOUNT_STATUS'">
+            <h3>{{ item.action === 'DISABLE' ? '停用' : '恢复' }}账号：{{ item.targetUserName }}</h3>
+            <p>状态 {{ statusLabel(item.beforeStatus) }} → {{ statusLabel(item.afterStatus) }}<template v-if="item.roleName"> · 当时角色「{{ item.roleName }}」</template></p>
+          </template>
+          <template v-else-if="item.type === 'OWNER_TRANSFER'">
+            <h3 v-if="item.action === 'INIT'">站长初始化：{{ item.targetUserName }}</h3>
+            <h3 v-else>站长转交：{{ item.operatorName }} → {{ item.targetUserName }}</h3>
+            <p>{{ item.outcome === 'SUCCESS' ? (item.action === 'INIT' ? '系统已按规则指定或纠正唯一站长。' : '原站长成为管理员，接任人成为唯一站长。') : '双方身份未因本次请求改变。' }}</p>
+          </template>
           <h3 v-else>{{ item.targetUserName }}：{{ item.beforeRoleName || '无' }} → {{ item.afterRoleName }}</h3>
-          <p v-if="item.note">{{ item.note }}</p>
+          <p v-if="item.note">{{ item.type === 'ACCOUNT_STATUS' || item.type === 'OWNER_TRANSFER' ? '原因：' : '' }}{{ item.note }}</p>
+          <p v-if="item.type === 'ACCOUNT_STATUS' || item.type === 'OWNER_TRANSFER'" class="ua-audit-result">{{ outcomeLabel[item.outcome] }}<template v-if="item.resultMessage"> · {{ item.resultMessage }}</template></p>
         </div>
       </article>
     </div>
     <div v-if="result && totalPages > 1" class="pagination-control"><button class="btn btn-outline" :disabled="loading || pageIndex === 0" @click="goPage(pageIndex - 1)">上一页</button><span>第 {{ pageIndex + 1 }} / {{ totalPages }} 页</span><button class="btn btn-outline" :disabled="loading || pageIndex + 1 >= totalPages" @click="goPage(pageIndex + 1)">下一页</button></div>
-  </section>
+  </AdminLayout>
 </template>

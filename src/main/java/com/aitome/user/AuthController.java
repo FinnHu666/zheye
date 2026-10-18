@@ -44,6 +44,8 @@ public class AuthController {
         UserAccount user = users.findByEmailIgnoreCase(request.email()).orElse(null);
         boolean matches = encoder.matches(request.password(), user == null ? dummyHash : user.getPasswordHash());
         if (user == null || !matches) throw new ApiProblem(HttpStatus.UNAUTHORIZED, "邮箱或密码不正确");
+        // 停用同样只在密码正确之后提示，且不展示管理原因（FINNS-16 UA-R08）
+        if (!user.isActive()) throw new ApiProblem(HttpStatus.FORBIDDEN, "账号已停用，请联系站点管理员。");
         // 验证门槛只在密码正确之后提示，避免未授权者借此探测邮箱状态；旧账号未验证仍可登录并被提示补验证
         if (!user.isEmailVerified() && !user.isLegacyAccount()) throw new ApiProblem(HttpStatus.FORBIDDEN, "请先验证邮箱，再返回登录。");
         rotateSession(session, servletRequest); session.setAttribute(USER_ID, user.getId()); session.setAttribute(AUTH_EPOCH, user.getSessionEpoch()); refreshCsrf(servletRequest, response);
@@ -69,6 +71,7 @@ public class AuthController {
         Object id = session.getAttribute(USER_ID);
         if (!(id instanceof Long)) throw new ApiProblem(HttpStatus.UNAUTHORIZED, "登录后才能进行此操作");
         UserAccount user = users.findById((Long) id).orElseThrow(() -> new ApiProblem(HttpStatus.UNAUTHORIZED, "登录已失效"));
+        if (!user.isActive()) throw new ApiProblem(HttpStatus.UNAUTHORIZED, "登录已失效");
         if (!(session.getAttribute(AUTH_EPOCH) instanceof Long epoch) || epoch != user.getSessionEpoch()) throw new ApiProblem(HttpStatus.UNAUTHORIZED, "登录已失效");
         return user;
     }

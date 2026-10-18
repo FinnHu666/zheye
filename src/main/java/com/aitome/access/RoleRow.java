@@ -14,4 +14,5 @@ public record RoleRow(long id, String code, String name, String description, Str
 
     public boolean isAdmin() { return Role.KIND_ADMIN.equals(systemKind); }
     public boolean isDefault() { return Role.KIND_DEFAULT.equals(systemKind); }
+    public boolean isOwner() { return Role.KIND_OWNER.equals(systemKind); }
 }

@@ -32,6 +32,10 @@ public class AccessAuditEntry {
     @Column(name = "removed_permissions", length = 500) private String removedPermissions;
     @Column(name = "moved_count") private Integer movedCount;
     @Column(name = "moved_names", length = 500) private String movedNames;
+    @Column(name = "before_status", length = 10) private String beforeStatus;
+    @Column(name = "after_status", length = 10) private String afterStatus;
+    @Column(nullable = false, length = 10, columnDefinition = "varchar(10) default 'SUCCESS' not null") private String outcome = "SUCCESS";
+    @Column(name = "result_message", length = 200) private String resultMessage;
     @Column(nullable = false, length = 200) private String note = "";
     @Column(name = "created_at", nullable = false) private Instant createdAt;
     protected AccessAuditEntry() {}

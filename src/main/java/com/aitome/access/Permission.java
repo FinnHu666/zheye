@@ -5,7 +5,7 @@ import java.util.Optional;
 
 /**
  * FINNS-11 权限目录（契约 §1）。代码检查依赖这里的枚举；数据库只保存“角色拥有哪些权限”。
- * lockAll：所有角色必须拥有；lockAdmin：管理员角色必须拥有（防止锁死管理入口）。
+ * lockAll：所有角色必须拥有；lockAdmin：管理员角色必须拥有（防止锁死管理入口）；站长角色拥有全部且不可关闭。
  */
 public enum Permission {
     CONTENT_PUBLIC("content.public", "页面", "浏览公开内容", "发现、专题广场、公开专题、VPS 指南", true, false, true),
@@ -37,7 +37,7 @@ public enum Permission {
     public boolean guest() { return guest; }
 
     /** 该权限在给定角色上是否不可关闭。 */
-    public boolean lockedFor(String systemKind) { return lockAll || (lockAdmin && Role.KIND_ADMIN.equals(systemKind)); }
+    public boolean lockedFor(String systemKind) { return lockAll || Role.KIND_OWNER.equals(systemKind) || (lockAdmin && Role.KIND_ADMIN.equals(systemKind)); }
 
     public static Optional<Permission> fromCode(String code) {
         return Arrays.stream(values()).filter(p -> p.code.equals(code)).findFirst();

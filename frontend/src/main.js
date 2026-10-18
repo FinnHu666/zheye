@@ -23,6 +23,7 @@ import AdminAuditPage from './pages/admin/AdminAuditPage.vue'
 import { refreshSession } from './lib/session'
 import './assets/styles.css'
 import './assets/account.css'
+import './assets/admin.css'
 
 // meta.perm：页面所需权限（FINNS-11）。无权限时 App 保留地址显示 403；接口另由服务端检查。
 const own = { requiresAuth: true, perm: 'collection.manage' }

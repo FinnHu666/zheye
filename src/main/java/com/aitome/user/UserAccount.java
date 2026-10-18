@@ -22,6 +22,9 @@ public class UserAccount {
     /** 会话撤销版本：登录时写入会话，不一致即视为已失效。只通过 SQL 自增，不由实体写回。 */
     @Column(name = "session_epoch", nullable = false, insertable = false, updatable = false, columnDefinition = "bigint default 0 not null") private long sessionEpoch;
     @Column(name = "password_changed_at") private Instant passwordChangedAt;
+    /** 账号状态（FINNS-16）：ACTIVE / DISABLED。只通过 AccessAdminService 的 SQL 变更，不由实体写回。 */
+    @Column(name = "account_status", nullable = false, insertable = false, updatable = false, columnDefinition = "varchar(10) default 'ACTIVE' not null") private String accountStatus = "ACTIVE";
+    @Column(name = "status_version", nullable = false, insertable = false, updatable = false, columnDefinition = "bigint default 1 not null") private long statusVersion;
 
     protected UserAccount() {}
     public UserAccount(String email, String passwordHash, String displayName) {
@@ -47,4 +50,6 @@ public class UserAccount {
     public boolean isLegacyAccount() { return legacyAccount; }
     public long getSessionEpoch() { return sessionEpoch; }
     public Instant getPasswordChangedAt() { return passwordChangedAt; }
+    public boolean isActive() { return !"DISABLED".equals(accountStatus); }
+    public long getStatusVersion() { return statusVersion; }
 }

@@ -8,5 +8,8 @@ import jakarta.persistence.*;
 public class AccessControlState {
     @Id private Short id;
     @Column(nullable = false) private long version;
+    /** 唯一站长（FINNS-16）。空表示尚未初始化；只经转交事务或启动初始化变更。 */
+    @Column(name = "owner_user_id") private Long ownerUserId;
+    @Column(name = "owner_version", nullable = false, columnDefinition = "bigint default 1 not null") private long ownerVersion = 1;
     protected AccessControlState() {}
 }

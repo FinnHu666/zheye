@@ -3,12 +3,14 @@ package com.aitome.access;
 import jakarta.persistence.*;
 import java.time.Instant;
 
-/** 角色。系统种类 ADMIN（管理员）与 DEFAULT（注册默认）不可删除，可改名。 */
+/** 角色。系统种类 ADMIN（管理员）与 DEFAULT（注册默认）不可删除，可改名；OWNER（站长）固定。 */
 @Entity
 @Table(name = "roles")
 public class Role {
     public static final String KIND_ADMIN = "ADMIN";
     public static final String KIND_DEFAULT = "DEFAULT";
+    /** 唯一站点所有者（FINNS-16）：只能经转交接口改变，不能分配、复制、改名或删除。 */
+    public static final String KIND_OWNER = "OWNER";
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
     @Column(nullable = false, unique = true, length = 40) private String code;

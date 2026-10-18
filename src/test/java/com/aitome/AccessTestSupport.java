@@ -46,6 +46,11 @@ final class AccessTestSupport {
     void setRole(long userId, String roleCode) {
         int updated = jdbc.update("update user_accounts set role_id=(select id from roles where code=?) where id=?", roleCode, userId);
         if (updated != 1) throw new IllegalStateException("cannot set role " + roleCode);
+        // 站长只能经转交改变（FINNS-16）；测试直接建立站长时同步站长指针，并让其他站长角色持有者降为管理员
+        if ("OWNER".equals(roleCode)) {
+            jdbc.update("update user_accounts set role_id=(select id from roles where code='ADMIN') where role_id=(select id from roles where code='OWNER') and id<>?", userId);
+            jdbc.update("update access_control_state set owner_user_id=? where id=1", userId);
+        }
     }
 
     Cookie csrf() throws Exception {

@@ -42,6 +42,24 @@ public class AccessAuditWriter {
                 movedCount, String.join("、", movedNames), clean(note), now());
     }
 
+    /** 账号停用/恢复记录（FINNS-16）。成功时与业务变更同事务；拒绝/失败时在独立（无事务）调用中写入。 */
+    public void status(Long operatorId, String operatorName, long targetId, String targetName, String roleCode, String roleName,
+                       String action, String beforeStatus, String afterStatus, String note, String outcome, String message) {
+        jdbc.update("insert into access_audit_log(type,action,operator_id,operator_name,target_user_id,target_user_name,role_code,role_name,before_status,after_status,note,outcome,result_message,created_at) values('ACCOUNT_STATUS',?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                action, operatorId, operatorName, targetId, targetName, roleCode, roleName, beforeStatus, afterStatus, clean(note), outcome, trim(message), now());
+    }
+
+    /** 站长转交/初始化记录：operator 为原站长（初始化为系统），target 为接任人，before/after_role 为接任人的角色变化。 */
+    public void owner(Long operatorId, String operatorName, Long targetId, String targetName, String beforeRoleCode, String beforeRoleName,
+                      String afterRoleCode, String afterRoleName, String action, String note, String outcome, String message) {
+        jdbc.update("insert into access_audit_log(type,action,operator_id,operator_name,target_user_id,target_user_name,before_role_code,before_role_name,after_role_code,after_role_name,note,outcome,result_message,created_at) values('OWNER_TRANSFER',?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                action, operatorId, operatorName, targetId, targetName, beforeRoleCode, beforeRoleName, afterRoleCode, afterRoleName, clean(note), outcome, trim(message), now());
+    }
+
+    private static String trim(String message) {
+        return message == null ? null : message.substring(0, Math.min(200, message.length()));
+    }
+
     private static String codes(Collection<Permission> permissions) {
         return permissions.isEmpty() ? null : String.join(",", permissions.stream().map(Permission::code).toList());
     }

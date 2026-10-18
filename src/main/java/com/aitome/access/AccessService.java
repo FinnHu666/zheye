@@ -32,7 +32,7 @@ public class AccessService {
         Object id = session == null ? null : session.getAttribute(AuthController.USER_ID);
         if (!(id instanceof Long userId)) return AccessContext.guest();
         AccessContext context = forUser(userId);
-        if (context == null) return AccessContext.guest(); // 会话指向已不存在的用户：按游客处理，受保护接口由拦截器返回“登录已失效”
+        if (context == null || !context.active()) return AccessContext.guest(); // 用户不存在或账号已停用（FINNS-16）：按游客处理，受保护接口由拦截器返回“登录已失效”
         // 会话撤销（FINNS-15）：登录时记录的 epoch 与库中不一致，说明密码已被重置/修改或账号被撤销会话，按失效处理
         Object epoch = session.getAttribute(AuthController.AUTH_EPOCH);
         return epoch instanceof Long value && value == context.sessionEpoch() ? context : AccessContext.guest();
@@ -41,17 +41,17 @@ public class AccessService {
     /** 用户不存在（会话失效）时返回 null。 */
     public AccessContext forUser(long userId) {
         List<AccessContext> rows = jdbc.query("""
-                select u.id,u.display_name,u.session_epoch,r.id as role_id,r.code,r.name,r.system_kind
+                select u.id,u.display_name,u.session_epoch,u.account_status,r.id as role_id,r.code,r.name,r.system_kind
                 from user_accounts u left join roles r on r.id=u.role_id where u.id=?""",
                 (rs, n) -> new AccessContext(rs.getLong("id"), rs.getString("display_name"), (Long) rs.getObject("role_id"),
-                        rs.getString("code"), rs.getString("name"), rs.getString("system_kind"), Set.of(), rs.getLong("session_epoch")), userId);
+                        rs.getString("code"), rs.getString("name"), rs.getString("system_kind"), Set.of(), rs.getLong("session_epoch"), !"DISABLED".equals(rs.getString("account_status"))), userId);
         if (rows.isEmpty()) return null;
         AccessContext row = rows.get(0);
         if (row.roleId() == null) { // H2 开发库的历史用户在启动初始化前可能还没有角色，按注册默认角色处理
             RoleRow fallback = defaultRole();
-            row = new AccessContext(row.userId(), row.displayName(), fallback.id(), fallback.code(), fallback.name(), fallback.systemKind(), Set.of(), row.sessionEpoch());
+            row = new AccessContext(row.userId(), row.displayName(), fallback.id(), fallback.code(), fallback.name(), fallback.systemKind(), Set.of(), row.sessionEpoch(), row.active());
         }
-        return new AccessContext(row.userId(), row.displayName(), row.roleId(), row.roleCode(), row.roleName(), row.systemKind(), permissionsOf(row.roleId()), row.sessionEpoch());
+        return new AccessContext(row.userId(), row.displayName(), row.roleId(), row.roleCode(), row.roleName(), row.systemKind(), permissionsOf(row.roleId()), row.sessionEpoch(), row.active());
     }
 
     public Set<Permission> permissionsOf(long roleId) {
