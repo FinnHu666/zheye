@@ -13,8 +13,12 @@ import editorMethods from '../lib/topic-builder/editor-methods'
 import HtmlBlockFrame from '../components/topic-builder/HtmlBlockFrame.vue'
 import HtmlCodeDialog from '../components/topic-builder/HtmlCodeDialog.vue'
 import ModulePicker from '../components/topic-builder/ModulePicker.vue'
+import ReauthPanel from '../components/ReauthPanel.vue'
+import { useSessionGuard } from '../lib/sessionGuard'
 export default {
-  components: { HtmlBlockFrame, HtmlCodeDialog, ModulePicker },
+  components: { HtmlBlockFrame, HtmlCodeDialog, ModulePicker, ReauthPanel },
+  // 登录失效时（任何受保护请求返回 401）保留页面里的内容并就地重新登录；归属由服务端逐请求校验
+  setup() { return { guard: useSessionGuard() } },
   data() {
     return {
       styles,
@@ -492,6 +496,7 @@ export default {
     class="topic-builder"
     :class="{ 'is-block-dragging': dragState?.active }"
   >
+    <div class="reauth-banner"><ReauthPanel :guard="guard" /></div>
     <header class="topbar">
       <strong>AI 专题创作</strong
       ><RouterLink to="/me/collections">我的专题 →</RouterLink>

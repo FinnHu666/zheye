@@ -22,6 +22,7 @@ public class AccountMailConfig {
                                         @Value("${finns.mail.password:}") String password,
                                         @Value("${finns.mail.from:}") String from,
                                         @Value("${finns.mail.starttls:true}") boolean starttls,
+                                        @Value("${finns.mail.ssl:false}") boolean ssl,
                                         @Value("${finns.public-base-url:}") String baseUrl,
                                         @Value("${server.address:}") String serverAddress,
                                         @Value("${finns.mail.outbox-dir:data/dev-mail}") String outboxDir) {
@@ -33,10 +34,9 @@ public class AccountMailConfig {
                 sender.setHost(host); sender.setPort(port); sender.setDefaultEncoding("UTF-8");
                 if (!username.isBlank()) sender.setUsername(username);
                 if (!password.isBlank()) sender.setPassword(password);
-                Properties props = sender.getJavaMailProperties();
-                props.put("mail.smtp.auth", String.valueOf(!username.isBlank()));
-                props.put("mail.smtp.starttls.enable", String.valueOf(starttls));
-                props.put("mail.smtp.connectiontimeout", "5000"); props.put("mail.smtp.timeout", "10000"); props.put("mail.smtp.writetimeout", "10000");
+                if (!username.isBlank() && !ssl && !starttls)
+                    throw new IllegalStateException("配置了 SMTP 账号却关闭了 TLS：请启用 FINNS_MAIL_SSL（465）或 FINNS_MAIL_STARTTLS（587），不允许明文传输凭据");
+                sender.getJavaMailProperties().putAll(smtpProperties(ssl, starttls, !username.isBlank()));
                 return new SmtpAccountMailSender(sender, from);
             }
             case "outbox" -> {
@@ -47,6 +47,25 @@ public class AccountMailConfig {
             case "disabled", "" -> { return new DisabledAccountMailSender(); }
             default -> throw new IllegalStateException("未知的 finns.mail.mode：" + mode);
         }
+    }
+
+    /**
+     * SMTP 连接属性。隐式 TLS（465）与 STARTTLS（587）二选一，隐式 TLS 优先；STARTTLS 为“必须”，
+     * 服务器不支持时报错，而不是悄悄退回明文。两种方式都校验服务器证书的主机名。
+     */
+    static Properties smtpProperties(boolean ssl, boolean starttls, boolean auth) {
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", String.valueOf(auth));
+        if (ssl) {
+            props.put("mail.smtp.ssl.enable", "true");
+            props.put("mail.smtp.starttls.enable", "false");
+        } else if (starttls) {
+            props.put("mail.smtp.starttls.enable", "true");
+            props.put("mail.smtp.starttls.required", "true");
+        }
+        if (ssl || starttls) props.put("mail.smtp.ssl.checkserveridentity", "true");
+        props.put("mail.smtp.connectiontimeout", "5000"); props.put("mail.smtp.timeout", "10000"); props.put("mail.smtp.writetimeout", "10000");
+        return props;
     }
 
     static boolean isLoopback(String address) {

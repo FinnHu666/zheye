@@ -105,6 +105,11 @@ public class AccountTokenService {
         jdbc.update("update account_action_tokens set status='FAILED' where id=? and status='PENDING'", id);
     }
 
+    /** 自 start 起已发出的令牌邮件数（含仍在发送中的），用于全局日预算。 */
+    public Integer sentSince(Instant start) {
+        return jdbc.queryForObject("select count(*) from account_action_tokens where sent_at>=? or (status='PENDING' and created_at>=?)", Integer.class, ts(start), ts(start));
+    }
+
     /** 同邮箱同用途距下一次可发送的剩余秒数（仅用于登录态响应，公开响应恒为 60）。 */
     public int cooldownSeconds(TokenPurpose purpose, String email) {
         List<Timestamp> sent = jdbc.query("select max(sent_at) from account_action_tokens where email=? and purpose=?", (rs, n) -> rs.getTimestamp(1), email, purpose.name());

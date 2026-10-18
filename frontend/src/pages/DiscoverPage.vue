@@ -1,13 +1,18 @@
 <script setup>
-import { onMounted, ref, computed, watch } from 'vue'
+import { onMounted, ref, shallowRef, computed, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { api, dateLabel } from '../lib/api'
 import { latestVisitTotal } from '../lib/siteVisit'
 import { can } from '../lib/session'
+import { useSessionGuard } from '../lib/sessionGuard'
+import ReauthPanel from '../components/ReauthPanel.vue'
 const emit = defineEmits(['write', 'toast'])
 const props = defineProps({ user: { type: Object, default: null } })
 const route = useRoute()
 const posts = ref([]); const filter = ref('ALL'); const postsLoading = ref(true); const postsLoadingMore = ref(false); const postsError = ref(''); const postsPage = ref(-1); const postsTotal = ref(0)
+// 评论的登录失效保护：登录失效或换号时评论留在输入框，在原处重新登录后再提交（ACCOUNT-P04）
+const commentGuard = shallowRef(null)
+watch(() => props.user?.id, () => { if (!commentGuard.value?.expired.value) commentGuard.value = null })
 const detail = ref(null); const detailLoading = ref(false); const detailError = ref(''); const comments = ref([]); const commentBody = ref('')
 const siteStats = ref(null); const numberFormatter = new Intl.NumberFormat('zh-CN')
 const commentsPage = ref(-1); const commentsTotal = ref(0); const commentsLoading = ref(false); const commentsError = ref(''); const commentSending = ref(false)
@@ -77,7 +82,7 @@ const loadComments = async (reset = false) => {
 const openPost = async (post, bodyLoaded = false) => {
   const requestId = ++detailRequestId
   commentsRequestId++; commentsLoading.value = false; detail.value = post; detailLoading.value = !bodyLoaded; detailError.value = ''
-  collectionMessage.value = ''; comments.value = []; commentsPage.value = -1; commentsTotal.value = 0; commentsError.value = ''; commentBody.value = ''
+  collectionMessage.value = ''; comments.value = []; commentsPage.value = -1; commentsTotal.value = 0; commentsError.value = ''; commentBody.value = ''; commentGuard.value = null
   loadComments(true)
   if (!bodyLoaded) {
     try {
@@ -125,6 +130,10 @@ const like = async () => { const postId = detail.value?.id; if (!postId) return;
 const comment = async () => {
   const postId = detail.value?.id
   if (!commentBody.value.trim() || !postId || commentSending.value) return
+  if (props.user) {
+    const guard = commentGuard.value || (commentGuard.value = useSessionGuard())
+    if (!(await guard.beforeSubmit())) return
+  }
   commentSending.value = true
   try {
     const created = await api(`/api/posts/${postId}/comments`, { method: 'POST', body: JSON.stringify({ body: commentBody.value }) })
@@ -133,7 +142,9 @@ const comment = async () => {
       commentsTotal.value += 1
       commentBody.value = ''
     }
-  } catch (error) { emit('toast', error.message) } finally { commentSending.value = false }
+  } catch (error) {
+    if (!commentGuard.value?.handle(error)) emit('toast', error.message) // 401 时评论留在输入框并出现重新登录面板
+  } finally { commentSending.value = false }
 }
 onMounted(() => { loadPosts(true); loadStats() })
 </script>
@@ -161,8 +172,9 @@ onMounted(() => { loadPosts(true); loadStats() })
         <p v-if="user && !can('post.interact')" class="empty role-note">当前角色「{{ user.role?.name }}」可以阅读讨论，但不能发表评论。</p>
         <form v-else @submit.prevent="comment" :aria-busy="commentSending">
           <textarea v-model="commentBody" rows="2" maxlength="1000" required placeholder="登录后写下你的想法…"></textarea>
-          <button class="btn btn-primary" :disabled="commentSending || !commentBody.trim()">{{ commentSending ? '正在发布…' : '参与讨论' }}</button>
+          <button class="btn btn-primary" :disabled="commentSending || !commentBody.trim() || commentGuard?.expired.value">{{ commentSending ? '正在发布…' : '参与讨论' }}</button>
         </form>
+        <ReauthPanel v-if="commentGuard" :guard="commentGuard" />
       </section>
     </section>
   </div>

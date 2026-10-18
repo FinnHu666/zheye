@@ -1,11 +1,12 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { api } from '../src/lib/api.js'
+import { api, UNAUTHORIZED_EVENT } from '../src/lib/api.js'
 import { currentUser } from '../src/lib/session.js'
 import { useSessionGuard } from '../src/lib/sessionGuard.js'
 import { emailError, passwordError } from '../src/lib/accountValidation.js'
 
 globalThis.document = { cookie: 'XSRF-TOKEN=test-token' }
+globalThis.window = new EventTarget() // api() 通过 window 广播 401
 let calls
 const respond = (...queue) => {
   calls = []
@@ -53,7 +54,7 @@ test('logging in as someone else is refused and never counts as recovering the o
   assert.equal(currentUser.value.id, 99, 'the browser really is signed in as the other account now')
 })
 
-test('logging in as the original account releases the page and the account check blocks a swapped session', async () => {
+test('logging in as the original account releases the page', async () => {
   currentUser.value = { id: 7, email: 'owner@finns.test' }
   const guard = useSessionGuard()
   guard.handle(Object.assign(new Error('x'), { status: 401 }))
@@ -62,11 +63,57 @@ test('logging in as the original account releases the page and the account check
   assert.equal(await guard.reLogin(), true)
   assert.equal(guard.expired.value, false)
   assert.equal(guard.password.value, '')
-  respond({ status: 200, body: { id: 8 } })
-  assert.equal(await guard.sameAccount(), false)
-  respond({ status: 401, body: { message: '登录已失效' } })
-  assert.equal(await guard.sameAccount(), false)
+})
+
+test('beforeSubmit blocks a session that expired or was swapped to another account, but not a network error', async () => {
+  currentUser.value = { id: 7, email: 'owner@finns.test' }
+  const guard = useSessionGuard()
+  respond({ status: 200, body: { id: 7 } })
+  assert.equal(await guard.beforeSubmit(), true)
+  assert.equal(guard.expired.value, false)
+
+  respond({ status: 200, body: { id: 8 } }) // 在别处换了账号
+  assert.equal(await guard.beforeSubmit(), false)
   assert.equal(guard.expired.value, true)
+  assert.equal(guard.mismatch.value, true)
+  assert.match(guard.error.value, /另一个账号/)
+  assert.equal(await guard.beforeSubmit(), false, 'stays blocked until the original account logs in again')
+
+  const second = useSessionGuard()
+  respond({ status: 401, body: { message: '登录已失效' } })
+  assert.equal(await second.beforeSubmit(), false)
+  assert.equal(second.expired.value, true)
+
+  const third = useSessionGuard()
+  globalThis.fetch = async () => { throw new Error('network down') }
+  assert.equal(await third.beforeSubmit(), true, 'a network failure is reported by the real submit, not swallowed here')
+  assert.equal(third.expired.value, false)
+})
+
+test('a 401 from a protected request is broadcast, but login and identity calls are not', async () => {
+  let fired = 0
+  const listener = () => { fired++ }
+  window.addEventListener(UNAUTHORIZED_EVENT, listener)
+  respond({ status: 401, body: {} }, { status: 401, body: {} }, { status: 401, body: {} }, { status: 400, body: {} })
+  await assert.rejects(api('/api/me/profile'))
+  assert.equal(fired, 1)
+  await assert.rejects(api('/api/auth/login', { method: 'POST', body: '{}' }))
+  await assert.rejects(api('/api/auth/me'))
+  assert.equal(fired, 1, 'wrong password or an anonymous identity check is not an expired login')
+  await assert.rejects(api('/api/me/posts'))
+  assert.equal(fired, 1, 'only 401 counts')
+  window.removeEventListener(UNAUTHORIZED_EVENT, listener)
+})
+
+test('the broadcast expires the guard only for a page that was opened while signed in', () => {
+  currentUser.value = { id: 7, email: 'owner@finns.test' }
+  const signedIn = useSessionGuard()
+  signedIn.onUnauthorized()
+  assert.equal(signedIn.expired.value, true)
+  currentUser.value = null
+  const guest = useSessionGuard()
+  guest.onUnauthorized()
+  assert.equal(guest.expired.value, false, 'a guest hitting a login-only action is not an expired session')
 })
 
 test('password and email checks match the server policy', () => {

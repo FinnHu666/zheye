@@ -40,8 +40,6 @@ body{overflow-x:clip}
   .header-actions .btn-primary{padding:9px 8px;font-size:12px}
   .main-nav{gap:8px;padding:4px 0 8px}
   .main-nav a{font-size:12px}
-  .personal-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;overflow:visible}
-  .personal-nav a{padding:7px 8px;font-size:12px;text-align:center}
   .pagination-control{gap:10px}
   .ambient{display:none}
 }
@@ -214,3 +212,20 @@ body{overflow-x:clip}
 .restricted-pill{background:#dcebf3!important;color:#245a75!important;margin-left:6px}
 @media(max-width:850px){.role-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.admin-user-row{flex-wrap:wrap}.admin-user-main{flex-basis:100%}.role-cards{grid-template-columns:1fr}.admin-toolbar .btn{width:100%}.audit-filters label{flex:1 1 100%}.audit-filters input,.audit-filters select{width:100%}.audit-filter-actions .btn{flex:1}}
+
+/* 个人中心统一版式（PersonalLayout）：导航与标题块在所有个人页的位置、宽度一致，切换页签不跳动。 */
+.personal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;min-height:132px;margin-bottom:28px}
+.personal-head-text{min-width:0;flex:1}
+.personal-head h1{font-family:Georgia,"Noto Sans SC",serif;font-size:38px;font-weight:500;line-height:1.25;letter-spacing:-1px;margin:12px 0 8px}
+.personal-head p{color:var(--muted);font-size:14px;margin:0;overflow-wrap:anywhere}
+.personal-head-actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:12px;padding-top:22px}
+@media(max-width:600px){
+  .personal-head{flex-direction:column;gap:12px;min-height:0}
+  .personal-head h1{font-size:30px}
+  .personal-head-actions{justify-content:flex-start;padding-top:0}
+  .personal-container .personal-nav{display:flex;flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;gap:5px;scrollbar-width:none;padding-bottom:12px;margin-bottom:24px}
+  .personal-container .personal-nav a{flex:0 0 auto;padding:9px 12px;font-size:12px}
+  .personal-container .personal-nav::-webkit-scrollbar{display:none}
+}
+/* 页面长短不同时滚动条会出现/消失，预留滚动条位置，避免内容水平方向跳动 */
+html{scrollbar-gutter:stable}

@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-import PersonalNav from '../components/PersonalNav.vue'
+import PersonalLayout from '../components/PersonalLayout.vue'
 import { api } from '../lib/api'
 const emit = defineEmits(['toast'])
 const state = ref(null), key = ref(''), busy = ref(false), error = ref(''), confirmDelete = ref(false)
@@ -28,10 +28,8 @@ async function remove() {
 }
 </script>
 <template>
-  <section class="page-hero personal-hero"><span class="kicker">YOUR SPACE</span><h1>让灵感，<em>有自己的助手。</em></h1><p>为你的专题创作配置 AI。</p></section>
-  <section class="section personal-section"><div class="personal-container"><PersonalNav />
+  <PersonalLayout kicker="AI SETTINGS" title="AI 配置" desc="为你的专题创作配置 AI。">
     <form class="profile-card ai-settings" @submit.prevent="save">
-      <span class="kicker">AI SETTINGS</span><h2>AI 配置</h2>
       <p class="muted-copy">DeepSeek · 使用你自己的账号额度</p>
       <p v-if="!state && !error" role="status">正在读取配置…</p>
       <template v-if="state">
@@ -49,7 +47,7 @@ async function remove() {
       </template>
       <p v-if="error" class="form-error" role="alert">{{ error }}</p>
     </form>
-  </div></section>
+  </PersonalLayout>
 </template>
 <style scoped>
 .settings-actions{display:flex;gap:12px;flex-wrap:wrap}.key-status{background:#eff4ee;padding:16px;border-radius:12px;color:#245d49}.delete-confirm{border-top:1px solid #dce3da;padding-top:16px}.ai-settings input{width:100%}

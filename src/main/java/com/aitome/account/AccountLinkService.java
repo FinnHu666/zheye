@@ -39,11 +39,12 @@ public class AccountLinkService {
     private final AccountMailService mail;
     private final SlidingWindowLimiter limiter;
     private final Clock clock;
+    private final AccountMailBudget budget;
 
     public AccountLinkService(UserRepository users, AccessService access, BCryptPasswordEncoder encoder, JdbcTemplate jdbc, TransactionTemplate tx,
-                              AccountTokenService tokens, AccountMailService mail, SlidingWindowLimiter limiter, Clock clock) {
+                              AccountTokenService tokens, AccountMailService mail, SlidingWindowLimiter limiter, Clock clock, AccountMailBudget budget) {
         this.users = users; this.access = access; this.encoder = encoder; this.jdbc = jdbc; this.tx = tx;
-        this.tokens = tokens; this.mail = mail; this.limiter = limiter; this.clock = clock;
+        this.tokens = tokens; this.mail = mail; this.limiter = limiter; this.clock = clock; this.budget = budget;
     }
 
     public static String normalizeEmail(String value) {
@@ -74,6 +75,7 @@ public class AccountLinkService {
     }
 
     private void issueAndSend(TokenPurpose purpose, String email, Long userId, boolean unverifiedAccount) {
+        if (!budget.allowNewLinkMail()) return; // 日预算用尽：与发送失败同样处理，响应不变、旧链接保持有效
         tokens.issue(purpose, email, userId).ifPresent(issued -> mail.sendLink(issued, unverifiedAccount));
     }
 

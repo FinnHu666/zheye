@@ -44,4 +44,6 @@ finns:
     password: ${FINNS_MAIL_PASSWORD:}
     from: ${FINNS_MAIL_FROM:}
     starttls: ${FINNS_MAIL_STARTTLS:true}
+    ssl: ${FINNS_MAIL_SSL:false}            # 隐式 TLS（465）；为 true 时忽略 starttls
+    daily-budget: ${FINNS_MAIL_DAILY_BUDGET:0}   # 全局日发送预算，建议服务商日额度的 80%；0 表示不限制
     async: true

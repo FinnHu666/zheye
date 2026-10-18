@@ -22,18 +22,19 @@ public class AccountMailService {
     static final Duration NOTICE_TIMEOUT = Duration.ofSeconds(3);
     private final AccountMailSender sender;
     private final AccountTokenService tokens;
+    private final AccountMailBudget budget;
     private final Clock clock;
     private final String baseUrl;
     private final boolean async;
     private final ZoneId zone;
     private final ExecutorService executor = new ThreadPoolExecutor(2, 2, 30, TimeUnit.SECONDS, new ArrayBlockingQueue<>(50), daemonFactory(), new ThreadPoolExecutor.AbortPolicy());
 
-    public AccountMailService(AccountMailSender sender, AccountTokenService tokens, Clock clock,
+    public AccountMailService(AccountMailSender sender, AccountTokenService tokens, AccountMailBudget budget, Clock clock,
                               @Value("${finns.public-base-url:}") String baseUrl,
                               @Value("${server.port:8080}") String port,
                               @Value("${finns.mail.async:true}") boolean async,
                               @Value("${finns.access.audit-zone:Asia/Shanghai}") String zone) {
-        this.sender = sender; this.tokens = tokens; this.clock = clock; this.async = async; this.zone = ZoneId.of(zone);
+        this.sender = sender; this.tokens = tokens; this.budget = budget; this.clock = clock; this.async = async; this.zone = ZoneId.of(zone);
         String trimmed = baseUrl == null ? "" : baseUrl.trim();
         this.baseUrl = (trimmed.isEmpty() ? "http://127.0.0.1:" + port : trimmed).replaceAll("/+$", "");
     }
@@ -66,6 +67,7 @@ public class AccountMailService {
 
     /** 密码更新通知：提交后发送，带 3 秒超时。失败返回 false，不影响已成功的密码更新。 */
     public boolean sendPasswordChangedNotice(String email) {
+        budget.noticeAttempted();
         AccountMail mail = new AccountMail(email, "你的 FINNS 密码已更新",
                 "你的 FINNS 账号密码已在 " + DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(zone).format(clock.instant()) + "（" + zone + "）更新。\n\n"
                 + "如果这是你本人的操作，无需处理。\n如果不是你本人操作，请立即在登录页选择“忘记密码”，通过邮箱重置密码。\n\n"
