@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "operation_id": "USER-ADMIN-P01",
+  "diff_revision": 1,
+  "requirement_revision": 1,
+  "date": "2026-10-18",
+  "timezone": "Asia/Singapore",
+  "confirmation": {
+    "source": "本轮用户在USER-ADMIN-P01具体差异展示后回复“确认写入”",
+    "confirmed": true,
+    "scope": "仅更新FINNS-16正文，保留Backlog及其他字段/关联"
+  },
+  "action": "workitem.update",
+  "changed_fields": [
+    "description_stripped"
+  ],
+  "workitem_identifier": "FINNS-16",
+  "workitem_id": "bf836bf4-f306-4a64-8b56-1e571939d14e",
+  "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+  "parent_workitem_id": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+  "write": {
+    "attempt_count": 1,
+    "successful_calls": 1,
+    "status": "succeeded",
+    "before_updated_at": "2026-10-17T15:05:56.286914Z",
+    "after_updated_at": "2026-10-18T07:21:33.265068Z"
+  },
+  "readback": {
+    "status": "verified",
+    "body_comparison": "equal_after_whitespace_normalization",
+    "protected_fields_unchanged": [
+      "name",
+      "project",
+      "workspace",
+      "parent",
+      "priority",
+      "assignees",
+      "labels",
+      "start_date",
+      "target_date",
+      "type_id",
+      "archived_at",
+      "is_draft",
+      "deleted_at",
+      "point",
+      "estimate_point",
+      "sort_order",
+      "cycle_id",
+      "completed_at",
+      "state"
+    ],
+    "protected_field_differences": [],
+    "state_id": "5b7d9df4-8ce4-40be-b110-83515a957a2a",
+    "state_name": "Backlog",
+    "cycle": {
+      "count": 11,
+      "unchanged": true,
+      "contains_item": true,
+      "no_more_pages": true
+    },
+    "release": {
+      "status": "unverified",
+      "reason": "HTTP 402 Payment Required",
+      "membership_preserved_claim": "未执行关联写操作；受读取限制，不能确认本轮最新Release成员"
+    }
+  },
+  "scope_boundaries": {
+    "comments_written": false,
+    "associations_written": false,
+    "other_workitems_written": false,
+    "prototype_created": false,
+    "business_code_changed": false,
+    "database_touched": false,
+    "services_changed": false,
+    "version_files_changed": false,
+    "git_commit_or_push": false
+  },
+  "evidence": {
+    "requirements": "docs/requirements/FOUNDATION_USER_ADMIN_REQUIREMENTS.md",
+    "approved_diff": "docs/requirements/FOUNDATION_USER_ADMIN_PLANE_SYNC.md",
+    "approved_payload": "docs/requirements/FOUNDATION_USER_ADMIN_PLANE_SYNC.json",
+    "approved_description_sha256_encoding": "UTF-8; exact local approved payload before remote whitespace normalization"
+  },
+  "approved_description_sha256": "de69fc05ef5c002404110f959f8ef649ce0e0af808050f6409777897fc19f6ac"
+}

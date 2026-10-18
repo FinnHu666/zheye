@@ -1,3 +1,11 @@
+# 当前任务：FINNS-16管理同步已完成（2026-10-18）
+
+用户单项确认USER-ADMIN-P01，仅正文写入并回读通过，[回执](requirements/FOUNDATION_USER_ADMIN_PLANE_RECEIPT.json)已保存。G1/PLANE通过，下一步G2原型待制作/待确认；需求修订1不变，Backlog不变。实际原型仍待对应授权；未实施业务。Cycle11项集合不变；Release成员HTTP 402未核实，本次无关联写操作。下方待确认内容属于此前准备记录。
+
+# 当前任务：FINNS-16需求归档与同步准备（2026-10-18）
+
+用户确认[账号停用需规修订1](requirements/FOUNDATION_USER_ADMIN_REQUIREMENTS.md)通过，并要求执行本地归档计划。[验收映射](iterations/0.7.0/ACCEPTANCE_USER_ADMIN.md)全部未执行；G1通过，下一步[USER-ADMIN-P01仅正文差异](requirements/FOUNDATION_USER_ADMIN_PLANE_SYNC.md)待单项确认后写入/回读。原型待制作，业务未实施；不改数据库、服务、发布版本或Git。FINNS-15原有验收/管理状态保留。以下同日及更早条目为历史，不覆盖本项当前状态。
+
 2026-10-18最新：C7 已完成（评论框与 AI 工作台接入会话失效保护，并修复换号提交缺陷），前端 38/38、打包 88/88；账号功能现可进入 G7 用户验收。真实邮件送达验证延后到上线前，Plane ACCOUNT-P02 待确认，改动未提交。见[实施记录§9](iterations/0.7.0/IMPLEMENTATION_ACCOUNT.md)。
 
 2026-10-18最新：邮件服务商选定 Brevo（Resend 备选），域名 2000678.xyz；日预算与 FINNS_MAIL_SSL 已实现（88/88）。待用户按[手册](iterations/0.7.0/MAIL_SETUP.md)注册、配 DNS、设环境变量并做真实邮件测试；真实 SMTP 未验证，改动未提交。

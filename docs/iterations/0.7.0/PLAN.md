@@ -1,3 +1,11 @@
+## FINNS-16管理同步补记（2026-10-18）
+
+计划增量修订6范围不变。[USER-ADMIN-P01](../../requirements/FOUNDATION_USER_ADMIN_PLANE_SYNC.md)获单项确认后仅更新正文并回读，[回执](../../requirements/FOUNDATION_USER_ADMIN_PLANE_RECEIPT.json)已保存。G1/PLANE通过、G2原型待制作/待确认，Backlog保持；Release成员HTTP 402未核实，无关联写操作。本次不开始原型或业务，不影响其他功能的阶段证据。
+
+## 计划增量修订6：FINNS-16 需求通过（2026-10-18）
+
+目标版本仍0.7.0；本轮仅需求记录与同步准备，不改变发布版本。F07 [需规修订1](../../requirements/FOUNDATION_USER_ADMIN_REQUIREMENTS.md)整项通过，[验收清单](ACCEPTANCE_USER_ADMIN.md)未执行；[USER-ADMIN-P01](../../requirements/FOUNDATION_USER_ADMIN_PLANE_SYNC.md)仅正文差异待逐项确认。当前在G1→G2管理同步检查点，原型待制作、业务未实施。FINNS-15既有G7验收与其已同步的In Progress管理状态不受影响，其余任务沿用各自证据。下方修订5各历史状态不覆盖本增量。
+
 ## 本轮管理执行完成（2026-10-17）
 
 用户“执行全部”确认已展示的V070-P01–P15，15项写入/回读全部完成。现有Cycle与Release已更新为“FINNS 0.7.0｜多人社区地基完善”，均关联FINNS-10/11/14–22，共11项。八个基础子项为FINNS-15–22，全部归属FINNS-14、Backlog。[执行回执](FOUNDATION_PLANE_RECEIPT.json)已保存。

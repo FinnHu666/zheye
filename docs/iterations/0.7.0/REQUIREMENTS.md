@@ -1,3 +1,15 @@
+## FINNS-16管理同步补记（2026-10-18）
+
+汇总增量修订8及F07需规修订1范围不变。USER-ADMIN-P01已获单项确认、正文写入并回读通过，[回执](../../requirements/FOUNDATION_USER_ADMIN_PLANE_RECEIPT.json)已保存；当前G1/PLANE通过、G2待制作，Backlog保持，业务未开始。下方“PLANE待确认”保留历史，不再重复确认或执行。
+
+## 汇总增量修订8：FINNS-16 需求基线（2026-10-18）
+
+| 范围 | 当前权威 | 当前事实 |
+| --- | --- | --- |
+| F07账号停用与用户管理衔接（FINNS-16） | [分项需规修订1](../../requirements/FOUNDATION_USER_ADMIN_REQUIREMENTS.md)、[验收映射UA-A01–UA-A12](ACCEPTANCE_USER_ADMIN.md) | G1整项通过；PLANE待USER-ADMIN-P01逐项确认，原型/设计/业务/测试未开始；Backlog不变 |
+
+本增量只冻结F07已确认细节，不重开已发布统计/角色管理，不修改其他分项范围。F07的Q03“停用是否隐藏作品”已确认为保持作品原可见范围、单独处置。下方修订7的整体“G1仍pending”及更早分项状态保留历史，以本增量、分项证据和最新交接为准。
+
 ## 当前管理状态（2026-10-17）
 
 0.7.0地基范围已完成Plane归版：FINNS-14为总项，八个基础子项FINNS-15–22，均关联现有0.7.0 Cycle和Release；[执行回执](FOUNDATION_PLANE_RECEIPT.json)已逐项回读。AI继续待定、评价/租房仍暂缓。分项细节和原型尚未确认，G1仍pending；下方“尚未写入/子项待创建”是执行前记录，需求行为条款不变。

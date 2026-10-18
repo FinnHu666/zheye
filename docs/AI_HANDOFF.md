@@ -1,3 +1,24 @@
+# 最新结果：账号功能 G7 验收通过（2026-10-18）
+
+- 用户明确回复“验收结论：全部通过。清单 A–H 各项我都已经在预览里确认过”。[验收记录](iterations/0.7.0/ACCEPTANCE_ACCOUNT.md)结果栏已记通过（用户确认，无逐项截图），G7 通过；下一阶段 **G8 发布**，尚未开始。
+- G8 前置（均未完成）：用户的发布授权；**部署前配置邮件**（设计评审 C4：不配置则新注册不可用，旧账号登录不受影响）；**真实邮件送达验证**（用户延后，ACCOUNT-D12：垃圾箱、SPF/DKIM/DMARC、HTTPS 链接、QQ/163/Outlook）；主库 `finns` 备份与恢复演练（V13 触及用户表）；四处版本同步（当前均为 0.7.0，需确认账号功能的发布版本）；Brevo 的两把已贴出的密钥应删除/重新生成，IP 授权要换成服务器固定 IP。
+- Plane：FINNS-15 仍是 In Progress。验收通过后映射为 Completed（Done）是单独的写操作，**需要用户明确提出并逐项确认**，本轮未写。8080 仍是旧包；预览已停止；代码已提交未推送（最新 a705249 之后仅本次文档）。
+
+# 最新交接：FINNS-16正文已同步并回读，下一步原型（2026-10-18）
+
+- 用户本轮回复“确认写入”，批准已展示的USER-ADMIN-P01差异修订1。写前重读FINNS-16的更新时间/保护字段与基线一致；仅执行一次正文更新，按ID回读正文一致，Backlog和19项保护字段保持。远程更新时间2026-10-18T07:21:33.265068Z。[脱敏回执](requirements/FOUNDATION_USER_ADMIN_PLANE_RECEIPT.json)、[执行记录/原差异](requirements/FOUNDATION_USER_ADMIN_PLANE_SYNC.md)已保存，决定USER-ADMIN-D06已记录。
+- Cycle完整11项集合前后一致。Release成员查询再次HTTP 402，未调用关联写操作；不得把历史关联或本次正文成功当成Release成员已回读。
+- `foundation-user-admin` G0/G1/PLANE通过、G2–G9待办。需求修订1与UA-A01–UA-A12不变，全部业务验收仍未执行。AI下一步是在获授权后复用现有Vue原型环境制作用户管理交互；用户接下来只需决定开始原型，具体原型完成后再确认修订与范围。不要重问产品决定或重复USER-ADMIN-P01，不将本次“确认写入”扩大为原型/业务/发布授权。
+- 本轮只改同步回执/记录、决定/索引/交接/进度和Unreleased；未改业务代码、数据库、服务、四处发布版本，未配置/发送邮件、未Git提交/推送/发布；原有未跟踪`.claude/`保持。最终文档/证据验证见[索引](iterations/0.7.0/ARTIFACTS.md)，业务测试/构建/浏览器未执行。
+
+# 最新交接：FINNS-16需求评审已落盘，Plane正文待单项确认（2026-10-18）
+
+- 用户已整项确认F07，随后要求执行归档与同步准备计划。[需规修订1](requirements/FOUNDATION_USER_ADMIN_REQUIREMENTS.md)记录作品保留/独立下架、停用保留密码找回但不解禁、全部旧会话撤销且恢复重新登录、禁止停用自己、最后正常管理者保护、沿用权限、原因双必填及本人提示；决定USER-ADMIN-D01–D05已记入[决定记录](requirements/FOUNDATION_DECISIONS.md)。
+- [验收映射UA-A01–UA-A12](iterations/0.7.0/ACCEPTANCE_USER_ADMIN.md)已形成，全部未执行。`foundation-user-admin` G0/G1通过、PLANE pending、G2–G9 pending；文档完成不等于业务实现/验收。原型、概设、契约尚未制作。
+- 本轮只读重读FINNS-16：正文仍G1待评审，更新时间2026-10-17T15:05:56.286914Z，Backlog；Cycle完整11项包含本项。Release成员查询HTTP 402，不能声称本轮已核实。[USER-ADMIN-P01具体差异与完整待写稿](requirements/FOUNDATION_USER_ADMIN_PLANE_SYNC.md)、[精确载荷](requirements/FOUNDATION_USER_ADMIN_PLANE_SYNC.json)已准备，尚无远程写入确认/调用/回执。用户下一步仅需单项确认该正文操作；不得重问需求批准或标记为明确延期。
+- AI下一步：收到USER-ADMIN-P01确认后写前重读，核对保护字段，仅更新正文并按ID回读；超时先读，保存脱敏回执后更新PLANE门禁。实际产品原型仍需对应授权及同步检查点处理；具体原型确认与G3/G4齐备后才能开展业务开发。
+- 本轮变更仅需求/计划/决定/验收清单、Plane待写稿/JSON、索引/交接/Unreleased与进度JSON。验证结果见[本轮索引](iterations/0.7.0/ARTIFACTS.md)。未运行前后端测试、构建、浏览器或数据库验收；未配置邮件、未触碰数据库/运行服务/四处版本，未Git提交/推送/发布。原有未跟踪`.claude/`保持，不处理其中内容。FINNS-15已有同步和G7验收状态保持，不能因本轮转F07而标Done。
+
 # 最新结果：FINNS-15 的 Plane 正文与状态已更新（2026-10-18）
 
 - 用户确认后执行 ACCOUNT-P02（正文）与 ACCOUNT-P03（状态 Backlog→In Progress），写前重读、写后回读通过；[回执](requirements/FOUNDATION_ACCOUNT_PLANE_RECEIPT_P02.json)已保存。Plane 状态为 In Progress，**不是 Done**；正文写明“G7 验收进行中、未发布、不是已上线能力”。0.7.0 Cycle 11 项含 FINNS-15 且其余项不变；**Release 成员无法回读（HTTP 402）**，本次操作也未触碰 Release。

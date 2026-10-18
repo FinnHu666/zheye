@@ -1,3 +1,11 @@
+## 当前增量：FINNS-16同步检查点通过（2026-10-18）
+
+[USER-ADMIN-P01回执](FOUNDATION_USER_ADMIN_PLANE_RECEIPT.json)：用户单项确认后正文已更新并回读，Backlog保持；G1/PLANE通过，下一步G2具体原型待制作/待确认。需求修订1和验收映射不变，未开始业务。Cycle集合不变；Release成员HTTP 402未核实，未写关联。下方待单项确认内容为此前准备记录，不再重复申请或执行同一操作。
+
+## 当前增量：FINNS-16 需求评审通过（2026-10-18）
+
+F07：[需规修订1](FOUNDATION_USER_ADMIN_REQUIREMENTS.md)已获本轮整项确认，[UA-A01–UA-A12](../iterations/0.7.0/ACCEPTANCE_USER_ADMIN.md)全部未执行。G1通过，PLANE待[USER-ADMIN-P01正文更新](FOUNDATION_USER_ADMIN_PLANE_SYNC.md)单项确认/执行/回读；G2具体原型待制作，不开始业务开发。FINNS-16本轮只读仍Backlog，Release成员HTTP 402无法核实。下方历史阶段不得覆盖本节。
+
 ## F01评审通过，进入同步检查点（2026-10-17）
 
 2026-10-18当前：F01已按用户原型批注更新[修订7](FOUNDATION_ACCOUNT_REQUIREMENTS.md)，[R2账号与基础资料局部原型](../iterations/0.7.0/ACCOUNT_PROFILE_R2_REVIEW.md)已制作待评审。旧ACCOUNT-P01只同步修订6，新注册顺序/密码上限待管理同步；不重复建卡、不宣称整个F05已通过。
@@ -82,7 +90,7 @@ F01 账号与身份维护已按获批 FND-P02 创建为 **FINNS-15**，父项 FI
 目标标题：**FINNS 0.7.0｜F07 账号停用与用户管理衔接**。进度：`foundation-user-admin`。
 
 - 复用已完成 FINNS-11 的用户查询、角色、权限和管理记录，新增正常/停用/恢复及理由；不重新打开 Done 项。
-- Q03 待确认：是否连带隐藏既有作品；账号状态与作品下架不能未经决定混为一个动作。
+- Q03 已确认：停用保留已发布作品原可见范围，内容下架单独处置并记录；其余已确认范围及验收以 [F07需规修订1](FOUNDATION_USER_ADMIN_REQUIREMENTS.md) 为准。
 - 停用与会话规则对齐 F01；旧会话不能继续受保护操作，不能借停用绕过最后正常管理者保护。
 - AI 交付：用户状态/权限矩阵、管理原型、扩展设计及停用/恢复/冲突证据。
 - 完成标准：状态在下一次请求生效；恢复可用；越权管理拒绝；最后管理者被保护；操作原因、对象和结果可查询，不删除用户资料。
