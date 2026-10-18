@@ -1,6 +1,6 @@
 # FINNS-15 Plane 正文差异与状态更新（ACCOUNT-P02 / P03）
 
-日期：2026-10-18。对象：FINNS-15（UUID `fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d`，项目 `587f13f8-9bd0-4ab2-933c-e3ace27f647f`）。**本文件是待确认的写入草案，尚未执行任何 Plane 写入。**
+日期：2026-10-18。对象：FINNS-15（UUID `fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d`，项目 `587f13f8-9bd0-4ab2-933c-e3ace27f647f`）。**ACCOUNT-P02、P03 已于 2026-10-18 经用户明确确认并执行、回读通过（见 [回执](FOUNDATION_ACCOUNT_PLANE_RECEIPT_P02.json)）。** 下文保留确认前的差异原文。
 
 写前核对（只读，2026-10-18）：FINNS-15 `updated_at=2026-10-17T15:37:44.841733Z`，状态 Backlog，父项 FINNS-14，优先级 none，与上次 ACCOUNT-P01 回执一致。项目状态：Backlog(`5b7d9df4-8ce4-40be-b110-83515a957a2a`)、Todo、In Progress(`71236130-c4d8-4d18-9a59-4106619bf8c6`)、Done、Cancelled。
 
@@ -82,4 +82,4 @@
 - 新正文不含任何密钥、邮箱地址、域名或个人信息；只写“选定 Brevo（备选 Resend）”和验证结论。
 - 正文明确“G7 验收进行中、用户尚未给出结论”“未发布”“不是已上线能力”，没有把实施或自动化通过写成验收通过。
 - 精确载荷见 [FOUNDATION_ACCOUNT_PLANE_SYNC_P02.json](FOUNDATION_ACCOUNT_PLANE_SYNC_P02.json)。
-- 确认/执行/回读目前均为 pending/not_executed。批准后写前重读、执行、回读，并把脱敏回执写入 `FOUNDATION_ACCOUNT_PLANE_RECEIPT_P02.json`。
+- 确认/执行/回读：approved / succeeded / verified（Release 成员无法回读：HTTP 402，见回执）。

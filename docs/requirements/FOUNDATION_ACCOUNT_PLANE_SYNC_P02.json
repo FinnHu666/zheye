@@ -27,9 +27,9 @@
       "only_changes": [
         "description_html"
       ],
-      "approval": "pending",
-      "execution": "not_executed",
-      "readback": "pending"
+      "approval": "approved",
+      "execution": "succeeded",
+      "readback": "verified"
     },
     {
       "id": "ACCOUNT-P03",
@@ -45,9 +45,9 @@
       ],
       "from": "Backlog",
       "to": "In Progress",
-      "approval": "pending",
-      "execution": "not_executed",
-      "readback": "pending"
+      "approval": "approved",
+      "execution": "succeeded",
+      "readback": "verified"
     }
   ],
   "preserve": [
@@ -68,5 +68,6 @@
   "post_write_checks": [
     "re-read by id; description_html equals params; state is In Progress; name/parent/priority/dates unchanged",
     "Cycle and Release lists still contain FINNS-15 and still have 11 items each"
-  ]
+  ],
+  "receipt": "docs/requirements/FOUNDATION_ACCOUNT_PLANE_RECEIPT_P02.json"
 }

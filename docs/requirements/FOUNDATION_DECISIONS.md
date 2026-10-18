@@ -1,3 +1,7 @@
+## 2026-10-18 FINNS-15 Plane 同步执行
+
+FND-D22 / ACCOUNT-P02、P03：用户明确回复“确认 ACCOUNT-P02 和 ACCOUNT-P03 两项 Plane 写入（FINNS-15 正文更新，状态 Backlog→In Progress），写前重读、写后回读”。已写前重读（`updated_at` 与正文均与差异基线一致）、各执行一次、按 ID 回读：正文更新为当前事实，状态改为 In Progress（group started，**不是 Done**），标题/父项/优先级/日期/负责人/标签不变；0.7.0 Cycle 11 项含 FINNS-15，其余项状态不变。Release 成员因 HTTP 402 无法回读（两项操作不涉及 Release）。见 [回执](FOUNDATION_ACCOUNT_PLANE_RECEIPT_P02.json)、[差异](FOUNDATION_ACCOUNT_PLANE_SYNC_P02.md)。未写评论/关联/其他工作项。
+
 ## 2026-10-18 真实邮件送达验证延后到上线
 
 ACCOUNT-D12：用户在看到“Brevo 真实发信到达 Gmail 但进垃圾箱”的结果后表示“目前不管这个内容，待后期上线再做验证”。落实：垃圾箱/送达位置、SPF/DKIM/DMARC 判定、HTTPS 链接对比、QQ/163/Outlook 实测都**延后到上线前（G8）**，不再作为 G7 验收的前置；设计评审条件 C2 剩余部分与 C5 随之转入 G8。这是用户的延期决定，不代表问题已解决。此前的 SMTP 通路验证（登录成功、已能发信）和密钥处理建议保持。

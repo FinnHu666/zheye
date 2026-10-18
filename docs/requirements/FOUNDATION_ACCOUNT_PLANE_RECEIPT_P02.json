@@ -1,0 +1,81 @@
+{
+  "schema": "finns-plane-receipt/1",
+  "executed": "2026-10-18",
+  "approval": {
+    "source": "user message 2026-10-18: 确认 ACCOUNT-P02 和 ACCOUNT-P03 两项 Plane 写入（FINNS-15 正文更新，状态 Backlog→In Progress），写前重读、写后回读。",
+    "scope": [
+      "ACCOUNT-P02",
+      "ACCOUNT-P03"
+    ]
+  },
+  "workitem": "FINNS-15",
+  "workitem_id": "fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d",
+  "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+  "pre_write_read": {
+    "updated_at": "2026-10-17T15:37:44.841733Z",
+    "state": "Backlog",
+    "parent": "FINNS-14",
+    "priority": "none",
+    "result": "matched the guarded values; description text identical to the approved 'before'"
+  },
+  "operations": [
+    {
+      "id": "ACCOUNT-P02",
+      "tool": "workitem.update",
+      "changed": [
+        "description_html"
+      ],
+      "payload_sha256": "dbc4e5282b2b359e6c3c3c705ebd7bbbe96545608e181964d3deb0470b470682",
+      "updated_at_after": "2026-10-18T07:01:51.989625Z",
+      "execution": "succeeded",
+      "readback": "verified"
+    },
+    {
+      "id": "ACCOUNT-P03",
+      "tool": "workitem.update",
+      "changed": [
+        "state"
+      ],
+      "from": "Backlog",
+      "to": "In Progress",
+      "to_state_id": "71236130-c4d8-4d18-9a59-4106619bf8c6",
+      "updated_at_after": "2026-10-18T07:02:09.659159Z",
+      "execution": "succeeded",
+      "readback": "verified"
+    }
+  ],
+  "execution_notes": [
+    "One P03 call was rejected by tool validation (an unsupported 'fields' parameter on update) before any change; it was repeated without that parameter. Exactly one successful state update was made."
+  ],
+  "readback": {
+    "by_id_after_both_writes": {
+      "state": "In Progress",
+      "state_group": "started",
+      "name_unchanged": true,
+      "parent": "FINNS-14",
+      "priority": "none",
+      "dates": null,
+      "assignees": [],
+      "labels": [],
+      "cycle_id_field": null
+    },
+    "description_html": "Re-read by id after both writes; compared with the approved payload text manually (identical, including no secrets/emails/domain).",
+    "cycle_0_7_0": {
+      "id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "item_count": 11,
+      "contains_FINNS-15": true,
+      "FINNS-10_11": "Done (unchanged)",
+      "FINNS-14_and_others": "Backlog (unchanged)",
+      "FINNS-15": "In Progress"
+    },
+    "release_0_7_0": {
+      "id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+      "readback": "not_possible",
+      "reason": "release list_workitems returned HTTP 402 Payment Required on 2026-10-18 (earlier sessions could read it). Neither operation touches Release membership."
+    }
+  },
+  "not_done": [
+    "no comment, relation, cycle, release, label, assignee, date or other work item was written",
+    "FINNS-21 and the other six children were not touched"
+  ]
+}
