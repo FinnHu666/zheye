@@ -1,6 +1,7 @@
 // Isolated acceptance only. Never print the credential or persist it in reports.
 import assert from 'node:assert/strict'
 import { readFile, writeFile } from 'node:fs/promises'
+import { signupViaDevOutbox } from './lib/dev-signup.mjs'
 const base = 'http://127.0.0.1:8082', reportPath = new URL('../target/iteration2-acceptance.json', import.meta.url)
 const email = 'builder-20261009@finns.dev', password = 'builder-test-2026'
 // Cookie client with recursive CSRF refresh, keeping tokens out of output.
@@ -32,7 +33,7 @@ try { const previous=JSON.parse(await readFile(reportPath,'utf8')); if(previous.
 const key=process.env.DEEPSEEK_API_KEY
 assert.ok(key,'Set the existing user credential in the process environment without printing it.')
 const b=session(), suffix=Date.now(), bEmail=`iteration2-${suffix}@finns.dev`
-await b('/api/auth/register','POST',{email:bEmail,password,displayName:'第二轮隔离账号'},201)
+await signupViaDevOutbox((path,body)=>b(path,'POST',body,path==='/api/auth/register'?201:200),{email:bEmail,password,displayName:'第二轮隔离账号'}) // 需 FINNS_MAIL_MODE=outbox
 assert.equal((await b('/api/me/ai-settings/deepseek')).configured,false)
 await a('/api/me/ai-settings/deepseek','PUT',{},403,false)
 const configured=await a('/api/me/ai-settings/deepseek','PUT',{key});assert.ok(configured.configured);assert.ok(!JSON.stringify(configured).includes(key))

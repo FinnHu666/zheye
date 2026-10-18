@@ -1,5 +1,6 @@
 // Explicit real-provider acceptance: fixed non-sensitive sources, at most six AI requests, no retry.
 import { mkdir, writeFile } from 'node:fs/promises'
+import { signupViaDevOutbox } from './lib/dev-signup.mjs'
 const base=new URL(process.argv[2]||'http://127.0.0.1:8082')
 if(base.hostname!=='127.0.0.1'||base.protocol!=='http:'||base.port==='8080')throw Error('Only the isolated loopback application is allowed')
 const cookies=new Map(),report={date:new Date().toISOString(),base:base.origin,status:'not-run',attemptedRequests:0,cases:[]}
@@ -19,7 +20,7 @@ try{
   if(process.env.FINNS_AI_TEST_EMAIL&&process.env.FINNS_AI_TEST_PASSWORD){
     await call('/api/auth/login',{email:process.env.FINNS_AI_TEST_EMAIL,password:process.env.FINNS_AI_TEST_PASSWORD})
   }else{
-    await call('/api/auth/register',{email:'real-ai-'+crypto.randomUUID()+'@finns.dev',password:crypto.randomUUID(),displayName:'真实AI隔离验收'})
+    await signupViaDevOutbox((path,body)=>call(path,body),{email:'real-ai-'+crypto.randomUUID()+'@finns.dev',password:'Ai-'+crypto.randomUUID().slice(0,12),displayName:'真实AI隔离验收'}) // 需 FINNS_MAIL_MODE=outbox
   }
   const capabilities=await call('/api/me/topic-builder/capabilities')
   if(!capabilities.aiAvailable||/fixture|mock|test/i.test(capabilities.model))throw Error('真实 DeepSeek 未配置；固定模型测试不能代替真实验收')

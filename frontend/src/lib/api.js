@@ -16,7 +16,11 @@ export async function api(url, options = {}) {
   })
   if (response.status === 204) return null
   const body = await response.json().catch(() => ({}))
-  if (!response.ok) throw new Error(body.message || '请求失败，请稍后再试')
+  if (!response.ok) {
+    const error = new Error(body.message || '请求失败，请稍后再试')
+    error.status = response.status // 页面据此区分 401（登录失效，需保护未提交内容）与其他错误
+    throw error
+  }
   return body
 }
 

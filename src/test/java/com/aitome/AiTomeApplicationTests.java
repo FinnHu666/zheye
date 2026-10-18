@@ -107,10 +107,8 @@ class AiTomeApplicationTests {
     @Test void collectionAndPersonalPostListsArePagedSummaries() throws Exception {
         MockHttpSession session = new MockHttpSession();
         Cookie csrf = csrfCookie();
-        String userResponse = mvc.perform(post("/api/auth/register").session(session).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.writeValueAsString(Map.of("email", uniqueEmail("summary-pages"), "password", "password123", "displayName", "列表摘要用户"))))
-                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        String userResponse = TestUsers.registerAndLogin(mvc, jdbc, session, uniqueEmail("summary-pages"), "password123", "列表摘要用户")
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         long authorId = json.readTree(userResponse).get("id").asLong();
 
         String prefix = "collection-pages-" + UUID.randomUUID().toString().replace("-", "");
@@ -217,9 +215,8 @@ class AiTomeApplicationTests {
         MockHttpSession session=new MockHttpSession();
         String email = uniqueEmail("new");
         Cookie csrf = csrfCookie();
-        mvc.perform(post("/api/auth/register").session(session).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue()).contentType(MediaType.APPLICATION_JSON)
-                .content(json.writeValueAsString(Map.of("email",email,"password","password123","displayName","新用户"))))
-                .andExpect(status().isCreated()).andExpect(jsonPath("$.displayName").value("新用户"));
+        TestUsers.registerAndLogin(mvc, jdbc, session, email, "password123", "新用户")
+                .andExpect(status().isOk()).andExpect(jsonPath("$.displayName").value("新用户"));
         csrf = csrfCookie();
         String response=mvc.perform(post("/api/posts").session(session).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue()).contentType(MediaType.APPLICATION_JSON)
                 .content(json.writeValueAsString(Map.of("type","ARTICLE","title","测试文章","summary","这是测试摘要","body","正文内容"))))
@@ -244,9 +241,8 @@ class AiTomeApplicationTests {
         MockHttpSession session = new MockHttpSession();
         String email = uniqueEmail("comment-pages");
         Cookie csrf = csrfCookie();
-        String userResponse = mvc.perform(post("/api/auth/register").session(session).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue()).contentType(MediaType.APPLICATION_JSON)
-                        .content(json.writeValueAsString(Map.of("email", email, "password", "password123", "displayName", "分页用户"))))
-                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        String userResponse = TestUsers.registerAndLogin(mvc, jdbc, session, email, "password123", "分页用户")
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         long userId = json.readTree(userResponse).get("id").asLong();
         csrf = csrfCookie();
         String postResponse = mvc.perform(post("/api/posts").session(session).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue()).contentType(MediaType.APPLICATION_JSON)
@@ -290,9 +286,8 @@ class AiTomeApplicationTests {
         MockHttpSession session = new MockHttpSession();
         String email = uniqueEmail("workspace");
         Cookie csrf = csrfCookie();
-        mvc.perform(post("/api/auth/register").session(session).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue()).contentType(MediaType.APPLICATION_JSON)
-                .content(json.writeValueAsString(Map.of("email", email, "password", "password123", "displayName", "专题用户"))))
-                .andExpect(status().isCreated());
+        TestUsers.registerAndLogin(mvc, jdbc, session, email, "password123", "专题用户")
+                .andExpect(status().isOk());
 
         csrf = csrfCookie();
         mvc.perform(patch("/api/me/profile").session(session).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue()).contentType(MediaType.APPLICATION_JSON)
@@ -332,9 +327,8 @@ class AiTomeApplicationTests {
         String ownerEmail = uniqueEmail("owner");
         MockHttpSession ownerSession = new MockHttpSession();
         Cookie csrf = csrfCookie();
-        String ownerResponse = mvc.perform(post("/api/auth/register").session(ownerSession).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue()).contentType(MediaType.APPLICATION_JSON)
-                        .content(json.writeValueAsString(Map.of("email", ownerEmail, "password", "password123", "displayName", "隔离用户甲"))))
-                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        String ownerResponse = TestUsers.registerAndLogin(mvc, jdbc, ownerSession, ownerEmail, "password123", "隔离用户甲")
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         long ownerId = json.readTree(ownerResponse).get("id").asLong();
 
         csrf = csrfCookie();
@@ -377,9 +371,8 @@ class AiTomeApplicationTests {
         String otherEmail = uniqueEmail("other");
         MockHttpSession otherSession = new MockHttpSession();
         csrf = csrfCookie();
-        String otherResponse = mvc.perform(post("/api/auth/register").session(otherSession).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue()).contentType(MediaType.APPLICATION_JSON)
-                        .content(json.writeValueAsString(Map.of("email", otherEmail, "password", "password123", "displayName", "隔离用户乙"))))
-                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        String otherResponse = TestUsers.registerAndLogin(mvc, jdbc, otherSession, otherEmail, "password123", "隔离用户乙")
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         long otherId = json.readTree(otherResponse).get("id").asLong();
 
         mvc.perform(get("/api/me/profile").session(otherSession)).andExpect(status().isOk())
@@ -417,10 +410,8 @@ class AiTomeApplicationTests {
     @Test void structuredCollectionWorkspaceSupportsDraftSavePublishAndIsolation() throws Exception {
         MockHttpSession owner = new MockHttpSession();
         Cookie csrf = csrfCookie();
-        mvc.perform(post("/api/auth/register").session(owner).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.writeValueAsString(Map.of("email", uniqueEmail("structured-owner"), "password", "password123", "displayName", "路线作者"))))
-                .andExpect(status().isCreated());
+        TestUsers.registerAndLogin(mvc, jdbc, owner, uniqueEmail("structured-owner"), "password123", "路线作者")
+                .andExpect(status().isOk());
 
         csrf = csrfCookie();
         String postJson = mvc.perform(post("/api/posts").session(owner).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue())
@@ -464,10 +455,8 @@ class AiTomeApplicationTests {
                 .andExpect(status().isConflict());
 
         MockHttpSession other = new MockHttpSession(); csrf = csrfCookie();
-        mvc.perform(post("/api/auth/register").session(other).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.writeValueAsString(Map.of("email", uniqueEmail("structured-other"), "password", "password123", "displayName", "其他用户"))))
-                .andExpect(status().isCreated());
+        TestUsers.registerAndLogin(mvc, jdbc, other, uniqueEmail("structured-other"), "password123", "其他用户")
+                .andExpect(status().isOk());
         mvc.perform(get("/api/me/collections/" + collectionId + "/draft").session(other)).andExpect(status().isForbidden());
 
         csrf = csrfCookie();
@@ -500,10 +489,8 @@ class AiTomeApplicationTests {
     private long createTestUser(String prefix) throws Exception {
         MockHttpSession session = new MockHttpSession();
         Cookie csrf = csrfCookie();
-        String response = mvc.perform(post("/api/auth/register").session(session).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.writeValueAsString(Map.of("email", uniqueEmail(prefix), "password", "password123", "displayName", "分页测试用户"))))
-                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        String response = TestUsers.registerAndLogin(mvc, jdbc, session, uniqueEmail(prefix), "password123", "分页测试用户")
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         return json.readTree(response).get("id").asLong();
     }
 

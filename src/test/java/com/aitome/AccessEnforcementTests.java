@@ -42,7 +42,7 @@ class AccessEnforcementTests {
         assertTrue(missing.isEmpty(), "endpoints without @RequirePermission/@PublicEndpoint: " + missing);
     }
 
-    @Test void registrationAlwaysGetsDefaultRoleAndIgnoresClientRole() throws Exception {
+    @Test void newAccountsAlwaysGetTheDefaultRole() throws Exception {
         var account = t.register("reg", Map.of("role", "ADMIN", "roleCode", "ADMIN"));
         JsonNode me = json.readTree(mvc.perform(get("/api/auth/me").session(account.session())).andExpect(status().isOk()).andReturn().getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8));
         assertEquals("MEMBER", me.path("role").path("code").asText());

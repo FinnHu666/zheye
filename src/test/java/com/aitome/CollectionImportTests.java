@@ -24,7 +24,7 @@ class CollectionImportTests {
     @Autowired JdbcTemplate jdbc;
     MockHttpSession user() throws Exception {
         MockHttpSession session = new MockHttpSession();
-        write(post("/api/auth/register"),session,Map.of("email", UUID.randomUUID()+"@finns.dev","password","password123","displayName","导入测试用户"),201);
+        TestUsers.registerAndLogin(mvc, jdbc, session, UUID.randomUUID()+"@finns.dev", "password123", "导入测试用户").andExpect(status().isOk());
         return session;
     }
     JsonNode write(MockHttpServletRequestBuilder builder,MockHttpSession user,Object body,int status) throws Exception {

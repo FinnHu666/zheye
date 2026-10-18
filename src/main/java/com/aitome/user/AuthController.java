@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -25,6 +24,8 @@ import java.util.Map;
 @PublicEndpoint("登录流程；/me 自行要求登录")
 public class AuthController {
     public static final String USER_ID = "USER_ID";
+    /** 登录时记录的会话撤销版本；与 user_accounts.session_epoch 不一致即视为已失效（FINNS-15）。 */
+    public static final String AUTH_EPOCH = "AUTH_EPOCH";
     private final UserRepository users;
     private final BCryptPasswordEncoder encoder;
     private final CookieCsrfTokenRepository csrfTokens;
@@ -32,25 +33,20 @@ public class AuthController {
 
     public AuthController(UserRepository users, BCryptPasswordEncoder encoder, CookieCsrfTokenRepository csrfTokens, AccessService access) {
         this.users = users; this.encoder = encoder; this.csrfTokens = csrfTokens; this.access = access;
+        this.dummyHash = encoder.encode("finns-timing-equalizer");
     }
 
-    @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, Object> register(@Valid @RequestBody RegisterRequest request, HttpSession session, HttpServletRequest servletRequest, HttpServletResponse response) {
-        if (users.existsByEmailIgnoreCase(request.email())) throw new ApiProblem(HttpStatus.CONFLICT, "该邮箱已注册");
-        UserAccount account = new UserAccount(request.email(), encoder.encode(request.password()), request.displayName());
-        account.assignRole(access.defaultRole().id()); // 角色只由服务端分配，请求中的任何角色字段都被忽略
-        UserAccount user = users.save(account);
-        rotateSession(session, servletRequest); session.setAttribute(USER_ID, user.getId()); refreshCsrf(servletRequest, response);
-        return view(user);
-    }
+    /** 邮箱不存在时也做一次 BCrypt 比对，使耗时与“密码错误”接近。 */
+    private final String dummyHash;
 
     @PostMapping("/login")
     public Map<String, Object> login(@Valid @RequestBody LoginRequest request, HttpSession session, HttpServletRequest servletRequest, HttpServletResponse response) {
-        UserAccount user = users.findByEmailIgnoreCase(request.email())
-                .filter(found -> encoder.matches(request.password(), found.getPasswordHash()))
-                .orElseThrow(() -> new ApiProblem(HttpStatus.UNAUTHORIZED, "邮箱或密码不正确"));
-        rotateSession(session, servletRequest); session.setAttribute(USER_ID, user.getId()); refreshCsrf(servletRequest, response);
+        UserAccount user = users.findByEmailIgnoreCase(request.email()).orElse(null);
+        boolean matches = encoder.matches(request.password(), user == null ? dummyHash : user.getPasswordHash());
+        if (user == null || !matches) throw new ApiProblem(HttpStatus.UNAUTHORIZED, "邮箱或密码不正确");
+        // 验证门槛只在密码正确之后提示，避免未授权者借此探测邮箱状态；旧账号未验证仍可登录并被提示补验证
+        if (!user.isEmailVerified() && !user.isLegacyAccount()) throw new ApiProblem(HttpStatus.FORBIDDEN, "请先验证邮箱，再返回登录。");
+        rotateSession(session, servletRequest); session.setAttribute(USER_ID, user.getId()); session.setAttribute(AUTH_EPOCH, user.getSessionEpoch()); refreshCsrf(servletRequest, response);
         return view(user);
     }
 
@@ -66,18 +62,21 @@ public class AuthController {
     public Map<String, Object> me(HttpSession session) {
         Object id = session.getAttribute(USER_ID);
         if (!(id instanceof Long)) throw new ApiProblem(HttpStatus.UNAUTHORIZED, "请先登录");
-        return view(users.findById((Long) id).orElseThrow(() -> new ApiProblem(HttpStatus.UNAUTHORIZED, "登录已失效")));
+        return view(requireUser(session, users));
     }
 
     public static UserAccount requireUser(HttpSession session, UserRepository users) {
         Object id = session.getAttribute(USER_ID);
         if (!(id instanceof Long)) throw new ApiProblem(HttpStatus.UNAUTHORIZED, "登录后才能进行此操作");
-        return users.findById((Long) id).orElseThrow(() -> new ApiProblem(HttpStatus.UNAUTHORIZED, "登录已失效"));
+        UserAccount user = users.findById((Long) id).orElseThrow(() -> new ApiProblem(HttpStatus.UNAUTHORIZED, "登录已失效"));
+        if (!(session.getAttribute(AUTH_EPOCH) instanceof Long epoch) || epoch != user.getSessionEpoch()) throw new ApiProblem(HttpStatus.UNAUTHORIZED, "登录已失效");
+        return user;
     }
 
     private Map<String, Object> view(UserAccount user) {
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("id", user.getId()); result.put("email", user.getEmail()); result.put("displayName", user.getDisplayName());
+        result.put("emailVerified", user.isEmailVerified());
         AccessContext context = access.forUser(user.getId());
         if (context != null) {
             result.put("role", Map.of("code", context.roleCode(), "name", context.roleName()));
@@ -93,8 +92,5 @@ public class AuthController {
         csrfTokens.saveToken(null, request, response);
     }
 
-    public record RegisterRequest(@NotBlank @Email String email,
-                                  @NotBlank @Size(min = 8, max = 72, message = "密码需要 8–72 个字符") String password,
-                                  @NotBlank @Size(max = 40, message = "昵称最多 40 个字符") String displayName) {}
     public record LoginRequest(@NotBlank @Email String email, @NotBlank String password) {}
 }

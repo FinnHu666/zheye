@@ -27,16 +27,13 @@ final class AccessTestSupport {
         return register(prefix, Map.of());
     }
 
+    /** 已验证账号 + 真实登录（FINNS-15 之后注册须经邮件验证，见 TestUsers）。extra 中的任何字段都不会影响角色或身份。 */
     Account register(String prefix, Map<String, Object> extra) throws Exception {
         MockHttpSession session = new MockHttpSession();
         String email = prefix + "-" + UUID.randomUUID().toString().substring(0, 8) + "@finns.test";
         String name = (prefix + UUID.randomUUID().toString().substring(0, 4)).substring(0, Math.min(prefix.length() + 4, 40));
-        var body = new java.util.HashMap<String, Object>(Map.of("email", email, "password", "password123", "displayName", name));
-        body.putAll(extra);
-        Cookie csrf = csrf();
-        String response = mvc.perform(post("/api/auth/register").session(session).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue())
-                        .contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(body)))
-                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
+        TestUsers.create(jdbc, email, "password123", name);
+        String response = TestUsers.login(mvc, session, email, "password123").andExpect(status().isOk()).andReturn().getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
         return new Account(json.readTree(response).path("id").asLong(), email, name, session);
     }
 

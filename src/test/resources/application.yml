@@ -7,3 +7,6 @@ spring:
       ddl-auto: create-drop
   flyway:
     enabled: false
+finns:
+  mail:
+    async: false

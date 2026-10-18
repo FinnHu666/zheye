@@ -53,7 +53,7 @@ class TopicBuilderTests {
     @DynamicPropertySource static void config(DynamicPropertyRegistry r){r.add("finns.ai.base-url",()->"http://127.0.0.1:"+upstream.getAddress().getPort());}
     @AfterAll static void stop(){upstream.stop(0);}
     @Autowired MockMvc mvc;@Autowired ObjectMapper json;@Autowired TopicHtmlPolicy html;@Autowired TopicDocumentValidator validator;@Autowired AiCredentialService credentials;@Autowired JdbcTemplate jdbc;
-    MockHttpSession user() throws Exception {MockHttpSession session=new MockHttpSession();write(post("/api/auth/register"),session,Map.of("email",UUID.randomUUID()+"@finns.dev","password","password123","displayName","专题验收用户"),201);write(put("/api/me/ai-settings/deepseek"),session,Map.of("key","test-only"),200);return session;}
+    MockHttpSession user() throws Exception {MockHttpSession session=new MockHttpSession();TestUsers.registerAndLogin(mvc,jdbc,session,UUID.randomUUID()+"@finns.dev","password123","专题验收用户").andExpect(status().isOk());write(put("/api/me/ai-settings/deepseek"),session,Map.of("key","test-only"),200);return session;}
     JsonNode write(MockHttpServletRequestBuilder builder,MockHttpSession session,Object body,int expected) throws Exception {
         Cookie token=mvc.perform(get("/api/auth/csrf")).andReturn().getResponse().getCookie("XSRF-TOKEN");
         var request=builder.session(session).cookie(token).header("X-XSRF-TOKEN",token.getValue()).contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsBytes(body));

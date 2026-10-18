@@ -1,0 +1,94 @@
+/* FINNS-15 账号流程样式（移植自 site-access 原型；已去除演示控制台、演示条与设备预览，资料页样式随 FINNS-21 另行移植）。 */
+.account-stage{max-width:1180px;margin:0 auto;padding:64px 36px 84px;display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center;min-height:77vh}
+.account-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:36px;box-shadow:0 14px 60px #203b2510;min-width:0}
+.account-card>.kicker{display:block;margin-top:30px}
+.account-card h2{font-family:Georgia,"Noto Sans SC",serif;font-size:32px;font-weight:500;line-height:1.4;letter-spacing:-1px;margin:12px 0}
+.account-back{font-size:12px;color:var(--muted)}
+.account-muted{color:var(--muted);font-size:13px;line-height:1.8}
+.account-form{display:grid;gap:18px;margin:24px 0 16px}
+.account-form label,.account-draft-label{display:grid;gap:8px;font-size:13px;font-weight:500}
+.account-form input,.account-draft-label textarea,.account-card input[type=email]{min-width:0;width:100%;border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:#fafbf8;font:inherit;outline:none}
+.account-form input:focus,.account-draft-label textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px #dce9df}
+.account-form input[type=checkbox]{width:auto}
+.account-form .account-checkbox{display:flex;align-items:center;gap:8px}
+.account-form .btn{justify-content:center}
+.account-align-right{justify-self:end;margin-top:-8px}
+.account-text-link,.account-footer-links a{color:var(--green);font-size:13px}
+.account-text-link{display:block;margin:16px 0}
+.account-footer-links{text-align:center;margin-top:22px}
+.account-info{background:#eff5ef;border:1px solid #dce8dd;border-radius:12px;padding:14px 16px;color:#365b42;font-size:13px;line-height:1.8;overflow-wrap:anywhere}
+.account-info p{margin:4px 0}
+.account-error{padding:12px 14px;background:#fdf1eb;border:1px solid #f2d5c6;border-radius:10px;color:#954c35;font-size:13px;line-height:1.7}
+.account-success,.account-expired{padding:20px 0 24px;line-height:1.9;font-size:14px}
+.account-status-icon{display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:#e3efe3;color:var(--green);font-size:28px}
+.account-expired .account-status-icon{background:#fbe9dc;color:#a36c39}
+.account-email{overflow-wrap:anywhere;font-size:15px}
+.account-envelope{font-size:50px;color:var(--green);margin:24px 0}
+.account-security-main{max-width:850px;min-width:0;width:100%}
+.account-security .personal-container{align-items:start}
+.account-page-title h1{font-family:Georgia,"Noto Sans SC",serif;font-size:38px;font-weight:500;margin:12px 0}
+.account-page-title>p{color:var(--muted);font-size:14px;margin-bottom:30px}
+.account-panel{border:1px solid var(--line);background:#fff;border-radius:18px;padding:24px;margin-bottom:20px}
+.account-panel>p{font-size:13px;line-height:1.8}
+.account-panel-head{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.account-panel-head>div{flex:1;min-width:150px}
+.account-panel h2{font-size:17px;font-weight:500;margin:0}
+.account-panel-head p{color:var(--muted);font-size:12px;margin:5px 0;overflow-wrap:anywhere}
+.account-icon{display:grid;place-items:center;width:44px;height:44px;background:#f0f3ec;color:var(--green);border-radius:12px;font-size:25px}
+.account-badge{font-size:11px;padding:5px 9px;border-radius:6px;white-space:nowrap}
+.account-badge.verified{background:#e9f2e8;color:#3c6547}
+.account-badge.pending{background:#f5eddf;color:#8b6d3c}
+.account-buttons{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+.account-panel .account-form{max-width:470px}
+.account-reauth{border-color:#c6d8bd;background:#f8fbf4}
+.account-mail{padding:16px 0;border-top:1px solid var(--line)}
+.account-mail small{color:var(--muted);font-size:11px;overflow-wrap:anywhere}
+.account-mail h3{font-size:14px;margin:8px 0}
+.account-mail p{font-size:12px;color:var(--muted);line-height:1.8}
+.account-mail .btn{font-size:12px}
+button:disabled{cursor:not-allowed;opacity:.55}
+@media(max-width:900px){.account-stage{gap:36px;padding:40px 24px}.account-card{padding:26px}}
+@media(max-width:600px){.account-stage{display:block;padding:25px 20px 70px;min-height:0}.account-card{padding:26px 22px;border-radius:18px}.account-card h2{font-size:28px}.account-card>.kicker{margin-top:22px}.account-security{padding:38px 20px 70px}.account-panel{padding:20px}.account-page-title h1{font-size:31px}.account-security-main{width:100%}.account-panel-head>div{min-width:130px}.account-buttons .btn{flex:1}.account-card .btn-block{width:100%;justify-content:center}}
+/* R2: compact account flow, field-level feedback, and separate profile view/edit. */
+.account-stage{display:block;max-width:524px;min-height:0;padding:36px 24px 76px}
+.account-card{padding:30px 34px;border-radius:20px;box-shadow:0 12px 45px #203b2509}
+.account-card h1{font-size:28px;line-height:1.4;letter-spacing:-.7px;font-weight:600;margin:26px 0 7px}
+.account-card>.account-muted{margin:0}
+.account-card .btn-block{min-height:45px;justify-content:center}
+.account-progress{display:flex;gap:26px;list-style:none;padding:0;margin:25px 0 22px;font-size:12px;color:#8c9690}
+.account-progress li{display:flex;align-items:center;gap:7px}
+.account-progress li span{width:22px;height:22px;display:grid;place-items:center;border:1px solid #dfe5dc;border-radius:50%;font-size:11px}
+.account-progress .active{color:var(--green);font-weight:600}
+.account-progress .active span,.account-progress .done span{color:white;background:var(--green);border-color:var(--green)}
+.account-progress .done{color:var(--green)}
+.account-progress+h1{margin-top:0}
+.account-form{gap:17px;margin:24px 0 14px}
+.account-form input{height:46px;background:#fcfdfa;border-radius:9px}
+.account-form input[type=checkbox]{height:auto}
+.account-form input[aria-invalid=true],.account-card input[aria-invalid=true]{border-color:#bb7565;background:#fffaf8;box-shadow:none}
+.account-field-error{color:#a14b36;font-size:12px;font-weight:400;line-height:1.7;margin:0;display:block}
+.account-field-hint{color:var(--muted);font-size:11px;font-weight:400;line-height:1.6}
+.account-purpose{font-size:12px;color:#687a6a;text-align:center;border-top:1px solid #edf0e8;padding-top:19px;margin:24px 0 0;letter-spacing:.6px}
+.account-verified-email{display:flex;gap:10px;align-items:center;background:#f0f5ed;border:1px solid #e3ebdd;border-radius:10px;padding:13px}
+.account-verified-email>span{color:var(--green);font-size:21px}
+.account-verified-email small{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}
+.account-verified-email strong{display:block;font-size:13px;font-weight:500;overflow-wrap:anywhere}
+.account-card .account-success{padding:22px 0 16px}
+.account-card .account-envelope{font-size:38px;margin:22px 0 8px}
+.account-stage .account-text-link{font-size:12px}
+@media(max-width:600px){.account-stage{padding:24px 18px 76px;max-width:480px}.account-card{padding:25px 24px}.account-card h1{font-size:26px}}
+@media(max-width:600px){.account-security .personal-nav{display:flex;flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;gap:5px;scrollbar-width:none;padding-bottom:12px;margin-bottom:24px}.account-security .personal-nav a{flex:0 0 auto;padding:9px 12px;font-size:12px}}
+@media(max-width:600px){.account-security .personal-nav::-webkit-scrollbar{display:none}}
+.password-recovery-entry{margin:20px 0 6px;padding:14px 16px;border:1px solid #e3eadd;border-radius:10px;background:#f7faf3}
+.account-link-button{border:0;background:none;color:var(--green);font:inherit;font-size:13px;font-weight:600;padding:0;cursor:pointer;text-align:left}
+.account-link-button:hover{text-decoration:underline}
+.password-recovery-entry small{display:block;font-size:11px;line-height:1.7;color:var(--muted);margin-top:5px}
+.password-email-recovery{margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
+.password-email-recovery>p{font-size:13px;line-height:1.85;color:var(--muted);margin:14px 0}
+.password-recovery-email{display:grid;gap:7px;background:#f4f7ef;border-radius:10px;padding:15px 17px}
+.password-recovery-email>span{font-size:11px;color:var(--muted)}
+.password-recovery-email strong{font-size:14px;font-weight:500;overflow-wrap:anywhere}
+.password-email-recovery .password-recovery-rule{font-size:12px;color:#776747}
+.password-email-recovery .account-buttons{margin-top:20px}
+.password-email-recovery .btn{font-size:13px}
+.password-email-recovery .account-info{color:#365b42}

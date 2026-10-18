@@ -1,5 +1,6 @@
 package com.aitome.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -8,6 +9,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class SpaController {
     @GetMapping({"/collections", "/collections/**", "/vps", "/private/tools", "/me", "/me/**", "/my/**", "/admin", "/admin/**"})
     public String frontendRoute() {
+        return "forward:/index.html";
+    }
+
+    /** 邮件链接页面（令牌在地址栏）：不发送 Referer、不缓存。 */
+    @GetMapping("/auth/**")
+    public String authRoute(HttpServletResponse response) {
+        response.setHeader("Referrer-Policy", "no-referrer");
+        response.setHeader("Cache-Control", "no-store");
         return "forward:/index.html";
     }
 }

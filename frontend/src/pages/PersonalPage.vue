@@ -3,8 +3,11 @@ import { onMounted, ref, computed } from 'vue'
 import { api, dateLabel } from '../lib/api'
 import { currentUser } from '../lib/session'
 import PersonalNav from '../components/PersonalNav.vue'
+import ReauthPanel from '../components/ReauthPanel.vue'
+import { useSessionGuard } from '../lib/sessionGuard'
 
 const emit = defineEmits(['toast', 'user-updated'])
+const guard = useSessionGuard() // 登录失效时保留未保存的资料并就地重新登录
 const profile = ref({ displayName: '', email: '', bio: '' })
 const saved = ref({ displayName: '', bio: '' })
 const fields = (p) => ({ displayName: p.displayName || '', bio: p.bio || '' })
@@ -27,11 +30,11 @@ const save = async () => {
     if (JSON.stringify(fields(profile.value)) === JSON.stringify(snapshot)) profile.value = result
     saved.value = fields(result); emit('user-updated', { ...result }); emit('toast', '个人资料已保存')
   }
-  catch (e) { error.value = e.message }
+  catch (e) { error.value = e.message; guard.handle(e) }
   finally { saving.value = false }
 }
 </script>
 <template>
   <section class="page-hero personal-hero"><span class="kicker">YOUR SPACE</span><h1>让这里成为<br /><em>你的创作基地。</em></h1><p>管理个人资料、发布内容，以及你正在整理的专题。</p></section>
-  <section class="section personal-section"><div class="personal-container"><PersonalNav /><div v-if="loading" class="loading">正在加载个人资料…</div><form v-else class="profile-card" @submit.prevent="save"><div><span class="kicker">PROFILE</span><h2>个人资料</h2><p class="muted-copy">邮箱用于登录，目前不能修改。</p></div><div class="profile-stats"><div><strong>{{ profile.postCount }}</strong><span>篇内容</span></div><div><strong>{{ profile.collectionCount }}</strong><span>个专题</span></div><div><strong>{{ profile.selectedCollectionCount }}</strong><span>个自选</span></div><div><strong>{{ dateLabel(profile.createdAt) }}</strong><span>加入 FINNS</span></div></div><label>昵称<input v-model="profile.displayName" maxlength="40" required /></label><label>邮箱<input :value="profile.email" disabled /></label><label v-if="isAdmin">角色<input :value="currentUser.role.name" disabled /></label><label>个人简介<textarea v-model="profile.bio" maxlength="500" rows="4" placeholder="介绍一下你关注的方向…" /></label><p v-if="error" class="form-error" role="alert">{{ error }}</p><button v-if="dirty" class="btn btn-primary" :disabled="saving">{{ saving ? '保存中…' : '保存资料' }}</button></form></div></section>
+  <section class="section personal-section"><div class="personal-container"><PersonalNav /><div v-if="loading" class="loading">正在加载个人资料…</div><form v-else class="profile-card" @submit.prevent="save"><div><span class="kicker">PROFILE</span><h2>个人资料</h2><p class="muted-copy">邮箱用于登录，目前不能修改。</p></div><div class="profile-stats"><div><strong>{{ profile.postCount }}</strong><span>篇内容</span></div><div><strong>{{ profile.collectionCount }}</strong><span>个专题</span></div><div><strong>{{ profile.selectedCollectionCount }}</strong><span>个自选</span></div><div><strong>{{ dateLabel(profile.createdAt) }}</strong><span>加入 FINNS</span></div></div><label>昵称<input v-model="profile.displayName" maxlength="40" required /></label><label>邮箱<input :value="profile.email" disabled /></label><label v-if="isAdmin">角色<input :value="currentUser.role.name" disabled /></label><label>个人简介<textarea v-model="profile.bio" maxlength="500" rows="4" placeholder="介绍一下你关注的方向…" /></label><p v-if="error" class="form-error" role="alert">{{ error }}</p><ReauthPanel :guard="guard" /><button v-if="dirty" class="btn btn-primary" :disabled="saving">{{ saving ? '保存中…' : '保存资料' }}</button></form></div></section>
 </template>

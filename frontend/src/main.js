@@ -6,6 +6,8 @@ import CollectionsPage from './pages/CollectionsPage.vue'
 import VpsPage from './pages/VpsPage.vue'
 import LocalToolsPage from './pages/LocalToolsPage.vue'
 import PersonalPage from './pages/PersonalPage.vue'
+import AccountFlowPage from './pages/AccountFlowPage.vue'
+import AccountSecurityPage from './pages/AccountSecurityPage.vue'
 import AiSettingsPage from './pages/AiSettingsPage.vue'
 import MyPostsPage from './pages/MyPostsPage.vue'
 import MyCollectionsPage from './pages/MyCollectionsPage.vue'
@@ -20,6 +22,7 @@ import AdminRolesPage from './pages/admin/AdminRolesPage.vue'
 import AdminAuditPage from './pages/admin/AdminAuditPage.vue'
 import { refreshSession } from './lib/session'
 import './assets/styles.css'
+import './assets/account.css'
 
 // meta.perm：页面所需权限（FINNS-11）。无权限时 App 保留地址显示 403；接口另由服务端检查。
 const own = { requiresAuth: true, perm: 'collection.manage' }
@@ -32,7 +35,9 @@ const router = createRouter({
     { path: '/collections/:id(\\d+)', component: CollectionDetailPage },
     { path: '/vps', component: VpsPage },
     { path: '/private/tools', component: LocalToolsPage },
+    ...['login', 'register', 'forgot', 'pending', 'verify', 'reset', 'setup'].map((mode) => ({ path: '/auth/' + mode, component: AccountFlowPage, meta: { accountMode: mode } })),
     { path: '/me', component: PersonalPage, meta: { requiresAuth: true } },
+    { path: '/me/security', component: AccountSecurityPage, meta: { requiresAuth: true } },
     { path: '/me/ai-settings', component: AiSettingsPage, meta: { requiresAuth: true, perm: 'ai.use' } },
     { path: '/me/posts', component: MyPostsPage, meta: { requiresAuth: true } },
     { path: '/me/collections', component: MyCollectionsPage, meta: own },
@@ -56,8 +61,10 @@ const router = createRouter({
 // 每次导航以服务端身份为准：角色或权限被调整后，下一次导航即按新权限展示。
 router.beforeEach(async (to) => {
   const user = await refreshSession()
+  // 旧的弹窗登录链接 /?signin=1&next=… 改为独立登录路由
+  if (to.path === '/' && to.query.signin === '1') return { path: '/auth/login', query: typeof to.query.next === 'string' ? { next: to.query.next } : {} }
   if (!to.matched.some((record) => record.meta.requiresAuth) || user) return true
-  return { path: '/', query: { signin: '1', next: to.fullPath } }
+  return { path: '/auth/login', query: { next: to.fullPath } }
 })
 
 createApp(App).use(router).mount('#app')

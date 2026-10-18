@@ -7,12 +7,7 @@ import { currentUser as user, can, refreshSession } from './lib/session'
 
 const router = useRouter()
 const route = useRoute()
-const authOpen = ref(false)
-const registerMode = ref(false)
 const composerOpen = ref(false)
-const authError = ref('')
-const authBusy = ref(false)
-const authForm = ref({ email: '', password: '', displayName: '' })
 const toastMessage = ref('')
 const logoutBusy = ref(false)
 let toastTimer
@@ -22,23 +17,11 @@ const activePath = computed(() => route.path)
 const requiredPerm = computed(() => route.matched.map((record) => record.meta.perm).filter(Boolean).pop())
 const forbidden = computed(() => !!user.value && !!requiredPerm.value && !can(requiredPerm.value))
 const showWrite = () => {
-  if (!user.value) { registerMode.value = false; authOpen.value = true; authError.value = '登录后才能发布内容'; return }
+  if (!user.value) { openAuth(); return }
   composerOpen.value = true
 }
 const showToast = (message) => { toastMessage.value = message; clearTimeout(toastTimer); toastTimer = setTimeout(() => { toastMessage.value = '' }, 2400) }
-const openAuth = (register = false) => { registerMode.value = register; authError.value = ''; authOpen.value = true }
-const submitAuth = async () => {
-  authBusy.value = true; authError.value = ''
-  try {
-    const payload = registerMode.value
-      ? authForm.value
-      : { email: authForm.value.email, password: authForm.value.password }
-    user.value = await api(`/api/auth/${registerMode.value ? 'register' : 'login'}`, { method: 'POST', body: JSON.stringify(payload) })
-    authOpen.value = false; authForm.value = { email: '', password: '', displayName: '' }; showToast(`你好，${user.value.displayName}`)
-    const next = typeof route.query.next === 'string' && route.query.next.startsWith('/') && !route.query.next.startsWith('//') ? route.query.next : ''
-    if (route.query.signin === '1') router.replace(next || '/')
-  } catch (error) { authError.value = error.message } finally { authBusy.value = false }
-}
+const openAuth = (register = false) => router.push({ path: register ? '/auth/register' : '/auth/login', query: route.path.startsWith('/auth') ? {} : { next: route.fullPath } })
 const logout = async () => {
   if (logoutBusy.value) return
   logoutBusy.value = true
@@ -51,9 +34,7 @@ const logout = async () => {
   } catch (error) { showToast(error.message) }
   finally { logoutBusy.value = false }
 }
-const closeDialogs = () => { authOpen.value = false; composerOpen.value = false }
 onMounted(() => { reportSiteEntry(); refreshSession() })
-watch(() => route.query.signin, (value) => { if (value === '1') openAuth() }, { immediate: true })
 watch(() => route.query.create, (value) => { if (value === 'post' || value === 'topic') composerOpen.value = true }, { immediate: true })
 </script>
 
@@ -82,23 +63,6 @@ watch(() => route.query.create, (value) => { if (value === 'post' || value === '
     </main>
 
     <footer><RouterLink class="brand" to="/" aria-label="FINNS 首页"><span class="brand-mark">F</span><span>FINNS</span></RouterLink><p>为独立思考与开放创造而生。</p><div class="footer-links"><RouterLink to="/collections">专题广场</RouterLink><RouterLink to="/vps">VPS 指南</RouterLink><RouterLink to="/me">个人中心</RouterLink><RouterLink v-if="can('admin.users')" to="/admin/users">管理</RouterLink></div><span>© 2026 FINNS</span></footer>
-
-    <div v-if="authOpen" class="overlay" @click.self="closeDialogs">
-      <section class="modal" role="dialog" aria-modal="true" aria-labelledby="auth-title">
-        <button class="modal-close" type="button" aria-label="关闭" @click="authOpen = false">×</button>
-        <span class="kicker">WELCOME</span>
-        <h2 id="auth-title">{{ registerMode ? '加入 FINNS' : '欢迎回来' }}</h2>
-        <p>{{ registerMode ? '创建账号，开始你的第一次分享。' : '登录后继续写作与讨论。' }}</p>
-        <form @submit.prevent="submitAuth">
-          <label v-if="registerMode">昵称<input v-model="authForm.displayName" autocomplete="nickname" maxlength="40" required placeholder="大家如何称呼你" /></label>
-          <label>邮箱<input v-model="authForm.email" autocomplete="email" type="email" required placeholder="you@example.com" /></label>
-          <label>密码<input v-model="authForm.password" :autocomplete="registerMode ? 'new-password' : 'current-password'" type="password" :minlength="registerMode ? 8 : undefined" required :placeholder="registerMode ? '至少 8 位' : '请输入密码'" /></label>
-          <p class="form-error" role="alert">{{ authError }}</p>
-          <button class="btn btn-primary btn-block" :disabled="authBusy">{{ authBusy ? '处理中…' : '继续' }}</button>
-        </form>
-        <button class="switch-btn" type="button" @click="openAuth(!registerMode)">{{ registerMode ? '已有账号？返回登录' : '还没有账号？立即注册' }}</button>
-      </section>
-    </div>
 
     <div v-if="composerOpen" class="overlay" @click.self="composerOpen = false"><section class="modal modal-wide" role="dialog" aria-modal="true"><button class="modal-close" aria-label="关闭" @click="composerOpen = false">×</button><span class="kicker">CREATE</span><h2>分享新的内容</h2><ComposerForm @ai-collection="composerOpen = false; router.push('/me/collections/ai/new')" @collection="composerOpen = false; router.push('/me/collections/new')" @done="composerOpen = false; showToast('内容已发布')" @error="showToast" /></section></div>
     <div v-if="toastMessage" class="toast show" role="status">{{ toastMessage }}</div>

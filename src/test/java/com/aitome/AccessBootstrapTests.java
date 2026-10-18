@@ -40,13 +40,8 @@ class AccessBootstrapTests {
     }
 
     private long registerFounder(AccessTestSupport t) throws Exception {
-        var session = new org.springframework.mock.web.MockHttpSession();
-        var csrf = t.csrf();
-        String body = json.writeValueAsString(java.util.Map.of("email", "founder@finns.test", "password", "password123", "displayName", "站长"));
-        String response = mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/api/auth/register").session(session)
-                        .cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue()).contentType(org.springframework.http.MediaType.APPLICATION_JSON).content(body))
-                .andReturn().getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
-        return json.readTree(response).path("id").asLong();
+        TestUsers.create(jdbc, "founder@finns.test", "password123", "站长");
+        return jdbc.queryForObject("select id from user_accounts where email='founder@finns.test'", Long.class);
     }
 
     private int managers() {
