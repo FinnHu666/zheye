@@ -1,6 +1,6 @@
 # FINNS 0.7.0｜F01 账号与身份维护（FINNS-15）：详细设计与接口契约（G4）
 
-日期：2026-10-18。契约修订：2（实施后同步）。依据：[概要设计](DESIGN_ACCOUNT.md)、[账号需规修订7](../../requirements/FOUNDATION_ACCOUNT_REQUIREMENTS.md)、原型 [R2.1](ACCOUNT_PROFILE_R2_REVIEW.md)（模拟契约见 `docs/prototypes/site-access/src/mock/account.js` 与 `tests/account.test.mjs`）。
+日期：2026-10-18。契约修订：3（修订 3：`FINNS_MAIL_SSL` 与全局日预算已实施；服务商选定 Brevo）。依据：[概要设计](DESIGN_ACCOUNT.md)、[账号需规修订7](../../requirements/FOUNDATION_ACCOUNT_REQUIREMENTS.md)、原型 [R2.1](ACCOUNT_PROFILE_R2_REVIEW.md)（模拟契约见 `docs/prototypes/site-access/src/mock/account.js` 与 `tests/account.test.mjs`）。
 
 状态：**G4 通过并已按 B1–B7 实施**（用户 2026-10-18 授权 B1–B7 与新增邮件依赖，ACCOUNT-D09；B8 资料局部不含）。实施偏差与验证见 [实施记录](IMPLEMENTATION_ACCOUNT.md)（D1：`token_hash` 改为 `varchar(64)`；D2：新增 `account_state` 单行标记表；D3：会话保护范围）。本文件的契约内容以实施记录的偏差为准更新如下，§12 的 U1 已解决。
 
@@ -170,6 +170,8 @@ create unique index ux_action_tokens_one_live on account_action_tokens (email, p
 | `FINNS_MAIL_HOST` / `PORT` / `USERNAME` / `PASSWORD` | SMTP | — |
 | `FINNS_MAIL_FROM` | 发信地址 | — |
 | `FINNS_MAIL_STARTTLS` | 是否 STARTTLS | `true` |
+| `FINNS_MAIL_SSL` | 隐式 TLS（465），为 true 时忽略 STARTTLS；STARTTLS 为“必须”，两种方式都校验服务器证书主机名；有 SMTP 账号却无 TLS 时拒绝启动（已实施） | `false` |
+| `FINNS_MAIL_DAILY_BUDGET` | 全局日发送预算（审计时区自然日）：已发令牌邮件 + 在途 + 通知邮件（进程内计数）；用尽后新令牌邮件按发送失败处理，通知邮件放行但计入（已实施） | `0`（不限）；真实配置建议服务商日额度的 80%，Brevo 为 240 |
 
 `outbox` 模式把邮件写入 `data/dev-mail/`（已被 `.gitignore` 的 `data/` 覆盖），仅当 `server.address` 为回环地址时启动，否则拒绝启动。`disabled` 模式：申请接口按 §3.3 响应、不发信也不记录链接；账号创建因此不可用。
 
@@ -248,7 +250,7 @@ create unique index ux_action_tokens_one_live on account_action_tokens (email, p
 | 编号 | 事项 | 影响 |
 | --- | --- | --- |
 | U1 | ~~实施授权：B1–B7 的范围（含新增 `spring-boot-starter-mail`）~~ | **已解决（ACCOUNT-D09）**：授权 B1–B7 与邮件依赖，B8 不含 |
-| U2 | **邮件服务**：SMTP 服务商、发信地址/域名、凭据由用户经环境变量提供；`FINNS_PUBLIC_BASE_URL` | 不阻断 B1–B7（出信箱代替）；阻断真实邮件验收与 G8 |
+| U2 | **邮件服务**：按[概设 §3.3.1](DESIGN_ACCOUNT.md)推荐 Brevo（首选）或 Resend（备选）的免费档，SMTP 接入；**需要用户确认：是否已有自有发信域名**，并自行在服务商注册、配置 SPF/DKIM/DMARC，经环境变量提供主机/端口/凭据/发件人；`FINNS_PUBLIC_BASE_URL`。已实施：`FINNS_MAIL_SSL`、`FINNS_MAIL_DAILY_BUDGET`（契约修订 3）。**用户已提供域名 2000678.xyz，选定 Brevo**；账号注册、DNS 与凭据待用户操作，见 [MAIL_SETUP.md](MAIL_SETUP.md) | 不阻断 B1–B7（出信箱代替）；阻断真实邮件验收与 G8 |
 | U3 | 专题编辑器与 AI 工作台的 401 保护：实施前核对既有行为，若已有等价保护则记录证据，否则纳入 B6 | 范围确认，默认纳入 |
 | U4 | 可选文案：等待验证页追加“也可能该邮箱已注册，可前往登录或找回密码” | 默认不加；加则属于文案变更 |
 | U5 | FINNS-21 资料查看/编辑局部是否随 F01 同批实施 | 默认不含（§9） |

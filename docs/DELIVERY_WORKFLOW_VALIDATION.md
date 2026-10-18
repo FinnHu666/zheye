@@ -25,3 +25,15 @@ python -X utf8 .agents/skills/finns-delivery-workflow/scripts/check_progress.py 
 ## 后续维护
 
 新证据录入阶段记录并绑定修订/源码，再更新进度证据哈希。脚本验证结构和证据完整性，AI 验证语义及授权；不能宣称其强制约束所有客户端或用户。完整业务阶段不得从配置删除。Plane 当前状态需要在获得相应指令后实时核对，历史回执不能代替实时读取。
+
+## 2026-10-18 增补：G3 设计评审轮
+
+新增 [设计评审](../.agents/skills/finns-delivery-workflow/references/design-review.md)，并接入 [阶段门禁](../.agents/skills/finns-delivery-workflow/references/stage-gates.md) 的 G3、交付 skill 和开发 skill 的各一处指引；没有新增门禁编号，进度文件结构不变。记录模板新增 `DESIGN_REVIEW_<功能>.md`。
+
+规则走查（本地，非独立代理）：
+- 适用：FINNS-15 概设修订 2 引入公共邮件服务商 → 触发评审（外部服务/第三方额度）；按专项规则读取官方定价页并标日期，读不到的写“未核实”；产出 [账号概设评审](iterations/0.7.0/DESIGN_REVIEW_ACCOUNT.md)，7 个条件分别落到关闭/转入下游/不采纳。
+- 相邻但不触发：修复已确认行为的小缺陷（如样式）、纯文档/skill 修改、普通技术问答 → 规则明确可豁免，需要在记录里写豁免理由；不会因此新增评审文件。
+- 失败情景：没有授权启动独立评审者 → 只能“同作者自评”，必须写明独立性有限（本轮即如此）；条件没有去向 → G3 保持待办；官方页面读取被拒绝 → 对应服务商写“未核实”，不能写进结论。
+- 脚本：`scripts/test_progress.py` 8 项通过，`check_progress.py` 对当前进度退出 2（真实待办）；两个 SKILL.md 的 frontmatter 与本地链接核对通过。官方 `quick_validate.py` 本轮未运行。
+
+限制：这是规则走查，没有让独立代理实际按新规则评审；评审规则能否在真实的设计争议中发现问题，要靠后续使用检验。

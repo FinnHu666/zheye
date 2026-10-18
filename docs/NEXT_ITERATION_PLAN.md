@@ -1,3 +1,9 @@
+2026-10-18最新：C7 已完成（评论框与 AI 工作台接入会话失效保护，并修复换号提交缺陷），前端 38/38、打包 88/88；账号功能现可进入 G7 用户验收。真实邮件送达验证延后到上线前，Plane ACCOUNT-P02 待确认，改动未提交。见[实施记录§9](iterations/0.7.0/IMPLEMENTATION_ACCOUNT.md)。
+
+2026-10-18最新：邮件服务商选定 Brevo（Resend 备选），域名 2000678.xyz；日预算与 FINNS_MAIL_SSL 已实现（88/88）。待用户按[手册](iterations/0.7.0/MAIL_SETUP.md)注册、配 DNS、设环境变量并做真实邮件测试；真实 SMTP 未验证，改动未提交。
+
+2026-10-18最新：账号概设修订2改用公共邮件服务商（SMTP，推荐 Brevo/Resend，免费额度取自官方页），并新增 G3 设计评审轮与账号概设自评（带条件通过）。待用户决定发信域名与服务商；日预算与 FINNS_MAIL_SSL 待实施；改动未提交。见[评审](iterations/0.7.0/DESIGN_REVIEW_ACCOUNT.md)。
+
 2026-10-18最新：FINNS-15账号B1–B7已实施（已本地提交 efaf23a、未推送/未发布），自动化与本机浏览器验证通过，G7待用户验收；真实SMTP、浏览器内会话失效保护、评论框/AI工作台接入未验。见[实施记录](iterations/0.7.0/IMPLEMENTATION_ACCOUNT.md)。资料局部B8待FINNS-21，Plane ACCOUNT-P02待单项确认，8080仍为不含账号功能的旧包。
 
 2026-10-18最新：FINNS-15账号开发设计完成。用户要求基于本地原型设计，已记G2通过（ACCOUNT-D08）并形成[概要设计](iterations/0.7.0/DESIGN_ACCOUNT.md)（G3）与[契约草案](iterations/0.7.0/CONTRACT_ACCOUNT.md)（G4待实施授权）。待决：实施授权与邮件依赖（U1）、邮件服务商/凭据（U2）、Plane ACCOUNT-P02单项同步。业务未实施。

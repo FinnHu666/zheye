@@ -1,3 +1,48 @@
+# 最新交接：个人中心版式修复已获用户确认（2026-10-18）
+
+- 用户在真实预览里确认“新的已经不跳了”，个人中心页签版式统一的修复通过（[实施记录 §10](iterations/0.7.0/IMPLEMENTATION_ACCOUNT.md)，验收清单新增 H1 记为通过）。这只是验收中的一项反馈，**G7 整体仍待办**：用户尚未给出全部通过的结论，清单 A–G 其余各项的结果以用户反馈为准。
+- 代码和文档仍未提交（上次提交 efaf23a/fabd44b）；预览运行中，验收完成后停止：`scripts\start-account-preview.ps1 -DatabaseName finns_test_070_account_accept -Stop`；Plane 未写，8080 仍是旧包。
+
+# 最新交接：个人中心页签版式统一（2026-10-18，验收反馈）
+
+- 用户验收中反馈：个人资料/账号安全/AI 配置等页签切换“割裂、跳跃”。原因是六个页面结构各异（有的有大标题横幅、导航对齐和宽度不同、手机导航形态不同）。已新增 `PersonalLayout.vue` 统一，六页改用；加了 `scrollbar-gutter:stable`。详见 [实施记录 §10](iterations/0.7.0/IMPLEMENTATION_ACCOUNT.md)。
+- 验证：前端 38/38、打包 88/88；用临时检查环境测得六页导航与标题块位置完全一致（桌面与手机）。**未在登录后的真实预览里肉眼验证**（登录被权限系统拒绝），请用户确认；预览已用新包重启（验收库数据保留）。取舍：去掉了各页大标题横幅。
+- 验收状态：G7 仍待办（用户在进行中）；代码和文档仍未提交；预览运行中，验收完停止：`scripts\start-account-preview.ps1 -DatabaseName finns_test_070_account_accept -Stop`。
+
+# 最新交接：账号功能 G7 验收开始（2026-10-18）
+
+- 用户宣布“验收开始”。已准备：隔离验收库 `finns_test_070_account_accept`（0.7.0 已发布库复制 + V13 迁移，含种子旧账号 demo@aitome.dev）、本机预览 <http://127.0.0.1:8091/auth/register>（出信箱模式，不发真实邮件）、[验收清单](iterations/0.7.0/ACCEPTANCE_ACCOUNT.md)（A–G 共 17 项，结果栏由用户填写）、`scripts/show-dev-mail.ps1`（列出出信箱最近邮件和链接）。
+- 本轮没有改动业务代码。结果以用户反馈为准：通过的项记到验收文档，问题由 AI 修复后复验；**未取得用户“全部通过”之前，G7 保持待办，不得标为验收通过**。真实邮件送达不在本次范围（ACCOUNT-D12）。
+- 验收中发现：`show-dev-mail.ps1`/`start-account-preview.ps1` 没有 UTF-8 BOM，用户在 Windows PowerShell 5.1 里运行时中文被按 ANSI 误读导致解析失败（我之前只在 PowerShell 7 里测过）。已给两个脚本加 BOM，并用 powershell.exe（5.1）解析与运行验证；以后含中文的 .ps1 要加 BOM 并在 5.1 里测。
+- 预览运行中（带出信箱），验收完成后停止：`scripts\start-account-preview.ps1 -DatabaseName finns_test_070_account_accept -Stop`。代码和文档仍未提交（上次提交 efaf23a/fabd44b），Plane 未写，8080 仍是旧包。
+
+# 最新交接：C7 会话失效保护补全（2026-10-18）
+
+- 设计评审条件 C7 已完成：`api()` 对受保护请求的 401 广播事件，`useSessionGuard` 自动监听；评论框和 AI 专题工作台已接入；提交前 `beforeSubmit()` 核对账号。**同时修复了第一轮接入的缺陷**：个人资料页/发布表单在换号后仍可提交（会把前一账号的内容写到新账号），现已在提交前核对并禁用按钮。详见 [实施记录 §9](iterations/0.7.0/IMPLEMENTATION_ACCOUNT.md)。
+- 验证：前端 38/38（变异检查通过）、打包 88/88；浏览器验证了评论路径（会话失效→面板出现、评论保留、按钮变灰）。**未验**：浏览器里面板内重新登录（输入密码的操作被权限系统拒绝，未绕过）、AI 工作台/资料页/发布表单/编辑器的面板逐页触发。后端未改。
+- 下一步：G7 用户验收（出信箱预览即可）；Plane ACCOUNT-P02 待单项确认；真实邮件送达验证已延后到上线前（ACCOUNT-D12）。代码和文档**仍未提交**（上次提交 efaf23a/fabd44b）；预览已停止。
+
+# 最新交接：Brevo 真实发信首次测试（2026-10-18）
+
+- 用户提供 Brevo SMTP 凭据后：先因用了 API 密钥（xkeysib-）认证失败，换 SMTP 密钥后因 Brevo 的 IP 拦截被拒，授权出口 IP 后登录成功；用 `-RealMail` 预览发了一封注册验证邮件到用户 Gmail：**到达，但进了垃圾箱**；无 Brevo 页脚（一个样本）；域名 DKIM/DMARC 记录齐全。详见 [实施记录 §8](iterations/0.7.0/IMPLEMENTATION_ACCOUNT.md)。
+- 推测原因（未证实）：邮件里是 `http://127.0.0.1:8091` 的回环链接、新域名/.xyz/共享 IP 信誉。下一步：用户在 Gmail“显示原始邮件”确认 SPF/DKIM/DMARC 判定；改用 HTTPS 公网链接重发对比；QQ/163/Outlook 各测一次。
+- 预览已停止；密钥只在该进程环境变量里，未写入任何文件。用户贴过的 API 密钥与 SMTP 密钥仍应在 Brevo 删除或重新生成。AI 在浏览器里提交注册表单曾被权限系统拒绝，由用户本人提交，没有绕过。
+- 代码和文档仍未提交（上次提交 efaf23a/fabd44b），Plane 未写。
+
+# 最新交接：邮件服务商选定 Brevo，日预算与 FINNS_MAIL_SSL 已实现（2026-10-18）
+
+- 用户提供域名 `2000678.xyz` 并让 AI 在 Brevo/Resend 中选一个：**选 Brevo，Resend 备选**。[MAIL_SETUP.md](iterations/0.7.0/MAIL_SETUP.md) 是用户操作手册（注册、阿里云云解析加记录、SMTP 密钥、用户级环境变量、`-RealMail` 预览测试）。域名现状：DNS 在阿里云（hichina），根域名无 MX/TXT/DMARC；本机解析器是 fake-IP，只能用 223.5.5.5/8.8.8.8 直接查。
+- 已实现（设计评审 C3 关闭）：`FINNS_MAIL_SSL`（隐式 TLS；STARTTLS 改为必须；校验证书主机名；有账号无 TLS 拒绝启动）、`FINNS_MAIL_DAILY_BUDGET`（全局日预算，用尽→新令牌邮件按发送失败、通知放行但计入、80% WARN）。H2 与 PostgreSQL（新库）各 88/88，打包通过，变异检查通过。**真实 SMTP 未验证、未注册账号、未写凭据**。
+- 事项：PostgreSQL 隔离测试每次要用新库名（旧库残留数据会让计数类测试失败，不是缺陷）；8091 预览占用 jar 时重新打包会失败，先 `-Stop`。预览实例当前在运行（新 jar，出信箱模式）。
+- 代码与文档仍**未提交**（上次提交 efaf23a/fabd44b），Plane 未写。下一步：用户按手册配置并真实测试，反馈到达/垃圾箱/页脚结果；之后 G7 验收。
+
+# 最新交接：概设改用公共邮件商，新增设计评审轮（2026-10-18）
+
+- 用户要求概设改用公共且尽量有免费额度的邮件商，并在开发 skill 增加一轮评审。已改 [概设修订2](iterations/0.7.0/DESIGN_ACCOUNT.md) §3.3.1：SMTP 接入、推荐 Brevo（首选，每天300封）/Resend（备选，每月3000/每天100），数字取自2026-10-18官方定价页（内置浏览器读取；WebFetch/WebSearch 因摘要模型不可用而失败，SendGrid/Postmark 的页面读取被拒绝，**这些及国内服务商未核实**）。硬前提是自有发信域名，**需要用户确认是否已有域名并选服务商**。新增待实施：全局日预算 `FINNS_MAIL_DAILY_BUDGET`、`FINNS_MAIL_SSL`（契约 U2，尚未编码）。
+- 新增 G3 设计评审轮：[design-review.md](../.agents/skills/finns-delivery-workflow/references/design-review.md)（触发条件、独立性要求、10个维度、外部服务专项规则、条件去向：关闭/转入下游/不采纳），已接入阶段门禁、交付 skill、开发 skill，模板见 record-templates；验证见 [流程验证](DELIVERY_WORKFLOW_VALIDATION.md)。
+- 已对账号概设补评审：[DESIGN_REVIEW_ACCOUNT.md](iterations/0.7.0/DESIGN_REVIEW_ACCOUNT.md)，**同作者自评，独立性有限**，带条件通过。发现并更正：概设“耗时一致”承诺过强（实现里已存在可测差异）。条件 C2/C3/C5/C7 转入 G7 前置、C4 转入 G8，不重开 G4–G6。如需独立评审，需用户授权隔离评审者。
+- 本轮仅文档与 skill 改动，**未提交**（上一次提交是 efaf23a/fabd44b），未改业务代码、未改 8080、未写 Plane。
+
 # 最新交接：FINNS-15账号功能B1–B7已实施，待验收（2026-10-18）
 
 - 用户授权按契约B1–B7实施并同意新增`spring-boot-starter-mail`（ACCOUNT-D09，B8资料局部不含）。已实施：V13迁移、令牌状态机+邮件端口（默认disabled，开发出信箱，SMTP待服务商）、`session_epoch`会话撤销、公开接口与登录态接口、`/auth/*`与`/me/security`页面、`api()`附带HTTP状态与登录失效就地重新登录面板。**代码已本地提交 `efaf23a`（`release/0.7.0`，文档随后另一次提交），未推送、未发布、四处版本未改、Plane未写。** 详见[实施记录](iterations/0.7.0/IMPLEMENTATION_ACCOUNT.md)（文件清单、偏差D1–D6、验证命令与结果、未验项）与[契约修订2](iterations/0.7.0/CONTRACT_ACCOUNT.md)。

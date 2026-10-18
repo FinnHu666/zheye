@@ -1,3 +1,7 @@
+## 账号概设修订2与设计评审（2026-10-18）
+
+[概设修订2](DESIGN_ACCOUNT.md)（公共邮件服务商）、[设计评审记录](DESIGN_REVIEW_ACCOUNT.md)；评审规则在 `.agents/skills/finns-delivery-workflow/references/design-review.md`。仅文档与 skill，未提交；服务商免费额度为 2026-10-18 官方页面读取值，会变。
+
 ## FINNS-15账号实施（2026-10-18）
 
 [实施与验证记录](IMPLEMENTATION_ACCOUNT.md)含文件清单、偏差、验证结果、事故与未验项；[契约修订2](CONTRACT_ACCOUNT.md)已回写实施偏差。代码改动未提交，验证jar仅为本地产物。

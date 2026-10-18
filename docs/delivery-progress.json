@@ -91,7 +91,8 @@
           "user_action": "本轮无需操作；AI增强仍待定",
           "evidence": [
             {
-              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json"
+              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json",
+              "sha256": "8bf6c8d304d5263d46e3ffc823cd0ec0c9a175d21417f98dd18406a3be13ea29"
             }
           ],
           "reason": "FINNS-9待定归属及移出0.7.0周期已回读；后续G1范围冻结后再核对原型前管理基线"
@@ -873,20 +874,24 @@
             },
             {
               "path": "docs/requirements/FOUNDATION_DECISIONS.md",
-              "sha256": "45ebf7dfdf8338e8e7c593b6b1f9c6ad71668f18897f3cb8fd506def5688b7c4"
+              "sha256": "fc6015f8667a8c1bf60093e3be7b663896de04e556d936da20c282032cdb5b3b"
             }
           ]
         },
         {
           "id": "G3",
           "status": "pass",
-          "next_action": "G3已通过；等待实施授权以完成G4并进入G5",
-          "user_action": "无需操作",
-          "reason": "概要设计修订1完成：令牌状态机、session_epoch会话撤销、邮件端口、密码策略与BCrypt 72字节处理、迁移与回退；复用现有栈，仅新增spring-boot-starter-mail待确认。AI内部检查，未实施、未运行验证",
+          "next_action": "G3带条件通过：C1/C3/C7已关闭，C6不采纳；C2/C5转入G8（用户延后），C4转入G8；独立评审可在用户授权后补做",
+          "user_action": "无需操作；如需独立评审请授权启动隔离评审者",
+          "reason": "概设修订2（邮件改用公共服务商、免费额度优先）+ 设计评审记录（同作者自评，独立性有限）：C1已关闭，C6不采纳，其余条件转入下游门禁；已转入的条件未关闭前G7/G8不得通过",
           "evidence": [
             {
               "path": "docs/iterations/0.7.0/DESIGN_ACCOUNT.md",
-              "sha256": "7a8b0eb7b0db2d0d9496946de612fc727987210ed780c55a187361a36ab097a2"
+              "sha256": "23dec84868f60f1a1e021fd151deca54e6903fda31f1a968ecd7a9389f93cfc0"
+            },
+            {
+              "path": "docs/iterations/0.7.0/DESIGN_REVIEW_ACCOUNT.md",
+              "sha256": "4cde7d8fc31832a70b1bab403ac7ca066391451a74a23858825defbf062fbf64"
             }
           ]
         },
@@ -899,11 +904,11 @@
           "evidence": [
             {
               "path": "docs/iterations/0.7.0/CONTRACT_ACCOUNT.md",
-              "sha256": "3b82e7b6705d882f996c3f456e826e4ce57192f3d0f288a05b6cb009b9382325"
+              "sha256": "6d7aa26c1bd1d38cd161f10a90019199efaf2792645687aa0dc7838ff3ea9dc2"
             },
             {
               "path": "docs/requirements/FOUNDATION_DECISIONS.md",
-              "sha256": "45ebf7dfdf8338e8e7c593b6b1f9c6ad71668f18897f3cb8fd506def5688b7c4"
+              "sha256": "fc6015f8667a8c1bf60093e3be7b663896de04e556d936da20c282032cdb5b3b"
             }
           ]
         },
@@ -916,7 +921,7 @@
           "evidence": [
             {
               "path": "docs/iterations/0.7.0/IMPLEMENTATION_ACCOUNT.md",
-              "sha256": "0e5aba0eeaee76e85905b7451ea407cc76cf27d0d60dc14cb5be0bc24a318070"
+              "sha256": "700452042419603935a1d039b8263d4b27463979496519d3bf573dc662d26a8e"
             }
           ]
         },
@@ -925,27 +930,27 @@
           "status": "pass",
           "next_action": "补做未验项：真实SMTP、浏览器内会话失效保护、评论框/AI工作台接入核对",
           "user_action": "无需操作",
-          "reason": "H2 83/83、PostgreSQL隔离库83/83（含并发）、前端35/35、构建、迁移演练、本机浏览器桌面/手机主路径通过；真实SMTP、会话失效浏览器验证、Node验收脚本运行均未验，已列入实施记录",
+          "reason": "H2 83/83、PostgreSQL隔离库83/83（含并发）、前端35/35、构建、迁移演练、本机浏览器桌面/手机主路径通过；真实SMTP、会话失效浏览器验证、Node验收脚本运行均未验，已列入实施记录；C7补全后前端38/38、打包88/88，评论路径浏览器验证（见实施记录§9）",
           "evidence": [
             {
               "path": "docs/iterations/0.7.0/IMPLEMENTATION_ACCOUNT.md",
-              "sha256": "0e5aba0eeaee76e85905b7451ea407cc76cf27d0d60dc14cb5be0bc24a318070"
+              "sha256": "700452042419603935a1d039b8263d4b27463979496519d3bf573dc662d26a8e"
             }
           ]
         },
         {
           "id": "G7",
           "status": "pending",
-          "next_action": "整理本机验收步骤；等待用户体验并给出验收结论",
-          "user_action": "按验收步骤体验账号流程（需在本机以出信箱模式启动测试实例），确认通过或指出问题；真实邮件验收需先提供SMTP服务商/凭据",
-          "reason": "尚无用户验收；自动化通过不等于验收通过"
+          "next_action": "验收进行中：按ACCEPTANCE_ACCOUNT.md逐项复验用户反馈的问题；取得用户“全部通过”结论后再把G7置为通过并登记证据",
+          "user_action": "在本机预览(127.0.0.1:8091)按验收清单A–G逐项体验，填写结果与结论；有问题就告诉AI",
+          "reason": "2026-10-18用户宣布验收开始，验收清单与环境已就绪（ACCEPTANCE_ACCOUNT.md）；尚无用户验收结论，自动化通过不等于验收通过"
         },
         {
           "id": "G8",
           "status": "pending",
           "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
           "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
-          "reason": "G7验收未通过；发布需另行授权、备份与恢复演练、四处版本同步；8080主站仍是旧包"
+          "reason": "G7验收未通过；发布需另行授权、备份与恢复演练、四处版本同步；8080仍是旧包；C4部署新包前必须配置邮件；用户延后的真实邮件验证（垃圾箱、SPF/DKIM/DMARC、HTTPS链接对比、QQ/163/Outlook、C5）须在上线前完成"
         },
         {
           "id": "G9",
@@ -998,7 +1003,9 @@
       },
       "implementation_record": "docs/iterations/0.7.0/IMPLEMENTATION_ACCOUNT.md",
       "implementation_status": "B1-B7 implemented; code committed locally as efaf23a, not pushed; B8 not included",
-      "implementation_commit": "efaf23a"
+      "implementation_commit": "efaf23a",
+      "design_review_path": "docs/iterations/0.7.0/DESIGN_REVIEW_ACCOUNT.md",
+      "acceptance_record": "docs/iterations/0.7.0/ACCEPTANCE_ACCOUNT.md"
     },
     {
       "id": "foundation-content",
@@ -1037,7 +1044,8 @@
           "reason": "工作项及0.7.0Cycle/Release登记归版均已执行回读；G1细节尚未冻结，原型前仍需复核最终基线",
           "evidence": [
             {
-              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json"
+              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json",
+              "sha256": "8bf6c8d304d5263d46e3ffc823cd0ec0c9a175d21417f98dd18406a3be13ea29"
             }
           ]
         },
@@ -1164,7 +1172,8 @@
           "reason": "工作项及0.7.0Cycle/Release登记归版均已执行回读；G1细节尚未冻结，原型前仍需复核最终基线",
           "evidence": [
             {
-              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json"
+              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json",
+              "sha256": "8bf6c8d304d5263d46e3ffc823cd0ec0c9a175d21417f98dd18406a3be13ea29"
             }
           ]
         },
@@ -1291,7 +1300,8 @@
           "reason": "工作项及0.7.0Cycle/Release登记归版均已执行回读；G1细节尚未冻结，原型前仍需复核最终基线",
           "evidence": [
             {
-              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json"
+              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json",
+              "sha256": "8bf6c8d304d5263d46e3ffc823cd0ec0c9a175d21417f98dd18406a3be13ea29"
             }
           ]
         },
@@ -1422,7 +1432,8 @@
           "reason": "工作项及0.7.0Cycle/Release登记归版均已执行回读；G1细节尚未冻结，原型前仍需复核最终基线",
           "evidence": [
             {
-              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json"
+              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json",
+              "sha256": "8bf6c8d304d5263d46e3ffc823cd0ec0c9a175d21417f98dd18406a3be13ea29"
             }
           ]
         },
@@ -1559,7 +1570,8 @@
           "reason": "工作项及0.7.0Cycle/Release登记归版均已执行回读；G1细节尚未冻结，原型前仍需复核最终基线",
           "evidence": [
             {
-              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json"
+              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json",
+              "sha256": "8bf6c8d304d5263d46e3ffc823cd0ec0c9a175d21417f98dd18406a3be13ea29"
             }
           ]
         },
@@ -1685,7 +1697,8 @@
           "reason": "工作项及0.7.0Cycle/Release登记归版均已执行回读；G1细节尚未冻结，原型前仍需复核最终基线",
           "evidence": [
             {
-              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json"
+              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json",
+              "sha256": "8bf6c8d304d5263d46e3ffc823cd0ec0c9a175d21417f98dd18406a3be13ea29"
             }
           ]
         },
@@ -1810,7 +1823,8 @@
           "reason": "工作项及0.7.0Cycle/Release登记归版均已执行回读；G1细节尚未冻结，原型前仍需复核最终基线",
           "evidence": [
             {
-              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json"
+              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json",
+              "sha256": "8bf6c8d304d5263d46e3ffc823cd0ec0c9a175d21417f98dd18406a3be13ea29"
             }
           ]
         },

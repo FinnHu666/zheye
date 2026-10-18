@@ -1,3 +1,15 @@
+## 2026-10-18 真实邮件送达验证延后到上线
+
+ACCOUNT-D12：用户在看到“Brevo 真实发信到达 Gmail 但进垃圾箱”的结果后表示“目前不管这个内容，待后期上线再做验证”。落实：垃圾箱/送达位置、SPF/DKIM/DMARC 判定、HTTPS 链接对比、QQ/163/Outlook 实测都**延后到上线前（G8）**，不再作为 G7 验收的前置；设计评审条件 C2 剩余部分与 C5 随之转入 G8。这是用户的延期决定，不代表问题已解决。此前的 SMTP 通路验证（登录成功、已能发信）和密钥处理建议保持。
+
+## 2026-10-18 邮件服务商选定
+
+ACCOUNT-D11：用户提供自有域名 `2000678.xyz`，要求在 Brevo 与 Resend 之间选一个，并授权先实现日预算与 `FINNS_MAIL_SSL`。落实：AI 按概设推荐**选定 Brevo，Resend 备选**（理由与风险见 [MAIL_SETUP.md](../iterations/0.7.0/MAIL_SETUP.md)）；日预算与 `FINNS_MAIL_SSL` 已实现并测试（[实施记录 §7](../iterations/0.7.0/IMPLEMENTATION_ACCOUNT.md)）。**未注册任何服务商账号、未改 DNS、未写入凭据、未发送真实邮件**——这些由用户按手册操作。只读查询了域名 DNS：托管在阿里云云解析，根域名无 MX/TXT/DMARC。
+
+## 2026-10-18 邮件服务商与设计评审轮
+
+ACCOUNT-D10：用户要求“修改概设使用公共的、尽可能有免费额度的邮件商；在开发 skill 新增一轮评审，用于判断概设的合理性”。落实：[概设修订2](../iterations/0.7.0/DESIGN_ACCOUNT.md) §3.3.1 改为公共服务商 + SMTP 接入，推荐 Brevo（首选）/Resend（备选），免费额度取自 2026-10-18 官方定价页，未读到的写“未核实”；新增全局日预算与 `FINNS_MAIL_SSL`（待实施，契约 U2）。开发/交付 skill 新增 G3 设计评审轮（[设计评审](../../.agents/skills/finns-delivery-workflow/references/design-review.md)），并补做 [账号概设评审](../iterations/0.7.0/DESIGN_REVIEW_ACCOUNT.md)：同作者自评、带条件通过。**未替用户选定服务商或域名**——这两项仍待用户决定；未写入凭据、未发送真实邮件、未提交。
+
 ## 2026-10-18 账号实施授权
 
 ACCOUNT-D09：用户在看到设计与契约后明确回复“授权按 CONTRACT_ACCOUNT.md 的 B1–B7 实施，同意新增 spring-boot-starter-mail；资料局部 B8 暂不含”。范围 = 契约 §11 的 B1–B7（迁移与实体、会话撤销、令牌与邮件端口、公开与登录态接口、前端、脚本与验证）+ 新增邮件依赖。**不含**：资料查看/编辑局部（B8，FINNS-21）、真实邮件服务商配置与发送、部署到 8080、四处版本变更、Git 提交/推送、Plane 写入。实施与验证见 [实施记录](../iterations/0.7.0/IMPLEMENTATION_ACCOUNT.md)。
