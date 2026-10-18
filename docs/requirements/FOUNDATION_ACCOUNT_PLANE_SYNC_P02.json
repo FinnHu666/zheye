@@ -1,0 +1,72 @@
+{
+  "schema": "finns-plane-ops/1",
+  "revision": 1,
+  "prepared": "2026-10-18",
+  "workitem": "FINNS-15",
+  "workitem_id": "fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d",
+  "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+  "read_before": {
+    "updated_at": "2026-10-17T15:37:44.841733Z",
+    "state_id": "5b7d9df4-8ce4-40be-b110-83515a957a2a",
+    "state_group": "backlog",
+    "parent": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+    "priority": "none",
+    "cycle_id_field": null,
+    "description_sha256": "cb2277539c92bd6fcdcf5376620db6106690191365a0e16bebc5f904ba43bac7"
+  },
+  "operations": [
+    {
+      "id": "ACCOUNT-P02",
+      "tool": "workitem",
+      "action": "update",
+      "params": {
+        "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "workitem_id": "fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d",
+        "description_html": "<p class=\"editor-paragraph-block\" data-spacing-group=\"body\" data-id=\"30d92ec7-ade9-4e20-8b95-63858767a09d\">内部需求：FINNS-REQ-020/ACCOUNT。管理总项：FINNS-14。目标产品版本：0.7.0；当前源码与本机已发布基线为0.7.0；账号能力已在开发分支release/0.7.0实施（B1–B7，已本地提交、未推送），尚未验收、未发布，本机8080主站仍是不含账号功能的旧包。<br>当前阶段（2026-10-18）：G1需求通过（修订5获批，修订7按用户批注更新：先验证邮箱再设置昵称和密码、密码8–20位）；G2原型R2.1作为设计输入获用户确认；G3概设修订2+设计评审（同作者自评、带条件通过）；G4–G6契约/实施/测试通过；G7验收进行中，用户尚未给出验收结论；G8发布未开始。下列内容是获批需求及当前实现范围，不是已上线能力。<br><br>目标：复用现有账号体系，补齐邮箱验证、本人改密、邮件找回、会话撤销及未保存内容保护。<br>1. 新注册先验证邮箱，再设置昵称和密码，创建成功后回正常登录入口，不自动登录。验证前不创建账号、不建立业务登录态；未验证不能通过注册响应或客户端标记获得业务登录态。<br>2. 旧账号正常登录保留，提示补验证；旧未验证且忘记密码者，在一次邮件流程中先验证邮箱、再设新密码，不需第二封重置邮件。不把历史邮箱批量标为已验证，不允许新账号冒用旧账号过渡例外。<br>3. 账号恢复采用邮件自助、一次性重置链接。注册/补验证链接24小时有效，重置链接（含旧账号合并恢复）30分钟有效。同邮箱同用途至少间隔60秒重发；重发成功仅最新链接有效，发送失败保留仍有效的旧链接。成功完成操作后失效；仅打开重置页不消耗、不改密或撤销会话。过期/已用/无效时可重新申请。服务端另有防滥用：同邮箱同用途每小时最多5次尝试、来源IP限流、全局日发送预算；公开申请对已注册/未注册邮箱响应一致，不泄露账号是否存在（响应体与状态码一致，整体耗时仍有可测差异，属已知局限）。<br>4. 主动改密核对旧密码，保留当前设备、其他设备退出；邮件重置成功后全部设备退出，再正常登录。旧账号单独补验证保留当前会话。成功更新密码还须撤销该账号其他未用恢复链接，重复/并发操作不得重复生效。<br>5. 新设密码8–20位（按字符计，且UTF-8不超过72字节，超出时明确拒绝而不是截断），不强制大小写/符号组合；支持粘贴及密码管理器，新密码输入两次且一致。错误旧密码、未登录、非本人操作不改变密码。登录不新增长度限制，已有8–72位旧密码继续有效；BCrypt只使用前72字节，因此不静默截断。<br>6. 找回/重发使用统一公开提示，不泄露邮箱是否注册/已验证。失败保留页面及非敏感输入；密码仅暂留当前页面内存，不进入日志或持久草稿，成功/离开清除；失败不产生半成功密码状态、不暗中自动重试修改请求。<br>7. 登录失效或被改密挤下线时，保护未提交的非敏感编辑内容并提示重新登录，避免直接跳转丢稿；恢复后核对当前账号，换账号不得提交前一账号内容。内容只留在页面内存、不写入持久草稿；登录失效时就地重新登录，换账号被拒。已接入个人资料页、发布表单、专题编辑器、评论框和AI专题工作台。<br>8. 本人改密或邮件重置成功后发送变更通知，不含密码、恢复凭据或私人内容；通知失败不回滚成功的密码更新、不误报改密失败。通知本身不算邮箱验证。<br><br>验收：ACCOUNT-01–08及P01–P06按确认范围映射到原型/接口/测试，覆盖新旧账号、有效/过期/已用链接、旧密码错误、会话撤销、发送失败、并发/重试、跨账号、敏感输入保护、未保存内容、桌面和移动端。需求评审通过不表示技术验证或业务验收完成，不标Done。<br><br>依赖与衔接：复用已完成的FINNS-11角色/身份边界；已提供SessionRevocationService.revokeAll供FINNS-16（F07）联调停用会话，不要求对方整个功能先完成。基础资料只读查看/独立编辑归FINNS-21（F05），不并入本项改邮箱或角色管理。<br><br>实施与验证状态（2026-10-18）：已实现V13迁移、一次性令牌表、session_epoch会话撤销、邮件端口（默认关闭；本机出信箱用于验收）、/auth/*与/me/security页面、全局日发送预算与隐式TLS选项；验收中按反馈统一了个人中心六个页签的版式。后端H2与PostgreSQL隔离库各88/88（含并发重置/并发注册）、前端38/38、V12→V13迁移演练、本机浏览器主路径通过。邮件服务商选定Brevo（备选Resend），SMTP登录与发信已验证，但测试邮件到达Gmail时进了垃圾箱，真实送达验证由用户延后到上线前。未验证：真实邮件送达（垃圾箱、SPF/DKIM/DMARC判定、HTTPS链接、QQ/163/Outlook）、真人手机/跨浏览器、资料查看/编辑页（FINNS-21）。<br><br>下一步：完成G7用户验收；上线前须完成真实邮件送达验证、在部署前配置邮件（否则新注册不可用，旧账号登录不受影响）、主库备份与恢复演练、四处版本同步及发布授权。当前不部署主站、不迁移主库。<br><br>排除：第三方社交登录、会员、修改登录邮箱、媒体上传、评价/租房恢复、公开AI私人工作稿。邮件验证/重置/通知是本项必要依赖，不再沿用旧“无外部服务调用”排除邮件本身；不引入无关外部服务，不重开已完成的统计或角色管理。<br><br>本地依据（仓库路径，不是公网链接）：docs/requirements/FOUNDATION_ACCOUNT_REQUIREMENTS.md（修订7，获批范围来自修订5）、FOUNDATION_ACCOUNT_REQUIREMENTS_R5_APPROVED.md、FOUNDATION_DECISIONS.md；docs/iterations/0.7.0/DESIGN_ACCOUNT.md、DESIGN_REVIEW_ACCOUNT.md、CONTRACT_ACCOUNT.md、IMPLEMENTATION_ACCOUNT.md、ACCEPTANCE_ACCOUNT.md、MAIL_SETUP.md；docs/delivery-progress.json。</p>"
+      },
+      "only_changes": [
+        "description_html"
+      ],
+      "approval": "pending",
+      "execution": "not_executed",
+      "readback": "pending"
+    },
+    {
+      "id": "ACCOUNT-P03",
+      "tool": "workitem",
+      "action": "update",
+      "params": {
+        "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "workitem_id": "fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d",
+        "state": "71236130-c4d8-4d18-9a59-4106619bf8c6"
+      },
+      "only_changes": [
+        "state"
+      ],
+      "from": "Backlog",
+      "to": "In Progress",
+      "approval": "pending",
+      "execution": "not_executed",
+      "readback": "pending"
+    }
+  ],
+  "preserve": [
+    "name",
+    "parent",
+    "priority",
+    "assignees",
+    "labels",
+    "start_date",
+    "target_date",
+    "type",
+    "0.7.0 Cycle/Release membership (11 items each)"
+  ],
+  "pre_write_checks": [
+    "re-read FINNS-15 by id; updated_at must still be 2026-10-17T15:37:44.841733Z and description unchanged",
+    "no other item touched"
+  ],
+  "post_write_checks": [
+    "re-read by id; description_html equals params; state is In Progress; name/parent/priority/dates unchanged",
+    "Cycle and Release lists still contain FINNS-15 and still have 11 items each"
+  ]
+}

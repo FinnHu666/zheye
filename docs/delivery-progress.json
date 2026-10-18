@@ -847,9 +847,9 @@
         {
           "id": "PLANE",
           "status": "pending",
-          "next_action": "整理ACCOUNT-P02正文差异（修订7、G2通过、G3设计完成、G4待授权）；获指令后重读当前对象并逐项确认写入回读",
-          "user_action": "决定是否单项确认ACCOUNT-P02正文更新；未确认前设计继续作为本地资料，不写Plane",
-          "reason": "上次ACCOUNT-P01仅覆盖修订6；D07注册顺序/密码上限、R2.1、G2确认与设计产物为新增差异。2026-10-18只读重读FINNS-15确认正文仍为修订6（updated_at 2026-10-17T15:37:44Z），未连接写入",
+          "next_action": "ACCOUNT-P02（正文）与P03（状态→In Progress）差异已准备并等待用户逐项确认；获确认后写前重读、执行、回读并保存回执",
+          "user_action": "逐项确认或拒绝ACCOUNT-P02、ACCOUNT-P03（可只批准其一）",
+          "reason": "2026-10-18只读重读FINNS-15：正文仍为修订6、状态Backlog，与本地修订7/实施现状有差异；精确差异见FOUNDATION_ACCOUNT_PLANE_SYNC_P02.md，尚未写入",
           "evidence": [
             {
               "path": "docs/iterations/0.7.0/ACCOUNT_PROFILE_R2_REVIEW.md",
@@ -858,6 +858,10 @@
             {
               "path": "docs/requirements/FOUNDATION_ACCOUNT_PLANE_RECEIPT.json",
               "sha256": "455a7f42ee20475e1ef9a6897ee7d496b7bcfe946d9d0242f039323d592c99b1"
+            },
+            {
+              "path": "docs/requirements/FOUNDATION_ACCOUNT_PLANE_SYNC_P02.md",
+              "sha256": "6c58f03d340850d542ba9bac181ce25f5013aee5fa7459132cb57490c2ba5386"
             }
           ]
         },
@@ -1005,7 +1009,11 @@
       "implementation_status": "B1-B7 implemented; code committed locally as efaf23a, not pushed; B8 not included",
       "implementation_commit": "efaf23a",
       "design_review_path": "docs/iterations/0.7.0/DESIGN_REVIEW_ACCOUNT.md",
-      "acceptance_record": "docs/iterations/0.7.0/ACCEPTANCE_ACCOUNT.md"
+      "acceptance_record": "docs/iterations/0.7.0/ACCEPTANCE_ACCOUNT.md",
+      "plane_pending_operations": [
+        "ACCOUNT-P02",
+        "ACCOUNT-P03"
+      ]
     },
     {
       "id": "foundation-content",
