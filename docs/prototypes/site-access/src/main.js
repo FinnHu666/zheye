@@ -8,7 +8,7 @@ import DiscoverPage from '@finns/pages/DiscoverPage.vue'
 import CollectionsPage from '@finns/pages/CollectionsPage.vue'
 import VpsPage from '@finns/pages/VpsPage.vue'
 import LocalToolsPage from '@finns/pages/LocalToolsPage.vue'
-import PersonalPage from '@finns/pages/PersonalPage.vue'
+import PersonalPage from './pages/ProfilePage.vue'
 import AiSettingsPage from '@finns/pages/AiSettingsPage.vue'
 import MyPostsPage from '@finns/pages/MyPostsPage.vue'
 import MyCollectionsPage from '@finns/pages/MyCollectionsPage.vue'
@@ -21,10 +21,14 @@ import TopicBuilderPage from '@finns/pages/TopicBuilderPage.vue'
 import AdminUsersPage from './pages/AdminUsersPage.vue'
 import AdminRolesPage from './pages/AdminRolesPage.vue'
 import AdminAuditPage from './pages/AdminAuditPage.vue'
+import AccountFlowPage from './pages/AccountFlowPage.vue'
+import AccountSecurityPage from './pages/AccountSecurityPage.vue'
+import AccountDraftPage from './pages/AccountDraftPage.vue'
 import { api } from '@finns/lib/api'
 import { sessionUser } from './proto/session'
 import '@finns/assets/styles.css'
 import './proto.css'
+import './account.css'
 
 installMockServer()
 
@@ -34,11 +38,15 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/', component: DiscoverPage },
+    ...['login', 'register', 'forgot', 'pending', 'verify', 'reset', 'setup'].map(mode => ({ path: '/auth/' + mode, component: AccountFlowPage, meta: { accountMode: mode } })),
+    { path: '/me/security', component: AccountSecurityPage, meta: { requiresAuth: true } },
+    { path: '/me/security/draft', component: AccountDraftPage, meta: { requiresAuth: true } },
     { path: '/collections', component: CollectionsPage },
     { path: '/collections/:id(\\d+)', component: CollectionDetailPage },
     { path: '/vps', component: VpsPage },
     { path: '/private/tools', component: LocalToolsPage },
     { path: '/me', component: PersonalPage, meta: { requiresAuth: true } },
+    { path: '/me/profile/edit', component: PersonalPage, meta: { requiresAuth: true, profileEdit: true } },
     { path: '/me/ai-settings', component: AiSettingsPage, meta: { requiresAuth: true, perm: 'ai.use' } },
     { path: '/me/posts', component: MyPostsPage, meta: { requiresAuth: true } },
     { path: '/me/collections', component: MyCollectionsPage, meta: own },
@@ -64,7 +72,7 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   try { sessionUser.value = await api('/api/auth/me') } catch { sessionUser.value = null }
   if (!to.matched.some((record) => record.meta.requiresAuth) || sessionUser.value) return true
-  return { path: '/', query: { signin: '1', next: to.fullPath } }
+  return { path: '/auth/login', query: { next: to.fullPath } }
 })
 
 document.title = `[原型] ${document.title}`

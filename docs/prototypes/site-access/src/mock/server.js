@@ -2,6 +2,7 @@
 // 这里演示的是“后端也必须检查”的规则，不是可上线的实现。
 import { getDb, reloadDb, saveDb, now, nextId, MINUTE, DAY } from './db'
 import { CATALOG, permLabel, isLocked, MAX_ROLES } from './roles'
+import { handleAccount, ensureAccount } from './account'
 
 // 角色清单保存在服务端（R3 起可新增、改名、删除）。
 const allRoles = () => getDb().roles
@@ -85,23 +86,6 @@ const routes = []
 const on = (method, pattern, handler) => routes.push({ method, pattern, handler })
 
 on('GET', /^\/api\/auth\/csrf$/, () => { document.cookie = `XSRF-TOKEN=${encodeURIComponent(getDb().csrf)}; path=/`; return {} })
-on('GET', /^\/api\/auth\/me$/, () => me(requireUser()))
-on('POST', /^\/api\/auth\/login$/, ({ body }) => {
-  const user = getDb().users.find((u) => u.email.toLowerCase() === String(body.email || '').toLowerCase())
-  if (!user || !body.password) fail(401, '邮箱或密码不正确')
-  getDb().session.userId = user.id
-  return me(user)
-})
-on('POST', /^\/api\/auth\/register$/, ({ body }) => {
-  const d = getDb()
-  if (d.users.some((u) => u.email.toLowerCase() === String(body.email).toLowerCase())) fail(409, '该邮箱已注册')
-  const user = { id: nextId(), displayName: body.displayName, email: body.email, role: 'MEMBER', createdAt: new Date(now()).toISOString(), bio: '' }
-  d.users.push(user); d.session.userId = user.id
-  const ignored = body.role ? `；已忽略客户端提交的 role=${body.role}` : ''
-  return { ...me(user), _note: `注册默认普通成员${ignored}` }
-})
-on('POST', /^\/api\/auth\/logout$/, () => { getDb().session.userId = null; return null })
-
 on('GET', /^\/api\/stats$/, async () => {
   const d = getDb()
   if (d.settings.slowStats) await new Promise((resolve) => setTimeout(resolve, 2200))
@@ -146,12 +130,6 @@ on('GET', /^\/api\/collections\/(\d+)\/outline$/, ({ match }) => {
 })
 on('GET', /^\/api\/vps$/, () => getDb().vps)
 
-const profileView = (user) => {
-  const d = getDb()
-  return { id: user.id, email: user.email, displayName: user.displayName, bio: user.bio, createdAt: user.createdAt, postCount: d.posts.filter((p) => p.authorId === user.id).length, collectionCount: d.collections.filter((c) => c.ownerId === user.id).length, selectedCollectionCount: (d.selections[user.id] || []).length }
-}
-on('GET', /^\/api\/me\/profile$/, () => profileView(requireUser()))
-on('PATCH', /^\/api\/me\/profile$/, ({ body }) => { const user = requireUser(); user.displayName = body.displayName; user.bio = body.bio; return profileView(user) })
 on('GET', /^\/api\/me\/posts$/, ({ params }) => { const user = requireUser(); const result = page(getDb().posts.filter((p) => p.authorId === user.id), params); return { ...result, items: result.items.map(postSummary) } })
 on('GET', /^\/api\/me\/collections$/, ({ params }) => {
   const user = requirePerm('collection.manage', '当前角色不能管理专题')
@@ -383,16 +361,21 @@ async function handle(url, init) {
       if (header !== d.csrf) fail(403, 'CSRF 校验失败')
     }
     if (notSimulated.test(path)) fail(501, '原型未模拟此功能（不在 0.7.0 浏览量/角色范围内）')
-    const route = routes.find((r) => r.method === method && r.pattern.test(path))
-    if (!route) fail(404, '接口不存在')
-    data = await route.handler({ match: path.match(route.pattern), params: parsed.searchParams, body })
+    const account = handleAccount(method, path, body, parsed.searchParams)
+    if (account.handled) data = account.data
+    else {
+      const route = routes.find((r) => r.method === method && r.pattern.test(path))
+      if (!route) fail(404, '接口不存在')
+      data = await route.handler({ match: path.match(route.pattern), params: parsed.searchParams, body })
+    }
     if (data === null) status = 204
     if (path === '/api/site-visits') note = data.reason
     if (data?._note) { note = data._note; delete data._note }
   } catch (error) {
     status = error.status || 500; data = { message: error.message }; note = error.message
   }
-  log({ method, path: path + (parsed.search || ''), status, note, role: roleLabel(currentUser()?.role) })
+  const safeSearch = new URLSearchParams(parsed.search); if (safeSearch.has('token')) safeSearch.set('token', '[hidden]')
+  log({ method, path: path + (safeSearch.size ? '?' + safeSearch : ''), status, note, role: roleLabel(currentUser()?.role) })
   saveDb(); emit()
   await new Promise((resolve) => setTimeout(resolve, 120)) // 让加载状态可见
   return json(status, data)
@@ -410,7 +393,7 @@ export function installMockServer() {
 
 // 原型控制台使用的模拟操作（不是产品接口）。
 export const proto = {
-  db: () => reloadDb(),
+  db: () => { const d = reloadDb(); ensureAccount(d); return d },
   update(mutator) { reloadDb(); mutator(getDb()); saveDb(); emit() },
   visitorId: () => localStorage.getItem(VISITOR_KEY),
   clearVisitor() { localStorage.removeItem(VISITOR_KEY); emit() },

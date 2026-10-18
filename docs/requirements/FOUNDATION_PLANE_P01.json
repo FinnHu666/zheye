@@ -1,0 +1,21 @@
+{
+  "operation_id": "FND-P01",
+  "diff_revision": 1,
+  "approval_status": "approved",
+  "execution_status": "succeeded",
+  "readback_status": "verified",
+  "scope": "Only create the unversioned foundation parent item. No children, cycles, status updates or other writes.",
+  "arguments": {
+    "action": "create",
+    "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+    "name": "FINNS｜多人社区基础能力完善（未分版）",
+    "state": "5b7d9df4-8ce4-40be-b110-83515a957a2a",
+    "priority": "none",
+    "description_stripped": "内部需求：FINNS-REQ-020。当前已发布应用版本：0.7.0（本机主站）；目标产品版本未分配。当前阶段：G0 已登记，核心方向已确认，G1 分项细节待评审；原型、业务实施及验收未开始。\n\n目标：先确定多人社区基础功能和现状缺口，借助本总项与后续分项逐步完成，再按依赖组织版本。读者、作者、管理员形成完整闭环。\n\n范围：F01 账号维护；F02 普通文章/话题草稿、Markdown 与发布生命周期；F03 传统专题接入审核；F04 浏览、标题摘要检索及阅读；F05 私人中心与公开作者主页；F06 收藏、用户点赞与审核评论；F07 既有用户角色管理扩展账号停用；F08 作品/评论统一审核和内容处置。已完成的访问统计及角色管理复用，不重开 FINNS-10/11。\n\n已确认规则：文章、传统专题、评论全部先审后公开；修改稿不直接覆盖发布版；撤回私人保留，重新公开需审核；正文纯文字 Markdown，不含媒体上传；私人资料和 AI 工作稿不公开。评价榜单及租房评价应用暂缓，AI 多轮增强和每日名言不自动纳入本批次。\n\n待评审：账号找回方式、审核本人作品的规则、停用与作品可见关系、下架恢复和历史内容过渡。本文只登记目标，不声称这些规则已实现。\n\n完成标准：分项范围和原型获确认，设计/接口与验收映射齐备；读者、作者、管理员、互动及权限/异常/移动端场景有证据；未通过的业务不标完成。当前仅登记总项，后续分项创建/关联、状态、旧项调整及版本组织逐项确认。\n\n本地证据路径（不是公网链接）：docs/requirements/FOUNDATION_BASELINE.md、FOUNDATION_DECISIONS.md、FOUNDATION_PLANE_SYNC.md；docs/delivery-progress.json。"
+  },
+  "approval_source": "本轮用户明确回复“写入”，确认此前已展示的FND-P01修订1，仅创建一条总工作项。",
+  "approved_date": "2026-10-17",
+  "receipt_path": "docs/requirements/FOUNDATION_PLANE_RECEIPT.json",
+  "workitem_id": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+  "identifier": "FINNS-14"
+}

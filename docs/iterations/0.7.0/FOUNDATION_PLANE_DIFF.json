@@ -1,0 +1,482 @@
+{
+  "schema_version": 1,
+  "diff_revision": 1,
+  "prepared_date": "2026-10-17",
+  "timezone": "Asia/Singapore",
+  "target_version": "0.7.0",
+  "status": "succeeded_and_verified",
+  "user_scope": "只纳入八项基础能力；AI和名言继续待定。评价/租房仍暂缓。",
+  "remote_reads": {
+    "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+    "active_items": 7,
+    "archived_items": 1,
+    "cycles": 2,
+    "archived_cycles": 0,
+    "releases": 1,
+    "pagination_complete": true,
+    "cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+    "release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+    "cycle_start_date": "2026-10-12T00:00:01Z",
+    "cycle_end_date": "2026-10-31T23:59:00Z",
+    "release_status": "unreleased",
+    "release_old_members": [
+      "INBOX-2",
+      "INBOX-3",
+      "INBOX-4"
+    ]
+  },
+  "execution_rules": [
+    "每项独立确认，确认前不写入。",
+    "$result:V070-Pxx.id 仅引用该项成功创建并回读的真实ID；依赖未完成则不执行关联，严禁传占位符给MCP。",
+    "create超时先查重，update写前重读；存在实质变化则重新确认。",
+    "P14/P15按集合逐项回读，核对新增和移除、不误伤现有项。",
+    "这是版本规划与管理调整，不是部署、发版或业务实施授权。"
+  ],
+  "operations": [
+    {
+      "operation_id": "V070-P01",
+      "diff_revision": 1,
+      "tool": "cycle",
+      "arguments": {
+        "action": "update",
+        "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+        "name": "FINNS 0.7.0｜多人社区地基完善",
+        "description": "目标产品版本：0.7.0；主题：多人社区地基完善。2026-10-17 用户确认八项基础能力 F01–F08 全部归入本版，AI 多轮增强与每日名言继续待定，评价/租房仍暂缓。\n已发布基线：本机已有 0.7.0，累计访问 FINNS-10 与角色访问管理 FINNS-11 已完成；新增基础功能尚未实现，不能据此宣称整个地基范围已发布。\n本版新增范围：账号改密/恢复及会话；普通文章草稿/Markdown/审核发布；传统专题审核适配；浏览检索阅读；私人个人中心/独立资料编辑/公开作者页；收藏点赞及先审评论；账号停用/恢复；作品与评论统一审核。\n核心边界：作品与评论先审后公开，修改稿和发布版隔离；纯文字 Markdown，无媒体上传；AI 工作稿及个人配置保持私人；不重开已完成的统计/角色管理。\n阶段：版本归属已确认，分项 G1 细节仍待评审，先具体原型及确认，再概设/详设/接口/验收映射，获授权后实施和发布。保留现有周期日期、负责人和时区，周期结束日期不等于发布承诺。\n本地路径（不是公网链接）：docs/iterations/0.7.0/PLAN.md、REQUIREMENTS.md；docs/requirements/FOUNDATION_BASELINE.md、FOUNDATION_TASKS.md；docs/delivery-progress.json。"
+      },
+      "change": {
+        "name": {
+          "from": "FINNS 0.7.0｜AI 沟通与基础访问管理",
+          "to": "FINNS 0.7.0｜多人社区地基完善"
+        },
+        "description": "替换旧三项范围和0.6.0基线说明，明确八项基础与已交付子集"
+      },
+      "preserve": "保留日期2026-10-12至2026-10-31、owned_by、时区；不完成或归档周期",
+      "depends_on": [],
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "approval_source": "本轮用户：执行全部（明确的V070-P01–P15清单）",
+      "approval_date": "2026-10-17",
+      "object_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063"
+    },
+    {
+      "operation_id": "V070-P02",
+      "diff_revision": 1,
+      "tool": "release",
+      "arguments": {
+        "action": "update",
+        "release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+        "name": "FINNS 0.7.0｜多人社区地基完善",
+        "description_html": "<p>目标产品版本：0.7.0；主题：多人社区地基完善。2026-10-17 用户确认八项基础能力 F01–F08 全部归入本版，AI 多轮增强与每日名言继续待定，评价/租房仍暂缓。</p><p>已发布基线：本机已有 0.7.0，累计访问 FINNS-10 与角色访问管理 FINNS-11 已完成；新增基础功能尚未实现，不能据此宣称整个地基范围已发布。</p><p>本版新增范围：账号改密/恢复及会话；普通文章草稿/Markdown/审核发布；传统专题审核适配；浏览检索阅读；私人个人中心/独立资料编辑/公开作者页；收藏点赞及先审评论；账号停用/恢复；作品与评论统一审核。</p><p>核心边界：作品与评论先审后公开，修改稿和发布版隔离；纯文字 Markdown，无媒体上传；AI 工作稿及个人配置保持私人；不重开已完成的统计/角色管理。</p><p>阶段：版本归属已确认，分项 G1 细节仍待评审，先具体原型及确认，再概设/详设/接口/验收映射，获授权后实施和发布。保留现有周期日期、负责人和时区，周期结束日期不等于发布承诺。</p><p>本地路径（不是公网链接）：docs/iterations/0.7.0/PLAN.md、REQUIREMENTS.md；docs/requirements/FOUNDATION_BASELINE.md、FOUNDATION_TASKS.md；docs/delivery-progress.json。</p>"
+      },
+      "change": {
+        "name": {
+          "from": "FINNS 0.7.0",
+          "to": "FINNS 0.7.0｜多人社区地基完善"
+        },
+        "description": "明确完整地基范围未交付，已有0.7.0子集发布证据独立保留"
+      },
+      "preserve": "保留 unreleased、tag、负责人及所有日期，不标 released、不改 changelog",
+      "depends_on": [],
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "approval_source": "本轮用户：执行全部（明确的V070-P01–P15清单）",
+      "approval_date": "2026-10-17",
+      "object_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79"
+    },
+    {
+      "operation_id": "V070-P03",
+      "diff_revision": 1,
+      "tool": "project",
+      "arguments": {
+        "action": "update",
+        "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "description": "FINNS 实际开发项目，绑定 E:/code/FINNS/AI-tome。当前源码和本机已发布基线 0.7.0；0.7.0 继续完善多人社区八项基础能力。累计访问/角色管理已完成，其余分项待评审。AI 多轮增强与每日名言待定，评价/租房暂缓。",
+        "description_html": "<h2>FINNS 实际开发项目</h2><p>绑定本地仓库 E:/code/FINNS/AI-tome。当前源码与本机已发布基线为 0.7.0；已交付累计访问与角色管理。0.7.0 规划继续打好多人社区地基，新增八项基础能力尚未交付。</p><p>范围：账号维护、文章草稿与审核发布、传统专题审核、浏览检索阅读、私人/公开个人页、收藏点赞与审核评论、账号停用、作品和评论审核。</p><p>AI 多轮增强与每日名言继续待定；评价/租房暂缓。未确定未来版本，不承诺发布日期。</p><p>沿用现有 0.7.0 周期与 Release，管理状态以 Plane 为准，实施和验收以本地证据为准。先评审需求、确认具体原型、完成设计，再获授权实施和发布。</p><p>本地路径（不是公网链接）：docs/RELEASE_ROADMAP.md；docs/iterations/0.7.0/PLAN.md、REQUIREMENTS.md；docs/delivery-progress.json。</p>"
+      },
+      "change": {
+        "description": "旧0.6.0基线/0.8.0承诺 → 当前0.7.0基线、八项地基范围、其他待定/暂缓"
+      },
+      "preserve": "保留项目名、标识符、network、成员、权限、时区及功能开关",
+      "depends_on": [],
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "approval_source": "本轮用户：执行全部（明确的V070-P01–P15清单）",
+      "approval_date": "2026-10-17",
+      "object_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f"
+    },
+    {
+      "operation_id": "V070-P04",
+      "diff_revision": 1,
+      "tool": "workitem",
+      "arguments": {
+        "action": "update",
+        "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "workitem_id": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+        "name": "FINNS 0.7.0｜多人社区基础能力完善",
+        "description_stripped": "内部需求：FINNS-REQ-020。当前已发布应用版本：0.7.0（本机主站）；目标产品版本：0.7.0。当前阶段：G0 已登记，核心方向已确认，G1 分项细节待评审；原型、业务实施及验收未开始。\n目标：先确定多人社区基础功能和现状缺口，借助本总项与后续分项逐步完成，再按依赖组织版本。读者、作者、管理员形成完整闭环。\n范围：F01 账号维护；F02 普通文章/话题草稿、Markdown 与发布生命周期；F03 传统专题接入审核；F04 浏览、标题摘要检索及阅读；F05 私人中心与公开作者主页；F06 收藏、用户点赞与审核评论；F07 既有用户角色管理扩展账号停用；F08 作品/评论统一审核和内容处置。已完成的访问统计及角色管理复用，不重开 FINNS-10/11。\n已确认规则：文章、传统专题、评论全部先审后公开；修改稿不直接覆盖发布版；撤回私人保留，重新公开需审核；正文纯文字 Markdown，不含媒体上传；私人资料和 AI 工作稿不公开。评价榜单及租房评价应用暂缓，AI 多轮增强和每日名言不自动纳入本批次。\n待评审：账号找回方式、审核本人作品的规则、停用与作品可见关系、下架恢复和历史内容过渡。本文只登记目标，不声称这些规则已实现。\n完成标准：分项范围和原型获确认，设计/接口与验收映射齐备；读者、作者、管理员、互动及权限/异常/移动端场景有证据；未通过的业务不标完成。当前仅登记总项，后续分项创建/关联、状态及旧项调整逐项确认。\n本地证据路径（不是公网链接）：docs/requirements/FOUNDATION_BASELINE.md、FOUNDATION_DECISIONS.md、FOUNDATION_PLANE_SYNC.md；docs/delivery-progress.json。\n\n2026-10-17 版本决定：八项基础能力全部归入0.7.0地基完善；AI多轮增强与每日名言待定，评价/租房仍暂缓。已有0.7.0发布子集不代表本项完成，G1细节及原型仍待确认。"
+      },
+      "change": {
+        "name": {
+          "from": "FINNS｜多人社区基础能力完善（未分版）",
+          "to": "FINNS 0.7.0｜多人社区基础能力完善"
+        },
+        "body": "仅更新版本归属及当前阶段说明，保留原范围、验收与待决"
+      },
+      "preserve": "保留 Backlog、priority、parent、负责人/标签/日期；周期和Release关联另操作",
+      "depends_on": [],
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "approval_source": "本轮用户：执行全部（明确的V070-P01–P15清单）",
+      "approval_date": "2026-10-17",
+      "object_id": "26ba60d7-9746-44e6-b135-9dc60100ea54"
+    },
+    {
+      "operation_id": "V070-P05",
+      "diff_revision": 1,
+      "tool": "workitem",
+      "arguments": {
+        "action": "update",
+        "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "workitem_id": "fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d",
+        "name": "FINNS 0.7.0｜F01 账号与身份维护",
+        "description_stripped": "内部需求：FINNS-REQ-020/ACCOUNT。管理总项：FINNS-14。当前已发布版本：0.7.0；目标产品版本：0.7.0。\n当前阶段：G0 已登记、G1 分项细节待评审；原型、业务实施及验收未开始。建议推进顺序第 1 步。\n目标：账号与身份维护。\n分项范围与验收清单：\n- 复用现有注册、登录、退出，不重写账号系统；补本人改密、账号恢复、登录失效和未保存内容保护。\n- 先解决 Q01：找回路径、身份核验和一次性凭据；建议改密使其他会话失效，当前会话是否保留待确认。\n- 不显示/回传旧密码，不引入第三方社交登录或会员体系；当前不配置邮件服务、不发真实邮件。\n- AI 交付：需求确认记录、账号原型、会话/恢复设计、实现及匹配场景的证据。\n- 完成标准：正常注册登录退出不回归；错误旧密码不改变账号；恢复不能接管他人账号；会话按确认规则失效；失败不丢输入。\n- 后续衔接：为 F07 的停用会话规则提供约定；F07 的需求讨论可先进行，不依赖本项已发版。\n需要先明确的契约：无新增分项前置；核对现有账号能力。共同联调验收：F07。依赖指规则/接口约定，不代表必须等对方整个功能完成后才可评审或设计。\n用户下一步：选择邮件自助或管理员协助找回；确认改密后的会话规则。\nAI 下一步：逐项明确产品细节及验收；管理核对后制作原型并确认，再设计和获授权实施。\n完成标准：本分项范围与具体原型确认，设计/接口/验收映射完整；上述正常、异常、权限和持久化场景有可追溯证据。登记、建卡和文档完成不代表功能已实现，未验收不标 Done。目标版本已定为0.7.0；部署另确认。\n排除：不恢复评价/租房应用、不扩大 AI 私人工作稿为公开发布，不新增媒体上传或外部服务调用；既有已完成能力复用。\n本地依据（文件路径，不是公网链接）：docs/requirements/FOUNDATION_BASELINE.md、FOUNDATION_TASKS.md、FOUNDATION_DECISIONS.md；docs/delivery-progress.json。\n\n2026-10-17 版本决定：八项基础能力全部归入0.7.0地基完善；AI多轮增强与每日名言待定，评价/租房仍暂缓。已有0.7.0发布子集不代表本项完成，G1细节及原型仍待确认。"
+      },
+      "change": {
+        "name": {
+          "from": "FINNS｜F01 账号与身份维护（未分版）",
+          "to": "FINNS 0.7.0｜F01 账号与身份维护"
+        },
+        "body": "仅更新版本归属及当前阶段说明，保留原范围、验收与待决"
+      },
+      "preserve": "保留 Backlog、priority、parent、负责人/标签/日期；周期和Release关联另操作",
+      "depends_on": [],
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "approval_source": "本轮用户：执行全部（明确的V070-P01–P15清单）",
+      "approval_date": "2026-10-17",
+      "object_id": "fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d"
+    },
+    {
+      "operation_id": "V070-P06",
+      "diff_revision": 1,
+      "tool": "workitem",
+      "arguments": {
+        "action": "update",
+        "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "workitem_id": "3a39aade-af87-40f6-8944-32dc87895c20",
+        "name": "FINNS｜多轮 AI 沟通与主动确认（待定）",
+        "description_stripped": "目标产品版本：未分配；当前已发布基线：0.7.0。\n当前阶段：G1：C01–C07 剩余范围待冻结；新原型待制作。\n范围：连续讨论、每轮关键追问、可纠正摘要；作者明确确认才进入问卷。采用已确认 A 页面内聊天和离开保护，不恢复完整聊天；保留本人 Key、直接问卷、用量及取消/迟到/失败保护。\n验收：纠正方向更新摘要；AI 建议不能直接跳问卷；失败保留输入；确认快照与候选接受边界有效。\n流程：确认需求→具体原型确认→概设/详设及接口/验收映射→授权实施→测试/验收→授权发布。\n证据路径：docs/iterations/0.7.0/PLAN.md、REQUIREMENTS.md；docs/delivery-progress.json 中 conversation。路径是本地仓库入口，不是外部可访问链接。\n历史来源：INBOX-2；直接归属 FINNS。\n排除：公开发布/公众评分、共享数据、复杂角色、任意脚本与自动部署；不改变已发布功能。\n下一步：完成对应同步检查点，明确剩余参数及具体原型；当前未实施/未验收/未发布。\n\n2026-10-17 决定：本需求保留待定，不纳入0.7.0地基范围；原功能与验收保留，周期及Release关联另行调整。"
+      },
+      "change": {
+        "name": {
+          "from": "FINNS 0.7.0｜多轮 AI 沟通与主动确认",
+          "to": "FINNS｜多轮 AI 沟通与主动确认（待定）"
+        },
+        "version": "0.7.0 → 未分配，保留需求"
+      },
+      "preserve": "保留 Backlog、优先级、负责人、原功能/验收；不取消或归档",
+      "depends_on": [],
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "approval_source": "本轮用户：执行全部（明确的V070-P01–P15清单）",
+      "approval_date": "2026-10-17",
+      "object_id": "3a39aade-af87-40f6-8944-32dc87895c20"
+    },
+    {
+      "operation_id": "V070-P07",
+      "diff_revision": 1,
+      "tool": "workitem",
+      "arguments": {
+        "action": "create",
+        "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "parent": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+        "name": "FINNS 0.7.0｜F07 账号停用与用户管理衔接",
+        "state": "5b7d9df4-8ce4-40be-b110-83515a957a2a",
+        "priority": "none",
+        "description_stripped": "内部需求：FINNS-REQ-020/USER_ADMIN。管理总项：FINNS-14。当前已发布版本：0.7.0；目标产品版本：0.7.0。\n当前阶段：G0 已登记、G1 分项细节待评审；原型、业务实施及验收未开始。建议推进顺序第 2 步。\n\n目标：账号停用与用户管理衔接。\n\n分项范围与验收清单：\n- 复用已完成 FINNS-11 的用户查询、角色、权限和管理记录，新增正常/停用/恢复及理由；不重新打开 Done 项。\n- Q03 待确认：是否连带隐藏既有作品；账号状态与作品下架不能未经决定混为一个动作。\n- 停用与会话规则对齐 F01；旧会话不能继续受保护操作，不能借停用绕过最后正常管理者保护。\n- AI 交付：用户状态/权限矩阵、管理原型、扩展设计及停用/恢复/冲突证据。\n- 完成标准：状态在下一次请求生效；恢复可用；越权管理拒绝；最后管理者被保护；操作原因、对象和结果可查询，不删除用户资料。\n\n需要先明确的契约：F01。共同联调验收：F08。依赖指规则/接口约定，不代表必须等对方整个功能完成后才可评审或设计。\n\n用户下一步：确认停用账号是否连带隐藏既有作品，沿用现有角色管理。\nAI 下一步：逐项明确产品细节及验收；管理核对后制作原型并确认，再设计和获授权实施。\n\n完成标准：本分项范围与具体原型确认，设计/接口/验收映射完整；上述正常、异常、权限和持久化场景有可追溯证据。登记、建卡和文档完成不代表功能已实现，未验收不标 Done。目标版本已定为0.7.0；部署另确认。\n\n排除：不恢复评价/租房应用、不扩大 AI 私人工作稿为公开发布，不新增媒体上传或外部服务调用；既有已完成能力复用。\n\n本地依据（文件路径，不是公网链接）：docs/requirements/FOUNDATION_BASELINE.md、FOUNDATION_TASKS.md、FOUNDATION_DECISIONS.md；docs/delivery-progress.json。"
+      },
+      "change": {
+        "from": "不存在",
+        "to": "FINNS 0.7.0｜F07 账号停用与用户管理衔接",
+        "source_operation": "FND-P03",
+        "source_revision": 1,
+        "scope": "保留原功能、验收及F05查看/独立编辑要求，仅确定目标版本"
+      },
+      "preserve": "父项FINNS-14；Backlog、priority none；无负责人/日期；关联周期和Release另操作",
+      "depends_on": [],
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "approval_source": "本轮用户：执行全部（明确的V070-P01–P15清单）",
+      "approval_date": "2026-10-17",
+      "object_id": "bf836bf4-f306-4a64-8b56-1e571939d14e",
+      "plane_identifier": "FINNS-16"
+    },
+    {
+      "operation_id": "V070-P08",
+      "diff_revision": 1,
+      "tool": "workitem",
+      "arguments": {
+        "action": "create",
+        "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "parent": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+        "name": "FINNS 0.7.0｜F08 作品与评论审核管理",
+        "state": "5b7d9df4-8ce4-40be-b110-83515a957a2a",
+        "priority": "none",
+        "description_stripped": "内部需求：FINNS-REQ-020/REVIEW。管理总项：FINNS-14。当前已发布版本：0.7.0；目标产品版本：0.7.0。\n当前阶段：G0 已登记、G1 分项细节待评审；原型、业务实施及验收未开始。建议推进顺序第 3 步。\n\n目标：作品与评论审核管理。\n\n分项范围与验收清单：\n- 文章、传统专题、评论均需通过审核后公开；提供待审查询、提交快照、通过/驳回原因、下架和管理记录。\n- Q02/Q04/Q05 待确认：审核本人作品、审核权限、下架恢复及旧内容过渡。管理员作品也需显式审核，不自行假定允许自审。\n- 先形成统一审核契约、对象适配约定与竞态规则，再由 F02/F03/F06 接入；各适配器与审核管理共同联调。\n- AI 交付：状态/角色矩阵、审核原型、快照及操作设计、实现和三类对象的联调证据。\n- 完成标准：待审/驳回内容不对公众泄露；只批准已提交版本；撤回/删除/停用后过期审核不能重新公开；重复操作不重复发布；原因和版本可追溯。\n- 非目标：本项不自动迁移真实库或补写历史审核结果，不增加外部内容审查服务。\n\n需要先明确的契约：F07。共同联调验收：F02、F03、F06。依赖指规则/接口约定，不代表必须等对方整个功能完成后才可评审或设计。\n\n用户下一步：确认审核本人作品、审核权限、下架恢复与历史内容过渡。\nAI 下一步：逐项明确产品细节及验收；管理核对后制作原型并确认，再设计和获授权实施。\n\n完成标准：本分项范围与具体原型确认，设计/接口/验收映射完整；上述正常、异常、权限和持久化场景有可追溯证据。登记、建卡和文档完成不代表功能已实现，未验收不标 Done。目标版本已定为0.7.0；部署另确认。\n\n排除：不恢复评价/租房应用、不扩大 AI 私人工作稿为公开发布，不新增媒体上传或外部服务调用；既有已完成能力复用。\n\n本地依据（文件路径，不是公网链接）：docs/requirements/FOUNDATION_BASELINE.md、FOUNDATION_TASKS.md、FOUNDATION_DECISIONS.md；docs/delivery-progress.json。"
+      },
+      "change": {
+        "from": "不存在",
+        "to": "FINNS 0.7.0｜F08 作品与评论审核管理",
+        "source_operation": "FND-P04",
+        "source_revision": 1,
+        "scope": "保留原功能、验收及F05查看/独立编辑要求，仅确定目标版本"
+      },
+      "preserve": "父项FINNS-14；Backlog、priority none；无负责人/日期；关联周期和Release另操作",
+      "depends_on": [],
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "approval_source": "本轮用户：执行全部（明确的V070-P01–P15清单）",
+      "approval_date": "2026-10-17",
+      "object_id": "6ac45b07-b338-4944-b957-cf9928cc72a0",
+      "plane_identifier": "FINNS-17"
+    },
+    {
+      "operation_id": "V070-P09",
+      "diff_revision": 1,
+      "tool": "workitem",
+      "arguments": {
+        "action": "create",
+        "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "parent": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+        "name": "FINNS 0.7.0｜F02 普通文章草稿与审核发布",
+        "state": "5b7d9df4-8ce4-40be-b110-83515a957a2a",
+        "priority": "none",
+        "description_stripped": "内部需求：FINNS-REQ-020/CONTENT。管理总项：FINNS-14。当前已发布版本：0.7.0；目标产品版本：0.7.0。\n当前阶段：G0 已登记、G1 分项细节待评审；原型、业务实施及验收未开始。建议推进顺序第 4 步。\n\n目标：普通文章草稿与审核发布。\n\n分项范围与验收清单：\n- 新建、保存、纯文字 Markdown 预览、提交审核、查看驳回、修改重提、发布、修改再审、撤回并私人保留。\n- Q06 待确认：普通话题是否同期适配、首期保存方式；更新内容必须经过 F08 已定规则。\n- 修改稿不覆盖读者可见旧版；待审稿不得被作者后续修改悄悄替换；撤回后各公开入口不可读。\n- AI 交付：作者状态原型、工作稿/发布稿与审核接口设计、实现及持久化/权限/并发证据。\n- 完成标准：刷新恢复工作稿；旧版在改稿待审时仍可读；审核通过才替换；非作者不能编辑；版本冲突与失败保留输入；Markdown 与预览一致且脚本不能执行。\n- 非目标：图片/附件、任意 HTML、永久删除、多作者协同、任意历史回滚、AI 私人稿公开发布。\n\n需要先明确的契约：F08。共同联调验收：F03、F04、F05。依赖指规则/接口约定，不代表必须等对方整个功能完成后才可评审或设计。\n\n用户下一步：确认话题是否同期、显式保存或自动保存的边界；沿用先审后发。\nAI 下一步：逐项明确产品细节及验收；管理核对后制作原型并确认，再设计和获授权实施。\n\n完成标准：本分项范围与具体原型确认，设计/接口/验收映射完整；上述正常、异常、权限和持久化场景有可追溯证据。登记、建卡和文档完成不代表功能已实现，未验收不标 Done。目标版本已定为0.7.0；部署另确认。\n\n排除：不恢复评价/租房应用、不扩大 AI 私人工作稿为公开发布，不新增媒体上传或外部服务调用；既有已完成能力复用。\n\n本地依据（文件路径，不是公网链接）：docs/requirements/FOUNDATION_BASELINE.md、FOUNDATION_TASKS.md、FOUNDATION_DECISIONS.md；docs/delivery-progress.json。"
+      },
+      "change": {
+        "from": "不存在",
+        "to": "FINNS 0.7.0｜F02 普通文章草稿与审核发布",
+        "source_operation": "FND-P05",
+        "source_revision": 1,
+        "scope": "保留原功能、验收及F05查看/独立编辑要求，仅确定目标版本"
+      },
+      "preserve": "父项FINNS-14；Backlog、priority none；无负责人/日期；关联周期和Release另操作",
+      "depends_on": [],
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "approval_source": "本轮用户：执行全部（明确的V070-P01–P15清单）",
+      "approval_date": "2026-10-17",
+      "object_id": "5531f40a-0693-4be3-a9f5-82c197a7ec6c",
+      "plane_identifier": "FINNS-18"
+    },
+    {
+      "operation_id": "V070-P10",
+      "diff_revision": 1,
+      "tool": "workitem",
+      "arguments": {
+        "action": "create",
+        "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "parent": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+        "name": "FINNS 0.7.0｜F03 传统专题接入审核",
+        "state": "5b7d9df4-8ce4-40be-b110-83515a957a2a",
+        "priority": "none",
+        "description_stripped": "内部需求：FINNS-REQ-020/COLLECTION。管理总项：FINNS-14。当前已发布版本：0.7.0；目标产品版本：0.7.0。\n当前阶段：G0 已登记、G1 分项细节待评审；原型、业务实施及验收未开始。建议推进顺序第 5 步。\n\n目标：传统专题接入审核。\n\n分项范围与验收清单：\n- 复用既有导入、编辑、预览、发布快照、复制及受限访问；发布/更新发布接入 F08 统一审核。\n- 审核通过才生成对应发布快照，工作稿继续隔离；受限阅读权限与审核同时生效。\n- 依据 F08 定下的历史内容过渡与下架恢复规则适配，不另选一套审批政策。\n- AI 交付：专题发布原型修订、审核适配设计及旧功能兼容/引用可见性证据。\n- 完成标准：导入/预览/复制兼容；待审专题不可公开；驳回不改变旧发布版；撤回引用不泄露原文；受限专题不经搜索/卡片越权；AI 工作稿保持私人。\n\n需要先明确的契约：F08。共同联调验收：F02、F04、F05。依赖指规则/接口约定，不代表必须等对方整个功能完成后才可评审或设计。\n\n用户下一步：核对既有专题与审核适配原型，复用已确认审核规则。\nAI 下一步：逐项明确产品细节及验收；管理核对后制作原型并确认，再设计和获授权实施。\n\n完成标准：本分项范围与具体原型确认，设计/接口/验收映射完整；上述正常、异常、权限和持久化场景有可追溯证据。登记、建卡和文档完成不代表功能已实现，未验收不标 Done。目标版本已定为0.7.0；部署另确认。\n\n排除：不恢复评价/租房应用、不扩大 AI 私人工作稿为公开发布，不新增媒体上传或外部服务调用；既有已完成能力复用。\n\n本地依据（文件路径，不是公网链接）：docs/requirements/FOUNDATION_BASELINE.md、FOUNDATION_TASKS.md、FOUNDATION_DECISIONS.md；docs/delivery-progress.json。"
+      },
+      "change": {
+        "from": "不存在",
+        "to": "FINNS 0.7.0｜F03 传统专题接入审核",
+        "source_operation": "FND-P06",
+        "source_revision": 1,
+        "scope": "保留原功能、验收及F05查看/独立编辑要求，仅确定目标版本"
+      },
+      "preserve": "父项FINNS-14；Backlog、priority none；无负责人/日期；关联周期和Release另操作",
+      "depends_on": [],
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "approval_source": "本轮用户：执行全部（明确的V070-P01–P15清单）",
+      "approval_date": "2026-10-17",
+      "object_id": "923e172c-6b67-4def-bfe5-745e68441ded",
+      "plane_identifier": "FINNS-19"
+    },
+    {
+      "operation_id": "V070-P11",
+      "diff_revision": 1,
+      "tool": "workitem",
+      "arguments": {
+        "action": "create",
+        "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "parent": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+        "name": "FINNS 0.7.0｜F04 浏览检索与阅读",
+        "state": "5b7d9df4-8ce4-40be-b110-83515a957a2a",
+        "priority": "none",
+        "description_stripped": "内部需求：FINNS-REQ-020/DISCOVERY。管理总项：FINNS-14。当前已发布版本：0.7.0；目标产品版本：0.7.0。\n当前阶段：G0 已登记、G1 分项细节待评审；原型、业务实施及验收未开始。建议推进顺序第 6 步。\n\n目标：浏览检索与阅读。\n\n分项范围与验收清单：\n- 标题/摘要搜索文章、名称/简介搜索专题；保留条件、区分类型、分页、清空、空态、失败重试及移动端阅读。\n- 数据契约衔接 F02/F03/F08 的有效发布版；先按权限和发布有效性过滤，再计算结果和总数。\n- 已有详情、直达、前进后退需核验，不为搜索重做所有路由。\n- AI 交付：搜索到阅读原型、查询/权限设计、实现与翻页及可见性证据。\n- 完成标准：可找到有权内容，分页稳定；工作稿/待审/撤回/下架不可搜索，数量不泄露；改稿待审时仍检索旧版；断网重试和手机操作可用。\n- 非目标：正文/章节/条目全文检索、独立搜索服务、推荐、热度算法。\n\n需要先明确的契约：F02、F03、F08。共同联调验收：F05。依赖指规则/接口约定，不代表必须等对方整个功能完成后才可评审或设计。\n\n用户下一步：评审并确认既定标题摘要检索、权限过滤和阅读验收；到G2再体验具体原型，不重复选择已定搜索范围。\nAI 下一步：逐项明确产品细节及验收；管理核对后制作原型并确认，再设计和获授权实施。\n\n完成标准：本分项范围与具体原型确认，设计/接口/验收映射完整；上述正常、异常、权限和持久化场景有可追溯证据。登记、建卡和文档完成不代表功能已实现，未验收不标 Done。目标版本已定为0.7.0；部署另确认。\n\n排除：不恢复评价/租房应用、不扩大 AI 私人工作稿为公开发布，不新增媒体上传或外部服务调用；既有已完成能力复用。\n\n本地依据（文件路径，不是公网链接）：docs/requirements/FOUNDATION_BASELINE.md、FOUNDATION_TASKS.md、FOUNDATION_DECISIONS.md；docs/delivery-progress.json。"
+      },
+      "change": {
+        "from": "不存在",
+        "to": "FINNS 0.7.0｜F04 浏览检索与阅读",
+        "source_operation": "FND-P07",
+        "source_revision": 1,
+        "scope": "保留原功能、验收及F05查看/独立编辑要求，仅确定目标版本"
+      },
+      "preserve": "父项FINNS-14；Backlog、priority none；无负责人/日期；关联周期和Release另操作",
+      "depends_on": [],
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "approval_source": "本轮用户：执行全部（明确的V070-P01–P15清单）",
+      "approval_date": "2026-10-17",
+      "object_id": "f40d22a9-ace3-4ab1-9050-abc7f4260f3a",
+      "plane_identifier": "FINNS-20"
+    },
+    {
+      "operation_id": "V070-P12",
+      "diff_revision": 1,
+      "tool": "workitem",
+      "arguments": {
+        "action": "create",
+        "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "parent": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+        "name": "FINNS 0.7.0｜F05 个人中心与公开作者主页",
+        "state": "5b7d9df4-8ce4-40be-b110-83515a957a2a",
+        "priority": "none",
+        "description_stripped": "内部需求：FINNS-REQ-020/PERSONAL。管理总项：FINNS-14。当前已发布版本：0.7.0；目标产品版本：0.7.0。\n当前阶段：G0 已登记、G1 分项细节待评审；原型、业务实施及验收未开始。建议推进顺序第 7 步。\n\n目标：个人中心与公开作者主页。\n\n资料交互补充（2026-10-17）：本人资料默认只读展示，点击“修改资料”进入独立路由编辑页，不沿用常驻输入框和改后再出现保存按钮的现状。建议保存成功/取消后返回查看页，失败留在编辑页并保留输入，有未保存改动离开时确认放弃；具体路径和布局待原型确认。仅沿用昵称/简介编辑，邮箱仍只读，不顺带修改角色或加入头像上传。基础资料与F01提前评审，作品状态和公开作者页按原依赖推进。新增PROFILE-01–07验收：只读默认、独立编辑、保存返回、取消不写入、失败保护、本人权限及移动端/直达刷新/前进后退。\n\n分项范围与验收清单：\n- 私人中心包含资料、账号入口、文章/专题的草稿/待审/驳回/已发布/已撤回管理、审核理由及文章收藏。\n- 公开主页只展示昵称、简介和访问者有权阅读的已发布作品；保留已有自选专题、AI 设置等私人入口。\n- 页面布局依赖 F02/F03/F08 状态定义；文章收藏部分与 F06 联调，其余页面可以先制作需求/原型。\n- AI 交付：私人/公开两套信息结构、原型、查询/隔离设计与越权/翻页证据。\n- 完成标准：作者能找到相应状态和审核结果；公开主页不包含邮箱、角色管理信息、私人稿、待审稿、AI 配置或本地工具；跨账号拒绝，手机可用。\n\n需要先明确的契约：F01、F02、F03、F08。共同联调验收：F06。依赖指规则/接口约定，不代表必须等对方整个功能完成后才可评审或设计。\n\n用户下一步：查看与修改使用独立页面已明确；以此为前提评审字段、保存/取消和失败行为，基础资料与F01提前处理，具体原型到G2确认。\nAI 下一步：逐项明确产品细节及验收；管理核对后制作原型并确认，再设计和获授权实施。\n\n完成标准：本分项范围与具体原型确认，设计/接口/验收映射完整；上述正常、异常、权限和持久化场景有可追溯证据。登记、建卡和文档完成不代表功能已实现，未验收不标 Done。目标版本已定为0.7.0；部署另确认。\n\n排除：不恢复评价/租房应用、不扩大 AI 私人工作稿为公开发布，不新增媒体上传或外部服务调用；既有已完成能力复用。\n\n本地依据（文件路径，不是公网链接）：docs/requirements/FOUNDATION_BASELINE.md、FOUNDATION_TASKS.md、FOUNDATION_DECISIONS.md；docs/delivery-progress.json。\n补充本地依据：docs/requirements/FOUNDATION_PROFILE_REQUIREMENTS.md（修订1）。"
+      },
+      "change": {
+        "from": "不存在",
+        "to": "FINNS 0.7.0｜F05 个人中心与公开作者主页",
+        "source_operation": "FND-P08",
+        "source_revision": 2,
+        "scope": "保留原功能、验收及F05查看/独立编辑要求，仅确定目标版本"
+      },
+      "preserve": "父项FINNS-14；Backlog、priority none；无负责人/日期；关联周期和Release另操作",
+      "depends_on": [],
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "approval_source": "本轮用户：执行全部（明确的V070-P01–P15清单）",
+      "approval_date": "2026-10-17",
+      "object_id": "9615eed1-2ebf-452f-8073-33ed2fe0719d",
+      "plane_identifier": "FINNS-21"
+    },
+    {
+      "operation_id": "V070-P13",
+      "diff_revision": 1,
+      "tool": "workitem",
+      "arguments": {
+        "action": "create",
+        "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "parent": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+        "name": "FINNS 0.7.0｜F06 文章收藏点赞与审核评论",
+        "state": "5b7d9df4-8ce4-40be-b110-83515a957a2a",
+        "priority": "none",
+        "description_stripped": "内部需求：FINNS-REQ-020/INTERACTION。管理总项：FINNS-14。当前已发布版本：0.7.0；目标产品版本：0.7.0。\n当前阶段：G0 已登记、G1 分项细节待评审；原型、业务实施及验收未开始。建议推进顺序第 8 步。\n\n目标：文章收藏点赞与审核评论。\n\n分项范围与验收清单：\n- 收藏/取消和本人收藏列表；按用户记录点赞，可取消、幂等计数；单层文字评论先进入 F08 审核，再公开。\n- 评论作者可见待审/驳回状态及理由，可删除本人待审或已发布评论；不增加评论编辑、楼中楼、图片、私信。\n- 与 F04/F05 接通正文入口与私人收藏列表；收藏不授予额外内容权限。\n- AI 交付：互动原型、用户关系/评论审核设计、实现和计数/可见性/并发证据。\n- 完成标准：重试不重复计数，取消正确；待审评论正文与数量不泄露；删除和审核竞态不重新公开；撤回内容不可继续互动，收藏不可绕权。\n\n需要先明确的契约：F02、F08。共同联调验收：F05。依赖指规则/接口约定，不代表必须等对方整个功能完成后才可评审或设计。\n\n用户下一步：确认收藏、点赞、单层评论及可见状态范围，沿用先审后发；具体原型到G2体验。\nAI 下一步：逐项明确产品细节及验收；管理核对后制作原型并确认，再设计和获授权实施。\n\n完成标准：本分项范围与具体原型确认，设计/接口/验收映射完整；上述正常、异常、权限和持久化场景有可追溯证据。登记、建卡和文档完成不代表功能已实现，未验收不标 Done。目标版本已定为0.7.0；部署另确认。\n\n排除：不恢复评价/租房应用、不扩大 AI 私人工作稿为公开发布，不新增媒体上传或外部服务调用；既有已完成能力复用。\n\n本地依据（文件路径，不是公网链接）：docs/requirements/FOUNDATION_BASELINE.md、FOUNDATION_TASKS.md、FOUNDATION_DECISIONS.md；docs/delivery-progress.json。"
+      },
+      "change": {
+        "from": "不存在",
+        "to": "FINNS 0.7.0｜F06 文章收藏点赞与审核评论",
+        "source_operation": "FND-P09",
+        "source_revision": 1,
+        "scope": "保留原功能、验收及F05查看/独立编辑要求，仅确定目标版本"
+      },
+      "preserve": "父项FINNS-14；Backlog、priority none；无负责人/日期；关联周期和Release另操作",
+      "depends_on": [],
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "approval_source": "本轮用户：执行全部（明确的V070-P01–P15清单）",
+      "approval_date": "2026-10-17",
+      "object_id": "c1217a72-fb2a-4c84-9cab-069432392240",
+      "plane_identifier": "FINNS-22"
+    },
+    {
+      "operation_id": "V070-P14",
+      "diff_revision": 1,
+      "tool": "cycle",
+      "arguments": {
+        "action": "manage_workitems",
+        "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+        "add_ids": "26ba60d7-9746-44e6-b135-9dc60100ea54,fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d,$result:V070-P07.id,$result:V070-P08.id,$result:V070-P09.id,$result:V070-P10.id,$result:V070-P11.id,$result:V070-P12.id,$result:V070-P13.id",
+        "remove_ids": "3a39aade-af87-40f6-8944-32dc87895c20"
+      },
+      "change": {
+        "add": "FINNS-14、FINNS-15及本批7个新子项，共9项",
+        "remove": "仅移除FINNS-9的周期关联，不删除工作项"
+      },
+      "preserve": "保留FINNS-10/11及其Done状态；保留周期日期",
+      "depends_on": [
+        "V070-P04",
+        "V070-P05",
+        "V070-P07",
+        "V070-P08",
+        "V070-P09",
+        "V070-P10",
+        "V070-P11",
+        "V070-P12",
+        "V070-P13"
+      ],
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "approval_source": "本轮用户：执行全部（明确的V070-P01–P15清单）",
+      "approval_date": "2026-10-17",
+      "resolved_arguments": {
+        "action": "manage_workitems",
+        "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+        "add_ids": "26ba60d7-9746-44e6-b135-9dc60100ea54,fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d,bf836bf4-f306-4a64-8b56-1e571939d14e,6ac45b07-b338-4944-b957-cf9928cc72a0,5531f40a-0693-4be3-a9f5-82c197a7ec6c,923e172c-6b67-4def-bfe5-745e68441ded,f40d22a9-ace3-4ab1-9050-abc7f4260f3a,9615eed1-2ebf-452f-8073-33ed2fe0719d,c1217a72-fb2a-4c84-9cab-069432392240",
+        "remove_ids": "3a39aade-af87-40f6-8944-32dc87895c20"
+      }
+    },
+    {
+      "operation_id": "V070-P15",
+      "diff_revision": 1,
+      "tool": "release",
+      "arguments": {
+        "action": "manage_workitems",
+        "release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+        "add_ids": "02da68ea-0375-4776-8e26-68c20fbe64c6,7f0caa7b-5ae5-4980-8aa0-55edcb67d375,26ba60d7-9746-44e6-b135-9dc60100ea54,fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d,$result:V070-P07.id,$result:V070-P08.id,$result:V070-P09.id,$result:V070-P10.id,$result:V070-P11.id,$result:V070-P12.id,$result:V070-P13.id",
+        "remove_ids": "7c4b8392-842d-4bc0-bff0-afc61351976d,d706862c-ab13-4077-9aed-5b86dd4b44ea,69614504-adb5-43d5-916c-8bb2e66de8a0"
+      },
+      "change": {
+        "add": "FINNS-10/11、FINNS-14/15及本批7子项，共11项",
+        "remove": "INBOX-2/3/4仅解除Release关联，保留历史项"
+      },
+      "preserve": "Release仍unreleased；不删除INBOX、不改变任何工作项状态",
+      "depends_on": [
+        "V070-P04",
+        "V070-P05",
+        "V070-P07",
+        "V070-P08",
+        "V070-P09",
+        "V070-P10",
+        "V070-P11",
+        "V070-P12",
+        "V070-P13"
+      ],
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "approval_source": "本轮用户：执行全部（明确的V070-P01–P15清单）",
+      "approval_date": "2026-10-17",
+      "resolved_arguments": {
+        "action": "manage_workitems",
+        "release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+        "add_ids": "02da68ea-0375-4776-8e26-68c20fbe64c6,7f0caa7b-5ae5-4980-8aa0-55edcb67d375,26ba60d7-9746-44e6-b135-9dc60100ea54,fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d,bf836bf4-f306-4a64-8b56-1e571939d14e,6ac45b07-b338-4944-b957-cf9928cc72a0,5531f40a-0693-4be3-a9f5-82c197a7ec6c,923e172c-6b67-4def-bfe5-745e68441ded,f40d22a9-ace3-4ab1-9050-abc7f4260f3a,9615eed1-2ebf-452f-8073-33ed2fe0719d,c1217a72-fb2a-4c84-9cab-069432392240",
+        "remove_ids": "7c4b8392-842d-4bc0-bff0-afc61351976d,d706862c-ab13-4077-9aed-5b86dd4b44ea,69614504-adb5-43d5-916c-8bb2e66de8a0"
+      }
+    }
+  ],
+  "receipt_path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json"
+}

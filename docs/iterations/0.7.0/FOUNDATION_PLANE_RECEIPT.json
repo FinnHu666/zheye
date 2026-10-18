@@ -1,0 +1,486 @@
+{
+  "schema_version": 1,
+  "diff_revision": 1,
+  "approval": {
+    "source": "本轮用户在V070-P01–P15逐项差异展示后回复：执行全部",
+    "scope": [
+      "V070-P01",
+      "V070-P02",
+      "V070-P03",
+      "V070-P04",
+      "V070-P05",
+      "V070-P06",
+      "V070-P07",
+      "V070-P08",
+      "V070-P09",
+      "V070-P10",
+      "V070-P11",
+      "V070-P12",
+      "V070-P13",
+      "V070-P14",
+      "V070-P15"
+    ],
+    "date": "2026-10-17",
+    "interpretation": "批准上轮明确列出的全部15项具体差异，不含新增操作、部署或业务实施"
+  },
+  "preflight": {
+    "checked_at": "2026-10-17T15:04:26.340Z",
+    "active": 7,
+    "archived": 1,
+    "pagination_complete": true,
+    "duplicates": false,
+    "cycle_members": [
+      "02da68ea-0375-4776-8e26-68c20fbe64c6",
+      "3a39aade-af87-40f6-8944-32dc87895c20",
+      "7f0caa7b-5ae5-4980-8aa0-55edcb67d375"
+    ],
+    "release_members": [
+      "69614504-adb5-43d5-916c-8bb2e66de8a0",
+      "7c4b8392-842d-4bc0-bff0-afc61351976d",
+      "d706862c-ab13-4077-9aed-5b86dd4b44ea"
+    ]
+  },
+  "operations": [
+    {
+      "operation_id": "V070-P01",
+      "tool": "cycle",
+      "action": "update",
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "attempted_at": "2026-10-17T15:05:16.369Z",
+      "object_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "checks": {
+        "name": true,
+        "description": true,
+        "protected_fields": true
+      },
+      "readback_at": "2026-10-17T15:05:19.302Z"
+    },
+    {
+      "operation_id": "V070-P02",
+      "tool": "release",
+      "action": "update",
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "attempted_at": "2026-10-17T15:05:20.429Z",
+      "object_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+      "checks": {
+        "name": true,
+        "description_html": true,
+        "protected_fields": true
+      },
+      "readback_at": "2026-10-17T15:05:22.044Z"
+    },
+    {
+      "operation_id": "V070-P03",
+      "tool": "project",
+      "action": "update",
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "attempted_at": "2026-10-17T15:05:22.836Z",
+      "object_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+      "checks": {
+        "description": true,
+        "description_html": true,
+        "protected_fields": true
+      },
+      "readback_at": "2026-10-17T15:05:25.662Z"
+    },
+    {
+      "operation_id": "V070-P04",
+      "tool": "workitem",
+      "action": "update",
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "attempted_at": "2026-10-17T15:05:29.402Z",
+      "object_id": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+      "checks": {
+        "name": true,
+        "description_stripped": true,
+        "protected_fields": true
+      },
+      "readback_at": "2026-10-17T15:05:32.499Z"
+    },
+    {
+      "operation_id": "V070-P05",
+      "tool": "workitem",
+      "action": "update",
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "attempted_at": "2026-10-17T15:05:33.545Z",
+      "object_id": "fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d",
+      "checks": {
+        "name": true,
+        "description_stripped": true,
+        "protected_fields": true
+      },
+      "readback_at": "2026-10-17T15:05:43.382Z"
+    },
+    {
+      "operation_id": "V070-P06",
+      "tool": "workitem",
+      "action": "update",
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "attempted_at": "2026-10-17T15:05:44.672Z",
+      "object_id": "3a39aade-af87-40f6-8944-32dc87895c20",
+      "checks": {
+        "name": true,
+        "description_stripped": true,
+        "protected_fields": true
+      },
+      "readback_at": "2026-10-17T15:05:47.085Z"
+    },
+    {
+      "operation_id": "V070-P07",
+      "tool": "workitem",
+      "action": "create",
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "attempted_at": "2026-10-17T15:05:53.891Z",
+      "object_id": "bf836bf4-f306-4a64-8b56-1e571939d14e",
+      "identifier": "FINNS-16",
+      "checks": {
+        "name": true,
+        "description_stripped": true,
+        "project": true,
+        "parent": true,
+        "state": true,
+        "priority": true,
+        "no_cycle": true,
+        "no_dates": true,
+        "no_assignees": true,
+        "no_labels": true
+      },
+      "readback_at": "2026-10-17T15:05:56.006Z"
+    },
+    {
+      "operation_id": "V070-P08",
+      "tool": "workitem",
+      "action": "create",
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "attempted_at": "2026-10-17T15:05:58.611Z",
+      "object_id": "6ac45b07-b338-4944-b957-cf9928cc72a0",
+      "identifier": "FINNS-17",
+      "checks": {
+        "name": true,
+        "description_stripped": true,
+        "project": true,
+        "parent": true,
+        "state": true,
+        "priority": true,
+        "no_cycle": true,
+        "no_dates": true,
+        "no_assignees": true,
+        "no_labels": true
+      },
+      "readback_at": "2026-10-17T15:06:00.978Z"
+    },
+    {
+      "operation_id": "V070-P09",
+      "tool": "workitem",
+      "action": "create",
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "attempted_at": "2026-10-17T15:06:04.119Z",
+      "object_id": "5531f40a-0693-4be3-a9f5-82c197a7ec6c",
+      "identifier": "FINNS-18",
+      "checks": {
+        "name": true,
+        "description_stripped": true,
+        "project": true,
+        "parent": true,
+        "state": true,
+        "priority": true,
+        "no_cycle": true,
+        "no_dates": true,
+        "no_assignees": true,
+        "no_labels": true
+      },
+      "readback_at": "2026-10-17T15:06:06.295Z"
+    },
+    {
+      "operation_id": "V070-P10",
+      "tool": "workitem",
+      "action": "create",
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "attempted_at": "2026-10-17T15:06:11.066Z",
+      "object_id": "923e172c-6b67-4def-bfe5-745e68441ded",
+      "identifier": "FINNS-19",
+      "checks": {
+        "name": true,
+        "description_stripped": true,
+        "project": true,
+        "parent": true,
+        "state": true,
+        "priority": true,
+        "no_cycle": true,
+        "no_dates": true,
+        "no_assignees": true,
+        "no_labels": true
+      },
+      "readback_at": "2026-10-17T15:06:13.190Z"
+    },
+    {
+      "operation_id": "V070-P11",
+      "tool": "workitem",
+      "action": "create",
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "attempted_at": "2026-10-17T15:06:15.656Z",
+      "object_id": "f40d22a9-ace3-4ab1-9050-abc7f4260f3a",
+      "identifier": "FINNS-20",
+      "checks": {
+        "name": true,
+        "description_stripped": true,
+        "project": true,
+        "parent": true,
+        "state": true,
+        "priority": true,
+        "no_cycle": true,
+        "no_dates": true,
+        "no_assignees": true,
+        "no_labels": true
+      },
+      "readback_at": "2026-10-17T15:06:18.770Z"
+    },
+    {
+      "operation_id": "V070-P12",
+      "tool": "workitem",
+      "action": "create",
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "attempted_at": "2026-10-17T15:06:21.605Z",
+      "object_id": "9615eed1-2ebf-452f-8073-33ed2fe0719d",
+      "identifier": "FINNS-21",
+      "checks": {
+        "name": true,
+        "description_stripped": true,
+        "project": true,
+        "parent": true,
+        "state": true,
+        "priority": true,
+        "no_cycle": true,
+        "no_dates": true,
+        "no_assignees": true,
+        "no_labels": true
+      },
+      "readback_at": "2026-10-17T15:06:25.452Z"
+    },
+    {
+      "operation_id": "V070-P13",
+      "tool": "workitem",
+      "action": "create",
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "attempted_at": "2026-10-17T15:06:27.826Z",
+      "object_id": "c1217a72-fb2a-4c84-9cab-069432392240",
+      "identifier": "FINNS-22",
+      "checks": {
+        "name": true,
+        "description_stripped": true,
+        "project": true,
+        "parent": true,
+        "state": true,
+        "priority": true,
+        "no_cycle": true,
+        "no_dates": true,
+        "no_assignees": true,
+        "no_labels": true
+      },
+      "readback_at": "2026-10-17T15:06:31.835Z"
+    },
+    {
+      "operation_id": "V070-P14",
+      "tool": "cycle",
+      "action": "manage_workitems",
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "attempted_at": "2026-10-17T15:06:53.654Z",
+      "resolved_add_ids": [
+        "26ba60d7-9746-44e6-b135-9dc60100ea54",
+        "fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d",
+        "bf836bf4-f306-4a64-8b56-1e571939d14e",
+        "6ac45b07-b338-4944-b957-cf9928cc72a0",
+        "5531f40a-0693-4be3-a9f5-82c197a7ec6c",
+        "923e172c-6b67-4def-bfe5-745e68441ded",
+        "f40d22a9-ace3-4ab1-9050-abc7f4260f3a",
+        "9615eed1-2ebf-452f-8073-33ed2fe0719d",
+        "c1217a72-fb2a-4c84-9cab-069432392240"
+      ],
+      "remove_ids": [
+        "3a39aade-af87-40f6-8944-32dc87895c20"
+      ],
+      "readback_at": "2026-10-17T15:06:56.423Z",
+      "checks": {
+        "exact_members": true,
+        "member_count": true,
+        "removed_absent": true,
+        "added_present": true
+      },
+      "final_member_ids": [
+        "02da68ea-0375-4776-8e26-68c20fbe64c6",
+        "26ba60d7-9746-44e6-b135-9dc60100ea54",
+        "5531f40a-0693-4be3-a9f5-82c197a7ec6c",
+        "6ac45b07-b338-4944-b957-cf9928cc72a0",
+        "7f0caa7b-5ae5-4980-8aa0-55edcb67d375",
+        "923e172c-6b67-4def-bfe5-745e68441ded",
+        "9615eed1-2ebf-452f-8073-33ed2fe0719d",
+        "bf836bf4-f306-4a64-8b56-1e571939d14e",
+        "c1217a72-fb2a-4c84-9cab-069432392240",
+        "f40d22a9-ace3-4ab1-9050-abc7f4260f3a",
+        "fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d"
+      ]
+    },
+    {
+      "operation_id": "V070-P15",
+      "tool": "release",
+      "action": "manage_workitems",
+      "approval_status": "approved",
+      "execution_status": "succeeded",
+      "readback_status": "verified",
+      "attempted_at": "2026-10-17T15:06:57.707Z",
+      "resolved_add_ids": [
+        "02da68ea-0375-4776-8e26-68c20fbe64c6",
+        "7f0caa7b-5ae5-4980-8aa0-55edcb67d375",
+        "26ba60d7-9746-44e6-b135-9dc60100ea54",
+        "fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d",
+        "bf836bf4-f306-4a64-8b56-1e571939d14e",
+        "6ac45b07-b338-4944-b957-cf9928cc72a0",
+        "5531f40a-0693-4be3-a9f5-82c197a7ec6c",
+        "923e172c-6b67-4def-bfe5-745e68441ded",
+        "f40d22a9-ace3-4ab1-9050-abc7f4260f3a",
+        "9615eed1-2ebf-452f-8073-33ed2fe0719d",
+        "c1217a72-fb2a-4c84-9cab-069432392240"
+      ],
+      "remove_ids": [
+        "7c4b8392-842d-4bc0-bff0-afc61351976d",
+        "d706862c-ab13-4077-9aed-5b86dd4b44ea",
+        "69614504-adb5-43d5-916c-8bb2e66de8a0"
+      ],
+      "readback_at": "2026-10-17T15:06:59.572Z",
+      "checks": {
+        "exact_members": true,
+        "member_count": true,
+        "removed_absent": true,
+        "added_present": true
+      },
+      "final_member_ids": [
+        "02da68ea-0375-4776-8e26-68c20fbe64c6",
+        "26ba60d7-9746-44e6-b135-9dc60100ea54",
+        "5531f40a-0693-4be3-a9f5-82c197a7ec6c",
+        "6ac45b07-b338-4944-b957-cf9928cc72a0",
+        "7f0caa7b-5ae5-4980-8aa0-55edcb67d375",
+        "923e172c-6b67-4def-bfe5-745e68441ded",
+        "9615eed1-2ebf-452f-8073-33ed2fe0719d",
+        "bf836bf4-f306-4a64-8b56-1e571939d14e",
+        "c1217a72-fb2a-4c84-9cab-069432392240",
+        "f40d22a9-ace3-4ab1-9050-abc7f4260f3a",
+        "fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d"
+      ]
+    }
+  ],
+  "write_calls": 15,
+  "status": "succeeded_and_verified",
+  "completed_at": "2026-10-17T15:07:42.492Z",
+  "final_checks": {
+    "active_count": true,
+    "eight_children": true,
+    "eight_backlog": true,
+    "eight_versioned": true,
+    "untouched_done_and_paused": true,
+    "inbox_history_unchanged": true,
+    "ai_unassigned": true,
+    "cycle_dates_preserved": true,
+    "release_unreleased": true,
+    "archived_unchanged": true
+  },
+  "resources": {
+    "cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+    "cycle_name": "FINNS 0.7.0｜多人社区地基完善",
+    "start_date": "2026-10-12T00:00:01Z",
+    "end_date": "2026-10-31T23:59:00Z",
+    "release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+    "release_name": "FINNS 0.7.0｜多人社区地基完善",
+    "release_status": "unreleased",
+    "member_identifiers": [
+      "FINNS-10",
+      "FINNS-11",
+      "FINNS-14",
+      "FINNS-15",
+      "FINNS-16",
+      "FINNS-17",
+      "FINNS-18",
+      "FINNS-19",
+      "FINNS-20",
+      "FINNS-21",
+      "FINNS-22"
+    ],
+    "children": [
+      {
+        "id": "fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d",
+        "identifier": "FINNS-15",
+        "name": "FINNS 0.7.0｜F01 账号与身份维护",
+        "parent": "26ba60d7-9746-44e6-b135-9dc60100ea54"
+      },
+      {
+        "id": "bf836bf4-f306-4a64-8b56-1e571939d14e",
+        "identifier": "FINNS-16",
+        "name": "FINNS 0.7.0｜F07 账号停用与用户管理衔接",
+        "parent": "26ba60d7-9746-44e6-b135-9dc60100ea54"
+      },
+      {
+        "id": "6ac45b07-b338-4944-b957-cf9928cc72a0",
+        "identifier": "FINNS-17",
+        "name": "FINNS 0.7.0｜F08 作品与评论审核管理",
+        "parent": "26ba60d7-9746-44e6-b135-9dc60100ea54"
+      },
+      {
+        "id": "5531f40a-0693-4be3-a9f5-82c197a7ec6c",
+        "identifier": "FINNS-18",
+        "name": "FINNS 0.7.0｜F02 普通文章草稿与审核发布",
+        "parent": "26ba60d7-9746-44e6-b135-9dc60100ea54"
+      },
+      {
+        "id": "923e172c-6b67-4def-bfe5-745e68441ded",
+        "identifier": "FINNS-19",
+        "name": "FINNS 0.7.0｜F03 传统专题接入审核",
+        "parent": "26ba60d7-9746-44e6-b135-9dc60100ea54"
+      },
+      {
+        "id": "f40d22a9-ace3-4ab1-9050-abc7f4260f3a",
+        "identifier": "FINNS-20",
+        "name": "FINNS 0.7.0｜F04 浏览检索与阅读",
+        "parent": "26ba60d7-9746-44e6-b135-9dc60100ea54"
+      },
+      {
+        "id": "9615eed1-2ebf-452f-8073-33ed2fe0719d",
+        "identifier": "FINNS-21",
+        "name": "FINNS 0.7.0｜F05 个人中心与公开作者主页",
+        "parent": "26ba60d7-9746-44e6-b135-9dc60100ea54"
+      },
+      {
+        "id": "c1217a72-fb2a-4c84-9cab-069432392240",
+        "identifier": "FINNS-22",
+        "name": "FINNS 0.7.0｜F06 文章收藏点赞与审核评论",
+        "parent": "26ba60d7-9746-44e6-b135-9dc60100ea54"
+      }
+    ]
+  }
+}

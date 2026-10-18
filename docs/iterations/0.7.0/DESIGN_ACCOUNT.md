@@ -1,0 +1,141 @@
+# FINNS 0.7.0｜F01 账号与身份维护（FINNS-15）：概要设计（G3）
+
+日期：2026-10-18。设计修订：1。依据：[账号需规修订7](../../requirements/FOUNDATION_ACCOUNT_REQUIREMENTS.md)（ACCOUNT-D01–D07，批准基线[修订5快照](../../requirements/FOUNDATION_ACCOUNT_REQUIREMENTS_R5_APPROVED.md)）、原型 [R2.1 记录](ACCOUNT_PROFILE_R2_REVIEW.md)（D08 用户要求基于该本地原型做开发设计）。详设与接口见 [CONTRACT_ACCOUNT.md](CONTRACT_ACCOUNT.md)。
+
+状态：**仅设计，未实施。** 没有修改业务源码、数据库、服务、四处版本或 Plane；没有配置或发送真实邮件。下文“现状”来自静态阅读源码，未复验运行服务。
+
+技术基线不变：Java 17、Spring Boot 3.3.8（Spring Security 6.3.6）、会话 + Cookie CSRF、JPA + JdbcTemplate、PostgreSQL（Flyway + Hibernate validate）、开发期 H2、Vue 3 + Vue Router + Vite。唯一新增依赖：`spring-boot-starter-mail`（版本由 Boot 管理，见 §6，需实施授权时一并确认）。
+
+## 1. 现状（以源码为准）
+
+| 方面 | 现状 | 位置 |
+| --- | --- | --- |
+| 注册 | `POST /api/auth/register` 一步创建账号并建立登录会话；无邮箱归属验证；密码 `@Size(8–72)` 按 UTF-16 字符计 | `user/AuthController.java` |
+| 登录 | 邮箱+BCrypt 比对；账号不存在时不做哈希计算（时间可区分） | 同上 |
+| 会话 | `HttpSession` 属性 `USER_ID`；服务端内存会话，超时 7 天；没有“按用户撤销会话”的手段 | `AuthController`、`application.yml` |
+| 身份读取 | 两条路径：`AuthController.requireUser`（静态方法，各控制器使用）与 `AccessService.resolve`（权限拦截器）；两者都只看 `USER_ID` | `user/`、`access/` |
+| 权限 | `profile.manage` 所有角色锁定拥有（含受限成员） | `V12`、`Permission` |
+| 用户表 | `user_accounts`：email、password_hash、display_name、bio、created_at、role_id；无验证/会话版本字段 | `UserAccount.java` |
+| 邮件 | 无依赖、无实现 | `pom.xml` |
+| 前端 | `App.vue` 内弹窗式登录/注册；`api()` 抛出的 Error 只带 message，丢失 HTTP 状态；`PersonalPage.vue` 是常驻编辑表单 | `frontend/src` |
+| SPA 回退 | 白名单，无 `/auth/**` | `SpaController.java` |
+| 迁移 | Flyway 到 V12 | `db/migration` |
+
+**BCrypt 事实（已核对上游源码）**：经本地代理读取 Spring Security 6.3.6（Boot 3.3.8 管理的版本）`BCrypt.java`/`BCryptPasswordEncoder.java`：`encode`/`matches` 没有长度检查；密钥调度只消耗前 72 字节（18 个 P 数组字 × 4 字节），其后的字节被**静默忽略**。因此“新设密码最多 20 位”不自动保证安全：20 个 4 字节字符（如 emoji）= 80 字节，会被静默截断。设计对策见 §3.4。参考文件副本只放在本机会话临时目录，仅作分析，未纳入仓库、未执行。
+
+## 2. 设计总览
+
+```
+邮件链接 ──▶ /auth/* 页面（Vue） ──▶ AuthLinkController（公开，CSRF）──▶ AccountLinkService ──▶ account_action_tokens
+                                                                       └▶ MailDispatcher ──▶ MailSender（smtp | outbox | disabled）
+登录页 ─────▶ AuthController.login ──▶ 校验密码、验证门槛 ──▶ 会话写入 USER_ID + AUTH_EPOCH
+账号安全页 ─▶ AccountController（登录，profile.manage）──▶ PasswordService ──▶ user_accounts（行锁）
+任意受保护请求 ─▶ PermissionInterceptor / requireUser ──▶ 比对 session_epoch（SessionGuard）
+```
+
+三条主线：**一次性凭据（令牌）**、**会话撤销（session_epoch）**、**邮件投递（端口 + 异步）**。其余沿用现有控制器/权限/CSRF 模式。
+
+## 3. 关键设计决定
+
+### 3.1 令牌：一张表，状态机，哈希存储
+
+新表 `account_action_tokens`（V13）：`purpose`（`SIGNUP` 注册、`VERIFY` 旧账号单独补验证、`RESET` 重置，含旧账号合并恢复）、`email`、`user_id`（SIGNUP 为空）、`token_hash`（SHA-256，唯一）、`status`、各时间戳。原始令牌为 256 位随机数（Base64URL），**只出现在邮件和发送任务的内存中**，不入库、不入日志。
+
+状态：`PENDING`（已创建、发送中）→ `ACTIVE`（发送成功，唯一有效）→ `VERIFIED`（仅 SIGNUP：邮箱已确认，待设置账号）→ `USED`；`SUPERSEDED`（被更新的链接替代）、`FAILED`（发送失败）。
+
+| 需求规则 | 落实 |
+| --- | --- |
+| 重发成功仅最新链接有效；发送失败保留旧链接 (D05) | 新令牌先以 `PENDING` 插入；**发送成功后**同一事务把同 (purpose,email) 的旧 `ACTIVE/VERIFIED` 置 `SUPERSEDED` 并提升新令牌；发送失败只把新令牌置 `FAILED` |
+| 同邮箱同用途间隔 ≥60 秒 | 以同 (purpose,email) 最近一次 `sent_at` 为准，数据库裁决；窗口内的请求不发信 |
+| 同一时刻只有一个在途发送 | PostgreSQL 部分唯一索引 `(email,purpose) where status='PENDING'`；并发第二次插入冲突 → 按“窗口内”处理；超过 2 分钟的 `PENDING` 视为崩溃遗留，下次请求先置 `FAILED` |
+| 打开链接不消耗 (D05/P06) | “检查链接”只读；消耗发生在显式提交（验证/设置/重置）的条件更新：`update … set status='USED' where id=? and status in(…) and expires_at>now`，影响行数为 1 才算成功 |
+| 24 小时 / 30 分钟 | `expires_at` 在创建时固定；SIGNUP 在 `VERIFIED` 后仍受原到期时间约束 |
+| 成功后撤销该账号其余未用恢复链接 (P06) | 密码更新事务内把该用户所有 `ACTIVE` 的 RESET/VERIFY 令牌置 `SUPERSEDED` |
+
+选择“令牌表 + 状态机”，不采用无状态签名链接（JWT/HMAC）：无状态链接无法实现“仅最新有效”“一次性”“成功后撤销其余链接”，也无法对并发提交做行级裁决。
+
+### 3.2 会话撤销：`session_epoch`，不引入会话存储
+
+现有会话是服务端内存中的 `HttpSession`，没有按用户检索的能力。需求要求“主动改密：保留当前设备，其余退出”“邮件重置：全部退出”，且撤销必须在下一次请求生效。
+
+- `user_accounts.session_epoch bigint not null default 0`。登录成功时把当前值写入会话属性 `AUTH_EPOCH`。
+- 受保护请求与 `/api/auth/me` 比对“会话中的 epoch”和“数据库中的 epoch”，不相等即视为已失效（沿用现有“登录已失效”的 401 文案）。比对复用已有的用户查询：`AccessService.forUser` 的 SQL 增加一列，`requireUser` 已加载实体，**不增加额外查询**。
+- 主动改密：`epoch + 1`，并把**当前会话**的 `AUTH_EPOCH` 同步为新值 → 其他设备失效、当前保留。邮件重置：`epoch + 1` 且不更新任何会话 → 全部失效。
+- F07（用户停用）复用同一机制：提供 `SessionRevocationService.revokeAll(userId)`，供 FINNS-16 联调（需求中的“停用会话契约”）。
+
+备选（不采用）：Spring Session JDBC（新依赖 + 新表，且改变现有会话存储，影响面远大于需求）；进程内会话注册表（重启丢失，且不适合将来多实例）。局限：epoch 按用户整体撤销，不支持“只踢出某一台设备”，与需求一致；真实设备列表不在本次范围。
+
+### 3.3 邮件：端口 + 三种实现 + 异步投递
+
+- `MailSender` 端口，`MailDispatcher` 负责模板与投递。实现：`SmtpMailSender`（生产，环境变量配置，凭据不入库/文档）、`OutboxMailSender`（仅本机开发/验收，写入忽略目录 `data/dev-mail/`，仅在显式开启且服务只监听回环地址时启用）、`DisabledMailSender`（**默认**：不发信、不记录链接，账号创建不可用，保证未配置邮件时不会出现“能注册但没有验证”的状态）。
+- 公开入口（申请链接）**异步投递**，HTTP 响应在发送结果之前返回，因此“账号存在/不存在/窗口内/发送失败”的响应体、状态码与耗时一致（P02）。发送结果只影响令牌状态与日志。
+- 通知邮件（改密成功）在事务提交后发送，带有限超时（3 秒）：失败不回滚改密，响应附 `noticeFailed:true` 以复现原型的补充提示（P05）。
+- 链接中的主机来自配置 `FINNS_PUBLIC_BASE_URL`，**不取自请求头**，避免主机头注入。
+
+### 3.4 密码：新设规则与 BCrypt 兼容
+
+新设/重置/主动改密统一由 `PasswordPolicy` 校验：按 Unicode 码点计 8–20 个，且 UTF-8 字节数 ≤72，两次输入一致。超过字节上限时**明确拒绝并提示缩短**，不截断、不预哈希（预哈希会让新旧哈希不可互通，需求要求兼容旧哈希）。不 trim、不限制字符集、不强制组合；允许粘贴与密码管理器。登录不新增长度限制（已有 8–72 位旧密码继续有效）。BCrypt 编码器与强度不变。
+
+### 3.5 注册与旧账号的区分
+
+- `email_verified_at`（可空）+ `legacy_account`（V13 对迁移时已存在的账号置 true）。新注册只能经“验证 → 设置账号”创建，创建时写入 `email_verified_at`，因此新账号从不处于“未验证”。
+- 登录门槛：`email_verified_at is null and not legacy_account` → 拒绝（密码正确时才提示需验证，避免未授权者探测）。旧账号未验证可登录并显示补验证提示。旧账号完成邮件重置或单独验证后写入 `email_verified_at`。不批量标记历史邮箱已验证。
+- 回退到旧程序包后若有人用旧注册接口创建账号，该账号 `legacy_account=false` 且未验证，新程序会拒绝其登录，需走邮件流程——这是有意的保守行为，记录为回退注意事项。
+
+### 3.6 防滥用（需求 D05 留给设计的部分）
+
+数值是设计默认值，**不是**用户确认的产品参数，可在实施中用配置调整：
+
+| 对象 | 规则 | 超限表现 |
+| --- | --- | --- |
+| 同邮箱同用途 | 间隔 ≥60 秒（已确认）；另 1 小时内最多 5 次尝试（含失败） | 公开入口：统一响应、不发信 |
+| 来源 IP | 申请链接 10 次 / 10 分钟；检查/消耗令牌 30 次 / 10 分钟 | 429 通用提示（对所有邮箱一视同仁） |
+| 主动改密的原密码错误 | 每用户 5 次 / 15 分钟 | 429；只影响改密，不影响登录/退出/邮件重置 |
+| 登录 | 本次不新增限流（“额外限流不锁死正常登录”）；仅补做不存在账号的哈希对齐以拉平耗时 | — |
+
+限流计数为进程内滑动窗口（当前单实例；重启清零，多实例需另行共享），**权威的发送间隔与小时上限落在数据库**。来源 IP 取自连接地址；若将来置于反向代理之后，需先配置受信代理再启用转发头，否则会被伪造。
+
+### 3.7 前端
+
+- 登录/注册弹窗改为独立路由：`/auth/login`、`/auth/register`、`/auth/pending`、`/auth/verify`、`/auth/setup`、`/auth/forgot`、`/auth/reset`，加上 `/me/security`、`/me/profile/edit`；`SpaController` 增加 `/auth/**`。旧的 `/?signin=1&next=…` 链接由路由守卫重定向。`next` 仅允许站内相对路径。
+- 页面从原型移植（`AccountFlowPage`、`AccountSecurityPage`、`ProfilePage`、校验辅助、样式），去掉模拟层、演示控制台、演示稿页与 `finns-account-session` 事件。
+- `api()` 给抛出的 Error 附加 `status`（加性改动）。新增 `lib/sessionGuard.js` 与共享的重新登录面板：任何受保护请求返回 401 时，原页面保留未提交内容、就地重新登录、核对返回的 `user.id` 与原所有者，不一致则禁止提交（P04）。内容只留在页面内存，密码输入从不持久化（P03）。
+- `/auth/**` 页面响应带 `Referrer-Policy: no-referrer` 与 `Cache-Control: no-store`；令牌留在地址栏以保证直达/刷新（ACCOUNT-07），因此服务端与前端都不得把完整 URL 写入日志或上报。
+
+## 4. 兼容、迁移与回退
+
+- **迁移**：Flyway `V13__account_verification_and_recovery.sql`，全部为附加变更：`user_accounts` 加 4 列、新建令牌表；对已有账号只做 `legacy_account=true` 标记，不改密码哈希、邮箱或角色。H2 开发库沿用 ddl update，另有启动初始化（幂等，带标记）补标记旧账号。
+- **既有功能不变**：登录接口形态、CSRF、私人草稿、AI Key、HTML 模块、角色权限、访问计数。登录响应仅追加 `emailVerified`。
+- **移除**：`POST /api/auth/register` 的旧一步语义被“令牌 + 设置账号”替换（请求体不同），所有调用方同步改：测试夹具、两个 Node 验收脚本、前端。
+- **回退**：回到不含 V13 的 0.7.0 程序包时，旧代码忽略新列和新表，密码哈希格式不变，旧账号继续登录。回退后创建的账号见 §3.5。已发出的链接随之失效。
+- **数据**：迁移触及主库用户表，按项目规则执行前须有可恢复备份与恢复演练（G8 前置，不在本轮）。
+
+## 5. 风险与对策
+
+| 风险 | 对策 |
+| --- | --- |
+| 邮件服务商/凭据未定，无法端到端真实验证 | 端口抽象 + 开发期出信箱 + 默认关闭；真实邮件验收列为独立未验项，待用户提供服务商 |
+| 新注册依赖邮件，邮件故障会阻断注册 | 默认关闭时给出明确不可用状态而非静默失败；运维以日志计数观察发送失败；旧账号登录不受影响 |
+| 公开接口账号枚举 | 统一响应体/状态码/耗时（异步），限流对所有邮箱一致；登录补哈希；测试覆盖“已注册/未注册/窗口内/失败”四类等同 |
+| 令牌泄露（日志/Referer/历史） | 哈希存储；检查与消耗用 POST 正文；`no-referrer`；不记录 URL 查询串 |
+| 并发重置/注册/改密 | 用户行 `for update` + 令牌条件更新 + 唯一约束；PostgreSQL 并发测试 |
+| epoch 比对遗漏某条身份读取路径 | 现有仅两条路径（见 §1）；测试遍历：撤销后对代表性受保护接口均返回 401 |
+| 进程内限流在重启/多实例失效 | 数据库侧间隔与小时上限为权威；限流为附加层，局限已记录 |
+| 密码字节上限与字符上限不一致 | `PasswordPolicy` 双重校验，明确提示；BCrypt 截断行为用测试固定（见契约测试 T-P01） |
+| 新增邮件依赖 | 版本由 Boot BOM 管理；仅在实施授权后加入，依赖解析结果在实施记录中保留 |
+
+## 6. 技术栈变动说明
+
+需求已把邮件验证/重置/通知定为本项必要依赖（需规 D01/D03/D06），无法在不引入邮件发送的前提下实现。新增 `spring-boot-starter-mail` 属于该需求的直接依赖，不改 Java/Spring Boot/Vue 基线，也不新增数据库产品或服务。
+
+## 7. 验收映射（详见契约 §10）
+
+| 需规条目 | 设计位置 | 主要验证 |
+| --- | --- | --- |
+| ACCOUNT-01、08 注册/登录/退出，未验证不可绕过 | §3.1、§3.5 | MockMvc 全流程；未验证/篡改邮箱/角色字段 |
+| ACCOUNT-02、03 恢复凭据与会话 | §3.1、§3.2 | 一次性、过期、已用、替换；申请与打开不改密/不退出 |
+| ACCOUNT-04 主动改密 | §3.2、§3.4 | 旧密码错误；保留当前、其他失效 |
+| ACCOUNT-05 旧账号过渡 | §3.5 | 补验证保留会话；合并恢复；新账号不能借道 |
+| ACCOUNT-06 失败与枚举 | §3.3、§3.6 | 统一响应、发送失败、并发 |
+| ACCOUNT-07 桌面/移动、直达刷新 | §3.7 | 浏览器检查（390/768/桌面） |
+| P01–P06 | §3.1–§3.7 | 契约 §10 逐条映射 |

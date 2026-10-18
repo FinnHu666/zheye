@@ -3,16 +3,67 @@
   "project": {
     "name": "FINNS",
     "plane_project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
-    "last_remote_check": "2026-10-14，FINNS-10/11需规修订3正文更新/保护字段及周期关联回读完成",
+    "last_remote_check": "2026-10-18只读重读FINNS-15：正文仍为修订6/2026-10-17更新，与本地修订7、R2.1、设计存在差异，未写入；此前2026-10-17检查记录保留",
     "cycles": {
       "0.7.0": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
       "0.8.0": "74c326cb-9864-4405-89ed-8e1675483486"
+    },
+    "foundation_parent": {
+      "workitem_id": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+      "identifier": "FINNS-14",
+      "state_name": "Backlog",
+      "target_version": "0.7.0",
+      "last_verified": "2026-10-17",
+      "receipt_path": "docs/requirements/FOUNDATION_PLANE_RECEIPT.json",
+      "version_sync_status": "verified",
+      "version_receipt_path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json"
+    },
+    "foundation_release": {
+      "release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+      "status": "unreleased",
+      "observed_members": [
+        "FINNS-10",
+        "FINNS-11",
+        "FINNS-14",
+        "FINNS-15",
+        "FINNS-16",
+        "FINNS-17",
+        "FINNS-18",
+        "FINNS-19",
+        "FINNS-20",
+        "FINNS-21",
+        "FINNS-22"
+      ],
+      "last_verified": "2026-10-17",
+      "membership_sync_status": "verified",
+      "receipt_path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json"
+    },
+    "foundation_cycle": {
+      "cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "name": "FINNS 0.7.0｜多人社区地基完善",
+      "start_date": "2026-10-12T00:00:01Z",
+      "end_date": "2026-10-31T23:59:00Z",
+      "observed_members": [
+        "FINNS-10",
+        "FINNS-11",
+        "FINNS-14",
+        "FINNS-15",
+        "FINNS-16",
+        "FINNS-17",
+        "FINNS-18",
+        "FINNS-19",
+        "FINNS-20",
+        "FINNS-21",
+        "FINNS-22"
+      ],
+      "last_verified": "2026-10-17",
+      "receipt_path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json"
     }
   },
   "tasks": [
     {
       "id": "conversation",
-      "version": "0.7.0",
+      "version": "未分配",
       "gates": [
         {
           "id": "G0",
@@ -22,7 +73,7 @@
           "evidence": [
             {
               "path": "docs/iterations/0.7.0/PLAN.md",
-              "sha256": "89ae30680ac2272300983acd5908b499f09c42160e2d16e8b266c41f9ae08508"
+              "sha256": "981b80871543881810b0fe44aa4e1198137ae26262042695278e897abf6d4bfe"
             }
           ]
         },
@@ -35,16 +86,15 @@
         },
         {
           "id": "PLANE",
-          "status": "pass",
-          "next_action": "发生范围或状态差异时按授权重新核对同步",
-          "user_action": "当前无需重复批准已完成 W01–W07",
+          "status": "pending",
+          "next_action": "保留待定需求，不恢复开发；用户日后决定评审时核对当前工作项",
+          "user_action": "本轮无需操作；AI增强仍待定",
           "evidence": [
             {
-              "path": "docs/plane-workitem-receipt.json",
-              "sha256": "ee1db2b4d638208322b2c99d770fd2c750964285f91962e9b6f43329fbca4a5d"
+              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json"
             }
           ],
-          "reason": "已按确认清单创建及关联，并回读验证"
+          "reason": "FINNS-9待定归属及移出0.7.0周期已回读；后续G1范围冻结后再核对原型前管理基线"
         },
         {
           "id": "G2",
@@ -101,7 +151,15 @@
         "identifier": "FINNS-9",
         "state": "5b7d9df4-8ce4-40be-b110-83515a957a2a",
         "cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063"
-      }
+      },
+      "previous_target_version": "0.7.0",
+      "target_version": null,
+      "management_status": "保留需求，先确定社区基础",
+      "management_change_source": "docs/requirements/FOUNDATION_DECISIONS.md",
+      "plane_sync_status": "本轮已核对，旧目标版本/暂缓差异待逐项确认",
+      "plane_cycle_id": null,
+      "plane_version_sync_status": "verified",
+      "plane_last_receipt_path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json"
     },
     {
       "id": "views",
@@ -115,7 +173,7 @@
           "evidence": [
             {
               "path": "docs/iterations/0.7.0/PLAN.md",
-              "sha256": "89ae30680ac2272300983acd5908b499f09c42160e2d16e8b266c41f9ae08508"
+              "sha256": "981b80871543881810b0fe44aa4e1198137ae26262042695278e897abf6d4bfe"
             }
           ]
         },
@@ -131,7 +189,7 @@
             },
             {
               "path": "docs/iterations/0.7.0/REQUIREMENTS.md",
-              "sha256": "86e07d9424e45e9ba57d78a832d9b2b18f3bd42bc79323452c6c359cc50d13d8"
+              "sha256": "643a6e09f1a3705358bedf3932f5a7dc0da001e7c0d2028d51fdc4a5fe6a08ec"
             }
           ],
           "reason": "用户明确更新本项方向；具体参数仍待原型细化；2026-10-15 需规修订 4 按已确认原型细化同一方向，复核后更新哈希"
@@ -287,7 +345,7 @@
           "evidence": [
             {
               "path": "docs/iterations/0.7.0/PLAN.md",
-              "sha256": "89ae30680ac2272300983acd5908b499f09c42160e2d16e8b266c41f9ae08508"
+              "sha256": "981b80871543881810b0fe44aa4e1198137ae26262042695278e897abf6d4bfe"
             }
           ]
         },
@@ -303,7 +361,7 @@
             },
             {
               "path": "docs/iterations/0.7.0/REQUIREMENTS.md",
-              "sha256": "86e07d9424e45e9ba57d78a832d9b2b18f3bd42bc79323452c6c359cc50d13d8"
+              "sha256": "643a6e09f1a3705358bedf3932f5a7dc0da001e7c0d2028d51fdc4a5fe6a08ec"
             }
           ],
           "reason": "用户明确更新本项方向；具体参数仍待原型细化；2026-10-15 需规修订 4 按已确认原型细化同一方向，复核后更新哈希"
@@ -449,7 +507,7 @@
     },
     {
       "id": "rating",
-      "version": "0.8.0",
+      "version": "未分配",
       "gates": [
         {
           "id": "G0",
@@ -459,9 +517,10 @@
           "evidence": [
             {
               "path": "docs/iterations/0.8.0/PLAN.md",
-              "sha256": "01a0076fcd747e626c4302ae854da3613903d23d380f4aa2600cf3dc4838b39c"
+              "sha256": "fe3ba22992d3a758c6603fe82c4ca7424163c776c2f9f6332f3435db8a044696"
             }
-          ]
+          ],
+          "reason": "原计划正文保留，仅追加用户暂停及未分版状态；复核说明见 FOUNDATION_DECISIONS.md"
         },
         {
           "id": "G1",
@@ -477,10 +536,10 @@
         },
         {
           "id": "PLANE",
-          "status": "pass",
-          "next_action": "发生范围或状态差异时按授权重新核对同步",
-          "user_action": "当前无需重复批准已完成 W01–W07",
-          "reason": "已按确认清单创建及关联，并回读验证",
+          "status": "pending",
+          "next_action": "按 FOUNDATION_PLANE_SYNC.md 后续差异准备精确变更，逐项确认后更新回读；不推进暂缓业务",
+          "user_action": "具体差异列出后单项确认；当前未获新写入批准",
+          "reason": "本地目标版本/暂缓决定与远程旧版本关联不一致；历史同步证据保留，不能视为新差异已同步",
           "evidence": [
             {
               "path": "docs/plane-workitem-receipt.json",
@@ -491,9 +550,9 @@
         {
           "id": "G2",
           "status": "pending",
-          "next_action": "按已确认方向制作具体可体验原型，展示参数、主路径及失败/适配状态",
-          "user_action": "原型形成后确认具体版本和范围；参数随原型核对",
-          "reason": "对应新功能原型尚未制作/确认"
+          "next_action": "保留历史资料，用户明确恢复后再评审范围与版本，不开展原型",
+          "user_action": "当前无需操作；如需恢复再明确提出",
+          "reason": "用户明确暂缓，目标版本未分配；原型未制作/确认"
         },
         {
           "id": "G3",
@@ -543,11 +602,16 @@
         "identifier": "FINNS-12",
         "state": "3f40f9d8-2245-4ee5-9686-252bcbde4751",
         "cycle_id": "74c326cb-9864-4405-89ed-8e1675483486"
-      }
+      },
+      "previous_target_version": "0.8.0",
+      "target_version": null,
+      "management_status": "暂缓",
+      "management_change_source": "docs/requirements/FOUNDATION_DECISIONS.md",
+      "plane_sync_status": "本轮已核对，旧目标版本/暂缓差异待逐项确认"
     },
     {
       "id": "rental",
-      "version": "0.8.0",
+      "version": "未分配",
       "gates": [
         {
           "id": "G0",
@@ -557,9 +621,10 @@
           "evidence": [
             {
               "path": "docs/iterations/0.8.0/PLAN.md",
-              "sha256": "01a0076fcd747e626c4302ae854da3613903d23d380f4aa2600cf3dc4838b39c"
+              "sha256": "fe3ba22992d3a758c6603fe82c4ca7424163c776c2f9f6332f3435db8a044696"
             }
-          ]
+          ],
+          "reason": "原计划正文保留，仅追加用户暂停及未分版状态；复核说明见 FOUNDATION_DECISIONS.md"
         },
         {
           "id": "G1",
@@ -575,10 +640,10 @@
         },
         {
           "id": "PLANE",
-          "status": "pass",
-          "next_action": "发生范围或状态差异时按授权重新核对同步",
-          "user_action": "当前无需重复批准已完成 W01–W07",
-          "reason": "已按确认清单创建及关联，并回读验证",
+          "status": "pending",
+          "next_action": "按 FOUNDATION_PLANE_SYNC.md 后续差异准备精确变更，逐项确认后更新回读；不推进暂缓业务",
+          "user_action": "具体差异列出后单项确认；当前未获新写入批准",
+          "reason": "本地目标版本/暂缓决定与远程旧版本关联不一致；历史同步证据保留，不能视为新差异已同步",
           "evidence": [
             {
               "path": "docs/plane-workitem-receipt.json",
@@ -589,9 +654,9 @@
         {
           "id": "G2",
           "status": "pending",
-          "next_action": "按已确认方向制作具体可体验原型，展示参数、主路径及失败/适配状态",
-          "user_action": "原型形成后确认具体版本和范围；参数随原型核对",
-          "reason": "对应新功能原型尚未制作/确认"
+          "next_action": "保留历史资料，用户明确恢复后再评审范围与版本，不开展原型",
+          "user_action": "当前无需操作；如需恢复再明确提出",
+          "reason": "用户明确暂缓，目标版本未分配；原型未制作/确认"
         },
         {
           "id": "G3",
@@ -641,7 +706,12 @@
         "identifier": "FINNS-13",
         "state": "3f40f9d8-2245-4ee5-9686-252bcbde4751",
         "cycle_id": "74c326cb-9864-4405-89ed-8e1675483486"
-      }
+      },
+      "previous_target_version": "0.8.0",
+      "target_version": null,
+      "management_status": "暂缓",
+      "management_change_source": "docs/requirements/FOUNDATION_DECISIONS.md",
+      "plane_sync_status": "本轮已核对，旧目标版本/暂缓差异待逐项确认"
     },
     {
       "id": "daily-quotes",
@@ -733,6 +803,1102 @@
           "reason": "仅登记需求，尚未评审、原型、设计、实施或验收"
         }
       ]
+    },
+    {
+      "id": "foundation-account",
+      "requirement_id": "FINNS-REQ-020/ACCOUNT",
+      "name": "账号与身份维护",
+      "version": "0.7.0",
+      "target_version": "0.7.0",
+      "plane_workitem_id": "fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d",
+      "plane_parent_workitem_id": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+      "gates": [
+        {
+          "id": "G0",
+          "status": "pass",
+          "next_action": "按 FOUNDATION_BASELINE.md 逐组评审分项细节",
+          "user_action": "无需重复批准已记录的定位与先审后发规则",
+          "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希",
+          "evidence": [
+            {
+              "path": "docs/requirements/FOUNDATION_BASELINE.md",
+              "sha256": "def3d6d454e763fbd2e4ee22a58da503f80e3c25df3260effc24ed40828a9017"
+            }
+          ]
+        },
+        {
+          "id": "G1",
+          "status": "pass",
+          "next_action": "保持已确认范围，处理ACCOUNT-P01原型前管理同步检查点",
+          "user_action": "无需重复批准已确认的账号需求；仅确认具体管理差异",
+          "reason": "修订5原批准保留；用户2026-10-18明确批注注册顺序和20位上限，已记录D07及修订7；R2尚待具体交互确认",
+          "evidence": [
+            {
+              "path": "docs/requirements/FOUNDATION_ACCOUNT_REQUIREMENTS.md",
+              "sha256": "694968a0b5fb6a28b0f527d75c6a1031a5de2efad6c21cb1562a3e45cee5df18"
+            },
+            {
+              "path": "docs/requirements/FOUNDATION_ACCOUNT_REQUIREMENTS_R5_APPROVED.md",
+              "sha256": "29c51de1362c4ab01468dacd43bb647df93e18e81a4d48b141e71a80f58dd89b"
+            }
+          ]
+        },
+        {
+          "id": "PLANE",
+          "status": "pending",
+          "next_action": "整理ACCOUNT-P02正文差异（修订7、G2通过、G3设计完成、G4待授权）；获指令后重读当前对象并逐项确认写入回读",
+          "user_action": "决定是否单项确认ACCOUNT-P02正文更新；未确认前设计继续作为本地资料，不写Plane",
+          "reason": "上次ACCOUNT-P01仅覆盖修订6；D07注册顺序/密码上限、R2.1、G2确认与设计产物为新增差异。2026-10-18只读重读FINNS-15确认正文仍为修订6（updated_at 2026-10-17T15:37:44Z），未连接写入",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/ACCOUNT_PROFILE_R2_REVIEW.md",
+              "sha256": "0fb891a2f23742a76c699ff3d95e445f0709556cd45002a7121739593e616462"
+            },
+            {
+              "path": "docs/requirements/FOUNDATION_ACCOUNT_PLANE_RECEIPT.json",
+              "sha256": "455a7f42ee20475e1ef9a6897ee7d496b7bcfe946d9d0242f039323d592c99b1"
+            }
+          ]
+        },
+        {
+          "id": "G2",
+          "status": "pass",
+          "next_action": "G2已通过；保持R2.1作为设计输入，如用户纠正确认范围则退回",
+          "user_action": "无需操作；如“基于此进行开发设计”并非确认R2.1，请告知",
+          "reason": "用户2026-10-18提供FINNS-15并要求基于本地原型进行开发设计，记为确认具体原型R2.1作为F01设计输入（ACCOUNT-D08）；资料查看/编辑局部仍属F05，G1未通过，不因此确认",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/ACCOUNT_PROFILE_R2_REVIEW.md",
+              "sha256": "0fb891a2f23742a76c699ff3d95e445f0709556cd45002a7121739593e616462"
+            },
+            {
+              "path": "docs/requirements/FOUNDATION_DECISIONS.md",
+              "sha256": "45ebf7dfdf8338e8e7c593b6b1f9c6ad71668f18897f3cb8fd506def5688b7c4"
+            }
+          ]
+        },
+        {
+          "id": "G3",
+          "status": "pass",
+          "next_action": "G3已通过；等待实施授权以完成G4并进入G5",
+          "user_action": "无需操作",
+          "reason": "概要设计修订1完成：令牌状态机、session_epoch会话撤销、邮件端口、密码策略与BCrypt 72字节处理、迁移与回退；复用现有栈，仅新增spring-boot-starter-mail待确认。AI内部检查，未实施、未运行验证",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/DESIGN_ACCOUNT.md",
+              "sha256": "7a8b0eb7b0db2d0d9496946de612fc727987210ed780c55a187361a36ab097a2"
+            }
+          ]
+        },
+        {
+          "id": "G4",
+          "status": "pass",
+          "next_action": "G4已通过并已按B1–B7实施；B8资料局部仍待FINNS-21单独确认",
+          "user_action": "无需操作",
+          "reason": "契约修订2：用户2026-10-18授权B1–B7与新增邮件依赖（ACCOUNT-D09），实施偏差D1–D6已回写；B8不含",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/CONTRACT_ACCOUNT.md",
+              "sha256": "3b82e7b6705d882f996c3f456e826e4ce57192f3d0f288a05b6cb009b9382325"
+            },
+            {
+              "path": "docs/requirements/FOUNDATION_DECISIONS.md",
+              "sha256": "45ebf7dfdf8338e8e7c593b6b1f9c6ad71668f18897f3cb8fd506def5688b7c4"
+            }
+          ]
+        },
+        {
+          "id": "G5",
+          "status": "pass",
+          "next_action": "B1–B7已实施；补做会话保护的评论框/AI工作台核对与真实SMTP验证",
+          "user_action": "无需操作",
+          "reason": "已实施并本地提交efaf23a（release/0.7.0，未推送）；验证jar哈希见实施记录；资料局部B8未实施",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/IMPLEMENTATION_ACCOUNT.md",
+              "sha256": "0e5aba0eeaee76e85905b7451ea407cc76cf27d0d60dc14cb5be0bc24a318070"
+            }
+          ]
+        },
+        {
+          "id": "G6",
+          "status": "pass",
+          "next_action": "补做未验项：真实SMTP、浏览器内会话失效保护、评论框/AI工作台接入核对",
+          "user_action": "无需操作",
+          "reason": "H2 83/83、PostgreSQL隔离库83/83（含并发）、前端35/35、构建、迁移演练、本机浏览器桌面/手机主路径通过；真实SMTP、会话失效浏览器验证、Node验收脚本运行均未验，已列入实施记录",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/IMPLEMENTATION_ACCOUNT.md",
+              "sha256": "0e5aba0eeaee76e85905b7451ea407cc76cf27d0d60dc14cb5be0bc24a318070"
+            }
+          ]
+        },
+        {
+          "id": "G7",
+          "status": "pending",
+          "next_action": "整理本机验收步骤；等待用户体验并给出验收结论",
+          "user_action": "按验收步骤体验账号流程（需在本机以出信箱模式启动测试实例），确认通过或指出问题；真实邮件验收需先提供SMTP服务商/凭据",
+          "reason": "尚无用户验收；自动化通过不等于验收通过"
+        },
+        {
+          "id": "G8",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "G7验收未通过；发布需另行授权、备份与恢复演练、四处版本同步；8080主站仍是旧包"
+        },
+        {
+          "id": "G9",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "G7验收未通过；发布需另行授权、备份与恢复演练、四处版本同步；8080主站仍是旧包"
+        }
+      ],
+      "plane_parent_identifier": "FINNS-14",
+      "plane_parent_link_status": "created_and_verified",
+      "task_breakdown_path": "docs/requirements/FOUNDATION_TASKS.md",
+      "review_order": 1,
+      "needs_contracts_from": [],
+      "joint_validation_with": [
+        "F07"
+      ],
+      "plane_child_write_status": "succeeded_and_verified",
+      "suggested_user_prompt": "开始 FINNS-14 的 F01「账号与身份维护」需求评审，先明确细节与验收，暂不开发。",
+      "plane_identifier": "FINNS-15",
+      "completed_plane_operation": "FND-P02",
+      "plane_receipt_path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json",
+      "version_decision_path": "docs/iterations/0.7.0/PLAN.md",
+      "plane_target_cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "plane_target_release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+      "plane_version_sync_status": "verified",
+      "plane_cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "plane_release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+      "completed_plane_operations": [
+        "V070-P05",
+        "V070-P14",
+        "V070-P15",
+        "ACCOUNT-P01"
+      ],
+      "last_plane_verified": "2026-10-17",
+      "scope_revision": 7,
+      "account_requirements_path": "docs/requirements/FOUNDATION_ACCOUNT_REQUIREMENTS.md",
+      "user_next": "体验并验收账号流程（G7）；决定是否提供SMTP凭据做真实邮件验收、是否发布到8080；ACCOUNT-P02 Plane差异是否单项确认",
+      "plane_requirements_sync_status": "pending_revision_7_and_design",
+      "approved_scope_revision": 5,
+      "approved_snapshot_path": "docs/requirements/FOUNDATION_ACCOUNT_REQUIREMENTS_R5_APPROVED.md",
+      "plane_requirements_receipt_path": "docs/requirements/FOUNDATION_ACCOUNT_PLANE_RECEIPT.json",
+      "prototype_revision": "R2.1",
+      "prototype_path": "docs/prototypes/site-access",
+      "prototype_url": "http://127.0.0.1:4175/me/security",
+      "prototype_record_path": "docs/iterations/0.7.0/ACCOUNT_PROFILE_R2_REVIEW.md",
+      "design_paths": {
+        "g3": "docs/iterations/0.7.0/DESIGN_ACCOUNT.md",
+        "g4": "docs/iterations/0.7.0/CONTRACT_ACCOUNT.md"
+      },
+      "implementation_record": "docs/iterations/0.7.0/IMPLEMENTATION_ACCOUNT.md",
+      "implementation_status": "B1-B7 implemented; code committed locally as efaf23a, not pushed; B8 not included",
+      "implementation_commit": "efaf23a"
+    },
+    {
+      "id": "foundation-content",
+      "requirement_id": "FINNS-REQ-020/CONTENT",
+      "name": "普通内容草稿与发布生命周期",
+      "version": "0.7.0",
+      "target_version": "0.7.0",
+      "plane_workitem_id": "5531f40a-0693-4be3-a9f5-82c197a7ec6c",
+      "plane_parent_workitem_id": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+      "gates": [
+        {
+          "id": "G0",
+          "status": "pass",
+          "next_action": "按 FOUNDATION_BASELINE.md 逐组评审分项细节",
+          "user_action": "无需重复批准已记录的定位与先审后发规则",
+          "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希",
+          "evidence": [
+            {
+              "path": "docs/requirements/FOUNDATION_BASELINE.md",
+              "sha256": "def3d6d454e763fbd2e4ee22a58da503f80e3c25df3260effc24ed40828a9017"
+            }
+          ]
+        },
+        {
+          "id": "G1",
+          "status": "pending",
+          "next_action": "按 FOUNDATION_TASKS.md 的 F02 澄清细节、形成该分项验收及确认记录",
+          "user_action": "确认话题是否同期、显式保存或自动保存的边界；沿用先审后发。",
+          "reason": "核心方向已确认，分项修订1及相关待决尚未完成评审"
+        },
+        {
+          "id": "PLANE",
+          "status": "pending",
+          "next_action": "先完成本分项G1细节评审，再核对现有工作项；一致则记录无需变更，有差异才提出新的具体写入",
+          "user_action": "本轮管理写入无需重复确认；下一步只评审本分项未决产品细节",
+          "reason": "工作项及0.7.0Cycle/Release登记归版均已执行回读；G1细节尚未冻结，原型前仍需复核最终基线",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json"
+            }
+          ]
+        },
+        {
+          "id": "G2",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G3",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G4",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G5",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G6",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G7",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G8",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G9",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        }
+      ],
+      "plane_parent_identifier": "FINNS-14",
+      "plane_parent_link_status": "created_and_verified",
+      "task_breakdown_path": "docs/requirements/FOUNDATION_TASKS.md",
+      "review_order": 4,
+      "needs_contracts_from": [
+        "F08"
+      ],
+      "joint_validation_with": [
+        "F03",
+        "F04",
+        "F05"
+      ],
+      "plane_child_write_status": "succeeded_and_verified",
+      "suggested_user_prompt": "开始 FINNS-14 的 F02「普通文章草稿与审核发布」需求评审，先明确细节与验收，暂不开发。",
+      "version_decision_path": "docs/iterations/0.7.0/PLAN.md",
+      "plane_target_cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "plane_target_release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+      "plane_version_sync_status": "verified",
+      "plane_identifier": "FINNS-18",
+      "plane_cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "plane_release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+      "plane_receipt_path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json",
+      "completed_plane_operations": [
+        "V070-P09",
+        "V070-P14",
+        "V070-P15"
+      ],
+      "last_plane_verified": "2026-10-17"
+    },
+    {
+      "id": "foundation-collection",
+      "requirement_id": "FINNS-REQ-020/COLLECTION",
+      "name": "传统专题接入审核",
+      "version": "0.7.0",
+      "target_version": "0.7.0",
+      "plane_workitem_id": "923e172c-6b67-4def-bfe5-745e68441ded",
+      "plane_parent_workitem_id": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+      "gates": [
+        {
+          "id": "G0",
+          "status": "pass",
+          "next_action": "按 FOUNDATION_BASELINE.md 逐组评审分项细节",
+          "user_action": "无需重复批准已记录的定位与先审后发规则",
+          "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希",
+          "evidence": [
+            {
+              "path": "docs/requirements/FOUNDATION_BASELINE.md",
+              "sha256": "def3d6d454e763fbd2e4ee22a58da503f80e3c25df3260effc24ed40828a9017"
+            }
+          ]
+        },
+        {
+          "id": "G1",
+          "status": "pending",
+          "next_action": "按 FOUNDATION_TASKS.md 的 F03 澄清细节、形成该分项验收及确认记录",
+          "user_action": "核对既有专题与审核适配原型，复用已确认审核规则。",
+          "reason": "核心方向已确认，分项修订1及相关待决尚未完成评审"
+        },
+        {
+          "id": "PLANE",
+          "status": "pending",
+          "next_action": "先完成本分项G1细节评审，再核对现有工作项；一致则记录无需变更，有差异才提出新的具体写入",
+          "user_action": "本轮管理写入无需重复确认；下一步只评审本分项未决产品细节",
+          "reason": "工作项及0.7.0Cycle/Release登记归版均已执行回读；G1细节尚未冻结，原型前仍需复核最终基线",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json"
+            }
+          ]
+        },
+        {
+          "id": "G2",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G3",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G4",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G5",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G6",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G7",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G8",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G9",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        }
+      ],
+      "plane_parent_identifier": "FINNS-14",
+      "plane_parent_link_status": "created_and_verified",
+      "task_breakdown_path": "docs/requirements/FOUNDATION_TASKS.md",
+      "review_order": 5,
+      "needs_contracts_from": [
+        "F08"
+      ],
+      "joint_validation_with": [
+        "F02",
+        "F04",
+        "F05"
+      ],
+      "plane_child_write_status": "succeeded_and_verified",
+      "suggested_user_prompt": "开始 FINNS-14 的 F03「传统专题接入审核」需求评审，先明确细节与验收，暂不开发。",
+      "version_decision_path": "docs/iterations/0.7.0/PLAN.md",
+      "plane_target_cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "plane_target_release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+      "plane_version_sync_status": "verified",
+      "plane_identifier": "FINNS-19",
+      "plane_cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "plane_release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+      "plane_receipt_path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json",
+      "completed_plane_operations": [
+        "V070-P10",
+        "V070-P14",
+        "V070-P15"
+      ],
+      "last_plane_verified": "2026-10-17"
+    },
+    {
+      "id": "foundation-discovery",
+      "requirement_id": "FINNS-REQ-020/DISCOVERY",
+      "name": "浏览检索与阅读",
+      "version": "0.7.0",
+      "target_version": "0.7.0",
+      "plane_workitem_id": "f40d22a9-ace3-4ab1-9050-abc7f4260f3a",
+      "plane_parent_workitem_id": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+      "gates": [
+        {
+          "id": "G0",
+          "status": "pass",
+          "next_action": "按 FOUNDATION_BASELINE.md 逐组评审分项细节",
+          "user_action": "无需重复批准已记录的定位与先审后发规则",
+          "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希",
+          "evidence": [
+            {
+              "path": "docs/requirements/FOUNDATION_BASELINE.md",
+              "sha256": "def3d6d454e763fbd2e4ee22a58da503f80e3c25df3260effc24ed40828a9017"
+            }
+          ]
+        },
+        {
+          "id": "G1",
+          "status": "pending",
+          "next_action": "按 FOUNDATION_TASKS.md 的 F04 澄清细节、形成该分项验收及确认记录",
+          "user_action": "评审并确认既定标题摘要检索、权限过滤和阅读验收；到G2再体验具体原型，不重复选择已定搜索范围。",
+          "reason": "核心方向已确认，分项修订1及相关待决尚未完成评审"
+        },
+        {
+          "id": "PLANE",
+          "status": "pending",
+          "next_action": "先完成本分项G1细节评审，再核对现有工作项；一致则记录无需变更，有差异才提出新的具体写入",
+          "user_action": "本轮管理写入无需重复确认；下一步只评审本分项未决产品细节",
+          "reason": "工作项及0.7.0Cycle/Release登记归版均已执行回读；G1细节尚未冻结，原型前仍需复核最终基线",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json"
+            }
+          ]
+        },
+        {
+          "id": "G2",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G3",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G4",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G5",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G6",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G7",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G8",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G9",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        }
+      ],
+      "plane_parent_identifier": "FINNS-14",
+      "plane_parent_link_status": "created_and_verified",
+      "task_breakdown_path": "docs/requirements/FOUNDATION_TASKS.md",
+      "review_order": 6,
+      "needs_contracts_from": [
+        "F02",
+        "F03",
+        "F08"
+      ],
+      "joint_validation_with": [
+        "F05"
+      ],
+      "plane_child_write_status": "succeeded_and_verified",
+      "suggested_user_prompt": "开始 FINNS-14 的 F04「浏览检索与阅读」需求评审，先明确细节与验收，暂不开发。",
+      "version_decision_path": "docs/iterations/0.7.0/PLAN.md",
+      "plane_target_cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "plane_target_release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+      "plane_version_sync_status": "verified",
+      "plane_identifier": "FINNS-20",
+      "plane_cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "plane_release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+      "plane_receipt_path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json",
+      "completed_plane_operations": [
+        "V070-P11",
+        "V070-P14",
+        "V070-P15"
+      ],
+      "last_plane_verified": "2026-10-17"
+    },
+    {
+      "id": "foundation-personal",
+      "requirement_id": "FINNS-REQ-020/PERSONAL",
+      "name": "私人中心与公开作者主页",
+      "version": "0.7.0",
+      "target_version": "0.7.0",
+      "plane_workitem_id": "9615eed1-2ebf-452f-8073-33ed2fe0719d",
+      "plane_parent_workitem_id": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+      "gates": [
+        {
+          "id": "G0",
+          "status": "pass",
+          "next_action": "按 FOUNDATION_BASELINE.md 逐组评审分项细节",
+          "user_action": "无需重复批准已记录的定位与先审后发规则",
+          "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希",
+          "evidence": [
+            {
+              "path": "docs/requirements/FOUNDATION_BASELINE.md",
+              "sha256": "def3d6d454e763fbd2e4ee22a58da503f80e3c25df3260effc24ed40828a9017"
+            },
+            {
+              "path": "docs/requirements/FOUNDATION_PROFILE_REQUIREMENTS.md",
+              "sha256": "6c5870908ac06f7e499a9806d46ef57eb0e806ac62d54e19a2a653e48ba72956"
+            }
+          ]
+        },
+        {
+          "id": "G1",
+          "status": "pending",
+          "next_action": "与F01提前评审 FOUNDATION_PROFILE_REQUIREMENTS.md 的字段与行为草案，沿用查看/编辑分离，不开发",
+          "user_action": "查看与修改使用独立页面已明确；以此为前提评审字段、保存/取消和失败行为，基础资料与F01提前处理，具体原型到G2确认。",
+          "reason": "资料默认只读与独立编辑已明确，本轮有基础资料局部R2原型待评审；F05整体范围与公开主页等仍未冻结"
+        },
+        {
+          "id": "PLANE",
+          "status": "pending",
+          "next_action": "先完成本分项G1细节评审，再核对现有工作项；一致则记录无需变更，有差异才提出新的具体写入",
+          "user_action": "本轮管理写入无需重复确认；下一步只评审本分项未决产品细节",
+          "reason": "工作项及0.7.0Cycle/Release登记归版均已执行回读；G1细节尚未冻结，原型前仍需复核最终基线",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json"
+            }
+          ]
+        },
+        {
+          "id": "G2",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G3",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G4",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G5",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G6",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G7",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G8",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G9",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        }
+      ],
+      "plane_parent_identifier": "FINNS-14",
+      "plane_parent_link_status": "created_and_verified",
+      "task_breakdown_path": "docs/requirements/FOUNDATION_TASKS.md",
+      "review_order": 7,
+      "needs_contracts_from": [
+        "F01",
+        "F02",
+        "F03",
+        "F08"
+      ],
+      "joint_validation_with": [
+        "F06"
+      ],
+      "plane_child_write_status": "succeeded_and_verified",
+      "suggested_user_prompt": "开始FINNS-14的F05基础个人资料评审，与F01一起处理；默认只读、独立编辑已经明确，先审阅字段与保存/取消规则，不开发。",
+      "scope_revision": 2,
+      "early_review_with": [
+        "foundation-account"
+      ],
+      "profile_requirement_path": "docs/requirements/FOUNDATION_PROFILE_REQUIREMENTS.md",
+      "plane_pending_diff_revision": 2,
+      "version_decision_path": "docs/iterations/0.7.0/PLAN.md",
+      "plane_target_cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "plane_target_release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+      "plane_version_sync_status": "verified",
+      "plane_identifier": "FINNS-21",
+      "plane_cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "plane_release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+      "plane_receipt_path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json",
+      "completed_plane_operations": [
+        "V070-P12",
+        "V070-P14",
+        "V070-P15"
+      ],
+      "last_plane_verified": "2026-10-17",
+      "partial_prototype_revision": "R2",
+      "partial_prototype_scope": "本人基础资料只读查看与独立编辑；F05整体G1未通过",
+      "partial_prototype_record_path": "docs/iterations/0.7.0/ACCOUNT_PROFILE_R2_REVIEW.md"
+    },
+    {
+      "id": "foundation-interaction",
+      "requirement_id": "FINNS-REQ-020/INTERACTION",
+      "name": "收藏点赞与审核评论",
+      "version": "0.7.0",
+      "target_version": "0.7.0",
+      "plane_workitem_id": "c1217a72-fb2a-4c84-9cab-069432392240",
+      "plane_parent_workitem_id": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+      "gates": [
+        {
+          "id": "G0",
+          "status": "pass",
+          "next_action": "按 FOUNDATION_BASELINE.md 逐组评审分项细节",
+          "user_action": "无需重复批准已记录的定位与先审后发规则",
+          "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希",
+          "evidence": [
+            {
+              "path": "docs/requirements/FOUNDATION_BASELINE.md",
+              "sha256": "def3d6d454e763fbd2e4ee22a58da503f80e3c25df3260effc24ed40828a9017"
+            }
+          ]
+        },
+        {
+          "id": "G1",
+          "status": "pending",
+          "next_action": "按 FOUNDATION_TASKS.md 的 F06 澄清细节、形成该分项验收及确认记录",
+          "user_action": "确认收藏、点赞、单层评论及可见状态范围，沿用先审后发；具体原型到G2体验。",
+          "reason": "核心方向已确认，分项修订1及相关待决尚未完成评审"
+        },
+        {
+          "id": "PLANE",
+          "status": "pending",
+          "next_action": "先完成本分项G1细节评审，再核对现有工作项；一致则记录无需变更，有差异才提出新的具体写入",
+          "user_action": "本轮管理写入无需重复确认；下一步只评审本分项未决产品细节",
+          "reason": "工作项及0.7.0Cycle/Release登记归版均已执行回读；G1细节尚未冻结，原型前仍需复核最终基线",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json"
+            }
+          ]
+        },
+        {
+          "id": "G2",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G3",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G4",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G5",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G6",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G7",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G8",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G9",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        }
+      ],
+      "plane_parent_identifier": "FINNS-14",
+      "plane_parent_link_status": "created_and_verified",
+      "task_breakdown_path": "docs/requirements/FOUNDATION_TASKS.md",
+      "review_order": 8,
+      "needs_contracts_from": [
+        "F02",
+        "F08"
+      ],
+      "joint_validation_with": [
+        "F05"
+      ],
+      "plane_child_write_status": "succeeded_and_verified",
+      "suggested_user_prompt": "开始 FINNS-14 的 F06「文章收藏点赞与审核评论」需求评审，先明确细节与验收，暂不开发。",
+      "version_decision_path": "docs/iterations/0.7.0/PLAN.md",
+      "plane_target_cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "plane_target_release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+      "plane_version_sync_status": "verified",
+      "plane_identifier": "FINNS-22",
+      "plane_cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "plane_release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+      "plane_receipt_path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json",
+      "completed_plane_operations": [
+        "V070-P13",
+        "V070-P14",
+        "V070-P15"
+      ],
+      "last_plane_verified": "2026-10-17"
+    },
+    {
+      "id": "foundation-user-admin",
+      "requirement_id": "FINNS-REQ-020/USER_ADMIN",
+      "name": "账号状态与既有用户管理衔接",
+      "version": "0.7.0",
+      "target_version": "0.7.0",
+      "plane_workitem_id": "bf836bf4-f306-4a64-8b56-1e571939d14e",
+      "plane_parent_workitem_id": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+      "gates": [
+        {
+          "id": "G0",
+          "status": "pass",
+          "next_action": "按 FOUNDATION_BASELINE.md 逐组评审分项细节",
+          "user_action": "无需重复批准已记录的定位与先审后发规则",
+          "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希",
+          "evidence": [
+            {
+              "path": "docs/requirements/FOUNDATION_BASELINE.md",
+              "sha256": "def3d6d454e763fbd2e4ee22a58da503f80e3c25df3260effc24ed40828a9017"
+            }
+          ]
+        },
+        {
+          "id": "G1",
+          "status": "pending",
+          "next_action": "按 FOUNDATION_TASKS.md 的 F07 澄清细节、形成该分项验收及确认记录",
+          "user_action": "确认停用账号是否连带隐藏既有作品，沿用现有角色管理。",
+          "reason": "核心方向已确认，分项修订1及相关待决尚未完成评审"
+        },
+        {
+          "id": "PLANE",
+          "status": "pending",
+          "next_action": "先完成本分项G1细节评审，再核对现有工作项；一致则记录无需变更，有差异才提出新的具体写入",
+          "user_action": "本轮管理写入无需重复确认；下一步只评审本分项未决产品细节",
+          "reason": "工作项及0.7.0Cycle/Release登记归版均已执行回读；G1细节尚未冻结，原型前仍需复核最终基线",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json"
+            }
+          ]
+        },
+        {
+          "id": "G2",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G3",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G4",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G5",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G6",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G7",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G8",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G9",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        }
+      ],
+      "plane_parent_identifier": "FINNS-14",
+      "plane_parent_link_status": "created_and_verified",
+      "task_breakdown_path": "docs/requirements/FOUNDATION_TASKS.md",
+      "review_order": 2,
+      "needs_contracts_from": [
+        "F01"
+      ],
+      "joint_validation_with": [
+        "F08"
+      ],
+      "plane_child_write_status": "succeeded_and_verified",
+      "suggested_user_prompt": "开始 FINNS-14 的 F07「账号停用与用户管理衔接」需求评审，先明确细节与验收，暂不开发。",
+      "version_decision_path": "docs/iterations/0.7.0/PLAN.md",
+      "plane_target_cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "plane_target_release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+      "plane_version_sync_status": "verified",
+      "plane_identifier": "FINNS-16",
+      "plane_cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "plane_release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+      "plane_receipt_path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json",
+      "completed_plane_operations": [
+        "V070-P07",
+        "V070-P14",
+        "V070-P15"
+      ],
+      "last_plane_verified": "2026-10-17"
+    },
+    {
+      "id": "foundation-review",
+      "requirement_id": "FINNS-REQ-020/REVIEW",
+      "name": "统一作品与评论审核管理",
+      "version": "0.7.0",
+      "target_version": "0.7.0",
+      "plane_workitem_id": "6ac45b07-b338-4944-b957-cf9928cc72a0",
+      "plane_parent_workitem_id": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+      "gates": [
+        {
+          "id": "G0",
+          "status": "pass",
+          "next_action": "按 FOUNDATION_BASELINE.md 逐组评审分项细节",
+          "user_action": "无需重复批准已记录的定位与先审后发规则",
+          "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希",
+          "evidence": [
+            {
+              "path": "docs/requirements/FOUNDATION_BASELINE.md",
+              "sha256": "def3d6d454e763fbd2e4ee22a58da503f80e3c25df3260effc24ed40828a9017"
+            }
+          ]
+        },
+        {
+          "id": "G1",
+          "status": "pending",
+          "next_action": "按 FOUNDATION_TASKS.md 的 F08 澄清细节、形成该分项验收及确认记录",
+          "user_action": "确认审核本人作品、审核权限、下架恢复与历史内容过渡。",
+          "reason": "核心方向已确认，分项修订1及相关待决尚未完成评审"
+        },
+        {
+          "id": "PLANE",
+          "status": "pending",
+          "next_action": "先完成本分项G1细节评审，再核对现有工作项；一致则记录无需变更，有差异才提出新的具体写入",
+          "user_action": "本轮管理写入无需重复确认；下一步只评审本分项未决产品细节",
+          "reason": "工作项及0.7.0Cycle/Release登记归版均已执行回读；G1细节尚未冻结，原型前仍需复核最终基线",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json"
+            }
+          ]
+        },
+        {
+          "id": "G2",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G3",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G4",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G5",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G6",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G7",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G8",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        },
+        {
+          "id": "G9",
+          "status": "pending",
+          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
+          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
+          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+        }
+      ],
+      "plane_parent_identifier": "FINNS-14",
+      "plane_parent_link_status": "created_and_verified",
+      "task_breakdown_path": "docs/requirements/FOUNDATION_TASKS.md",
+      "review_order": 3,
+      "needs_contracts_from": [
+        "F07"
+      ],
+      "joint_validation_with": [
+        "F02",
+        "F03",
+        "F06"
+      ],
+      "plane_child_write_status": "succeeded_and_verified",
+      "suggested_user_prompt": "开始 FINNS-14 的 F08「作品与评论审核管理」需求评审，先明确细节与验收，暂不开发。",
+      "version_decision_path": "docs/iterations/0.7.0/PLAN.md",
+      "plane_target_cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "plane_target_release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+      "plane_version_sync_status": "verified",
+      "plane_identifier": "FINNS-17",
+      "plane_cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "plane_release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+      "plane_receipt_path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json",
+      "completed_plane_operations": [
+        "V070-P08",
+        "V070-P14",
+        "V070-P15"
+      ],
+      "last_plane_verified": "2026-10-17"
     }
   ],
   "required_gates": [

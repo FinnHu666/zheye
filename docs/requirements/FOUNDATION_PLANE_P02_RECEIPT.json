@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "operation_id": "FND-P02",
+  "diff_revision": 1,
+  "approval": {
+    "source": "本轮用户：确认FND-p02写入",
+    "date": "2026-10-17",
+    "scope": "仅创建 FND-P02，使用差异修订 1 原参数"
+  },
+  "preflight": {
+    "checked_at": "2026-10-17T14:47:02.126Z",
+    "active_count": 6,
+    "archived_count": 1,
+    "duplicate": false,
+    "parent_id": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+    "parent_updated_at": "2026-10-17T10:46:27.856336Z",
+    "state_verified": true
+  },
+  "execution": {
+    "action": "workitem.create",
+    "write_count": 1,
+    "status": "succeeded",
+    "created_at": "2026-10-17T14:47:04.469075Z"
+  },
+  "readback": {
+    "status": "verified",
+    "checked_at": "2026-10-17T14:47:29.446Z",
+    "checks": {
+      "project": true,
+      "parent": true,
+      "title": true,
+      "state": true,
+      "priority": true,
+      "body": true,
+      "unversioned": true,
+      "no_dates": true,
+      "no_assignees": true,
+      "no_labels": true
+    }
+  },
+  "workitem": {
+    "id": "fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d",
+    "identifier": "FINNS-15",
+    "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+    "parent_id": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+    "parent_identifier": "FINNS-14",
+    "name": "FINNS｜F01 账号与身份维护（未分版）",
+    "state_id": "5b7d9df4-8ce4-40be-b110-83515a957a2a",
+    "state_name": "Backlog",
+    "priority": "none",
+    "cycle_id": null,
+    "assignees": [],
+    "start_date": null,
+    "target_date": null
+  },
+  "boundary": "仅管理登记；G1 分项需求仍待评审，未开始原型或业务实现，未操作其他远程对象。"
+}

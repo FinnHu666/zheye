@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "operation_id": "ACCOUNT-P01",
+  "diff_revision": 1,
+  "prepared_date": "2026-10-17",
+  "timezone": "Asia/Singapore",
+  "scope": "Update FINNS-15 description only after individual confirmation; no other remote writes",
+  "approval_status": "approved",
+  "execution_status": "succeeded",
+  "readback_status": "verified",
+  "user_requirement_approval": {
+    "source": "本轮用户：接受本组，确认 FINNS-15 需求通过",
+    "approved_revision": 5,
+    "approval_does_not_authorize_remote_write": true
+  },
+  "current": {
+    "workitem_id": "fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d",
+    "name": "FINNS 0.7.0｜F01 账号与身份维护",
+    "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+    "parent": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+    "state_id": "5b7d9df4-8ce4-40be-b110-83515a957a2a",
+    "state_name": "Backlog",
+    "priority": "none",
+    "assignees": [],
+    "labels": [],
+    "start_date": null,
+    "target_date": null,
+    "cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+    "updated_at": "2026-10-17T15:05:43.210160Z",
+    "body_summary": "G1细节待评审，恢复方式/会话待选；未包含本轮ACCOUNT-D01–06，仍有无外部服务调用排除"
+  },
+  "target": {
+    "body_summary": "G1已通过，G2具体原型待制作；完整反映修订5已确认范围和验收，不表示业务完成"
+  },
+  "preserve": [
+    "name",
+    "project",
+    "parent",
+    "state",
+    "priority",
+    "assignees",
+    "labels",
+    "start_date",
+    "target_date",
+    "cycle_id",
+    "Release membership",
+    "other workitems and project/cycle/release metadata"
+  ],
+  "verified_associations": {
+    "cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+    "cycle_total": 11,
+    "cycle_contains_account": true,
+    "release_id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+    "release_total": 11,
+    "release_contains_account": true
+  },
+  "arguments": {
+    "action": "update",
+    "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+    "workitem_id": "fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d",
+    "description_stripped": "内部需求：FINNS-REQ-020/ACCOUNT。管理总项：FINNS-14。目标产品版本：0.7.0；当前源码与本机已发布基线为0.7.0，新增账号能力尚未实现。\n当前阶段：2026-10-17用户确认修订5整项需求通过（ACCOUNT-D01–06）；G1已通过。下一阶段G2具体产品原型待制作、待确认；设计、实现、测试、验收未开始。下列内容是获批需求，不是已上线能力。\n\n目标：复用现有账号体系，补齐邮箱验证、本人改密、邮件找回、会话撤销及未保存内容保护。\n1. 新注册须验证邮箱后才能登录；验证成功回正常登录入口，不自动登录。未验证不能通过注册响应或客户端标记获得业务登录态。\n2. 旧账号正常登录保留，提示补验证；旧未验证且忘记密码者，在一次邮件流程中先验证邮箱、再设新密码，不需第二封重置邮件。不把历史邮箱批量标为已验证，不允许新账号冒用旧账号过渡例外。\n3. 账号恢复采用邮件自助、一次性重置链接。注册/补验证链接24小时有效，重置链接（含旧账号合并恢复）30分钟有效。同邮箱同用途至少间隔60秒重发；重发成功仅最新链接有效，发送失败保留仍有效的旧链接。成功完成操作后失效；仅打开重置页不消耗、不改密或撤销会话。过期/已用/无效时可重新申请。另在技术设计明确服务端防滥用和发送一致性。\n4. 主动改密核对旧密码，保留当前设备、其他设备退出；邮件重置成功后全部设备退出，再正常登录。旧账号单独补验证保留当前会话。成功更新密码还须撤销该账号其他未用恢复链接，重复/并发操作不得重复生效。\n5. 密码沿用产品约定8–72字符，不强制大小写/符号组合；支持粘贴及密码管理器，新密码输入两次且一致。错误旧密码、未登录、非本人操作不改变密码。当前BCrypt字节上限与字符约定的兼容在设计解决，不能静默截断；改变用户可输入范围须另行明确。\n6. 找回/重发使用统一公开提示，不泄露邮箱是否注册/已验证。失败保留页面及非敏感输入；密码仅暂留当前页面内存，不进入日志或持久草稿，成功/离开清除；失败不产生半成功密码状态、不暗中自动重试修改请求。\n7. 登录失效或被改密挤下线时，保护未提交的非敏感编辑内容并提示重新登录，避免直接跳转丢稿；恢复后核对当前账号，换账号不得提交前一账号内容。具体保存/清理方案在设计明确。\n8. 本人改密或邮件重置成功后发送变更通知，不含密码、恢复凭据或私人内容；通知失败不回滚成功的密码更新、不误报改密失败。通知本身不算邮箱验证。\n\n验收：ACCOUNT-01–08及P01–P06按确认范围映射到原型/接口/测试，覆盖新旧账号、有效/过期/已用链接、旧密码错误、会话撤销、发送失败、并发/重试、跨账号、敏感输入保护、未保存内容、桌面和移动端。需求评审通过不表示技术验证或业务验收完成，不标Done。\n\n依赖与衔接：复用已完成的FINNS-11角色/身份边界；为FINNS-16（F07）提供停用会话契约并联调，不要求对方整个功能先完成。基础资料只读查看/独立编辑归FINNS-21（F05），不并入本项改邮箱或角色管理。\n\n下一步：核对本次管理同步并回读后，制作具体账号产品原型，用户确认修订及范围后补概设/详设/接口与验收映射，再获授权实施。邮件服务商、凭据、存储兼容、限流/发送一致性属于后续设计；当前不配置邮件、不发送真实邮件、不迁移数据库或部署主站。\n\n排除：第三方社交登录、会员、修改登录邮箱、媒体上传、评价/租房恢复、公开AI私人工作稿。邮件验证/重置/通知是本项必要依赖，不再沿用旧“无外部服务调用”排除邮件本身；不引入无关外部服务，不重开已完成的统计或角色管理。\n\n本地依据（仓库路径，不是公网链接）：docs/requirements/FOUNDATION_ACCOUNT_REQUIREMENTS.md（确认整理修订6，获批范围来自修订5）、FOUNDATION_ACCOUNT_REQUIREMENTS_R5_APPROVED.md、FOUNDATION_DECISIONS.md；docs/delivery-progress.json。"
+  },
+  "execution_rules": [
+    "写前重读FINNS-15；正文有实质变化时重新计算差异并确认，不覆盖他人新内容。",
+    "只执行此description_stripped更新，不额外写状态、父项、Cycle或Release，不发邮件、不实施业务。",
+    "按ID回读，比较规范化正文并核对保留字段/关联；仅成功调用没有回读不能记同步完成。",
+    "读取与更新间存在API并发窗口；超时先回读，不盲目重复更新。"
+  ],
+  "approval_source": "本轮用户：确认 ACCOUNT-P01，仅更新正文",
+  "approval_date": "2026-10-17",
+  "receipt_path": "docs/requirements/FOUNDATION_ACCOUNT_PLANE_RECEIPT.json"
+}

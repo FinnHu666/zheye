@@ -1,4 +1,42 @@
+2026-10-18最新：FINNS-15账号B1–B7已实施（已本地提交 efaf23a、未推送/未发布），自动化与本机浏览器验证通过，G7待用户验收；真实SMTP、浏览器内会话失效保护、评论框/AI工作台接入未验。见[实施记录](iterations/0.7.0/IMPLEMENTATION_ACCOUNT.md)。资料局部B8待FINNS-21，Plane ACCOUNT-P02待单项确认，8080仍为不含账号功能的旧包。
+
+2026-10-18最新：FINNS-15账号开发设计完成。用户要求基于本地原型设计，已记G2通过（ACCOUNT-D08）并形成[概要设计](iterations/0.7.0/DESIGN_ACCOUNT.md)（G3）与[契约草案](iterations/0.7.0/CONTRACT_ACCOUNT.md)（G4待实施授权）。待决：实施授权与邮件依赖（U1）、邮件服务商/凭据（U2）、Plane ACCOUNT-P02单项同步。业务未实施。
+
 # FINNS 下一阶段需求与实施方案
+
+2026-10-18最新原型R2.1：账号安全卡片内增加“忘记原密码？通过邮箱重置”，使用当前账号邮箱、无需旧密码；申请保持登录，邮件完成重置后全部退出，沿用已确认恢复规则。[评审记录](iterations/0.7.0/ACCOUNT_PROFILE_R2_REVIEW.md)。12项模拟测试与构建/浏览器检查通过，等待用户评审；业务/Plane未操作。
+
+2026-10-18当前：用户对R1给出具体批注，已完成[账号与基础资料R2原型](iterations/0.7.0/ACCOUNT_PROFILE_R2_REVIEW.md)。注册先邮箱验证后设昵称/密码，上限20位；单卡片/行内校验；`/me`只读、`/me/profile/edit`独立编辑。待用户评审R2，F05整体需求仍待评审；修订7与Plane旧基线差异已列出但未连接/写入，真实业务未实施。
+
+2026-10-17 FINNS-15：已在既有site-access上完成[账号产品原型R1](iterations/0.7.0/PROTOTYPE_ACCOUNT.md)，入口 <http://127.0.0.1:4175/auth/register>。G1/PLANE既有通过，G2仍pending等待用户确认R1范围与交互；模拟测试7/7及构建/桌面手机浏览器检查完成，未实施真实账号后端或邮件。本轮无Plane操作，其他七项需求保持待评审；下方待制作段落为历史。
+
+2026-10-17 ACCOUNT-P01执行完成：用户单项确认后仅更新FINNS-15正文并回读，Backlog和既有字段/关联保持，[回执](requirements/FOUNDATION_ACCOUNT_PLANE_RECEIPT.json)已保存。F01 G1/PLANE通过，下一步G2具体产品原型待制作；其他七项仍待评审。本轮无原型/业务/邮件/数据库/服务变更。
+
+2026-10-17 当前F01阶段：用户确认FINNS-15按修订5整项需求通过，G1 pass；[原文快照](requirements/FOUNDATION_ACCOUNT_REQUIREMENTS_R5_APPROVED.md)与[确认态修订6](requirements/FOUNDATION_ACCOUNT_REQUIREMENTS.md)已保存。[ACCOUNT-P01](requirements/FOUNDATION_ACCOUNT_PLANE_SYNC.md)只更新该项正文，待单独确认/执行/回读后进入具体原型；其他七项仍待评审，尚未实施。
+
+2026-10-17 F01参数组已确认：验证24小时、重置30分钟、60秒重发及最新链接/验证后正常登录规则，见 [账号需规修订5](requirements/FOUNDATION_ACCOUNT_REQUIREMENTS.md)。下一步最后一组密码/失败/通知及验收建议，再做整项确认；G1仍pending，未实施或写Plane。
+
+2026-10-17 F01追加确认：旧账号正常登录保留、提示补验证；忘记密码且未验证者通过一次邮件流程先验证再重置，见 [账号需规修订4](requirements/FOUNDATION_ACCOUNT_REQUIREMENTS.md)。下一步链接/重发及验证后登录规则，G1仍pending；未改真实数据或Plane。
+
+2026-10-17 F01追加确认：新注册用户验证邮箱后才能登录，见 [账号需规修订3](requirements/FOUNDATION_ACCOUNT_REQUIREMENTS.md)。该门槛不自动应用于旧账号，下一步评审补验证和忘记密码过渡；G1仍pending，本轮未写Plane或开发业务。
+
+2026-10-17 F01追加确认：主动改密保留当前设备/退出其他设备，邮件重置全部退出并正常登录，见 [账号需求修订2](requirements/FOUNDATION_ACCOUNT_REQUIREMENTS.md)。下一步邮箱验证时机及新旧账号过渡，后续链接规则；本轮未写回Plane，G1仍pending。
+
+2026-10-17 F01评审：邮件自助找回、已验证邮箱及一次性重置链接已确认，见 [账号需求修订1](requirements/FOUNDATION_ACCOUNT_REQUIREMENTS.md)。下一步确认改密会话规则，再明确邮箱验证和旧账号过渡；G1仍pending，本轮未写Plane或配置/发送邮件。
+
+2026-10-17 执行结果：用户“执行全部”后，V070-P01–P15全部写入并回读通过；复用0.7.0周期/Release，二者均关联FINNS-10/11/14–22，共11项，Release仍unreleased。八个基础子项FINNS-15–22均在FINNS-14下、Backlog，见 [执行回执](iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json)。下一步F01账号及提前F05资料的需求评审，G1仍pending；下方“未写入/待确认”是历史。
+
+2026-10-17 当前归版：八项基础能力全部纳入0.7.0“打好地基”；AI增强和每日名言继续待定，评价/租房暂缓。[计划修订5](iterations/0.7.0/PLAN.md)、[需规汇总修订7](iterations/0.7.0/REQUIREMENTS.md)已更新。复用现有Plane周期/Release，[15项差异](iterations/0.7.0/FOUNDATION_PLANE_DIFF.md)待单项确认，本轮零次远程写入；既有0.7.0已发布子集与新增未实现范围分别记录。下方未分版状态为历史。
+
+2026-10-17 FND-P02 结果：用户单项确认后，已创建 **FINNS-15｜F01 账号与身份维护（未分版）**，挂到 FINNS-14，Backlog；按 ID 回读核对通过，[回执](requirements/FOUNDATION_PLANE_P02_RECEIPT.json) 已保存。其余七个子项未执行。下一步评审账号找回方式及改密会话规则，G1 仍 pending，原型及业务开发未开始；下方“八项未执行”属于此前草稿状态。
+
+2026-10-17 F05 交互澄清：本人资料默认只读，点击“修改资料”后进入独立编辑页；基础资料与 F01 一起提前评审。新增 [查看/编辑需求](requirements/FOUNDATION_PROFILE_REQUIREMENTS.md)，FND-P08 载荷修订至 2，其余子项载荷不变。当前只修改本地需求/任务草稿，未连接 Plane 或开发业务页面。
+
+2026-10-17 任务拆分：FINNS-14 的八项基础功能已细化为 [逐步任务单](requirements/FOUNDATION_TASKS.md)，包括依赖、用户选择、AI产物和完成标准；新建子项的 [FND-P02–P09 差异](requirements/FOUNDATION_PLANE_CHILDREN.md) 及精确参数已备好，等待逐项确认，未实际写入。全部目标版本仍未分配，G1/PLANE pending；第一步先评审账号恢复和改密会话规则，不恢复评价/租房任务，不实施业务。
+
+2026-10-17 管理结果：用户逐项确认 FND-P01，基础能力总工作项 **FINNS-14** 已在 Plane FINNS 项目创建并按 ID 回读；状态 Backlog，未分配版本周期、负责人或日期。[回执](requirements/FOUNDATION_PLANE_RECEIPT.json) 与 [功能基线](requirements/FOUNDATION_BASELINE.md) 已关联。仅创建总项，八个分项仍待 G1 评审与单独同步；旧评价/租房远程差异未执行，业务未实施。
+
+2026-10-17 当前基础方向：FINNS-REQ-020 按多人社区完整基础细化账号、文章、传统专题、检索阅读、私人/公开个人页、互动、用户管理和审核。作品与评论均先审后公开，正文纯文字 Markdown；分项需求和验收草案见 [基线修订 1](requirements/FOUNDATION_BASELINE.md)。当前应用已发布 0.7.0；新基础需求未分版，评价及租房评价应用暂缓，多轮 AI 增强未分版。Plane 已只读核对，FINNS-10/11 Done 保留，FINNS-12/13 仍是远程旧计划；FND-P01 总项创建待单项确认。新原型/业务开发未开始，后续旧计划段落为历史。
 
 2026-10-15 新需求池登记：FINNS-REQ-019 首页每日随机展示互助、共赢及让世界更美好主题的名言。用户明确暂不分配版本，不纳入 0.7.0 / 0.8.0；G0 已记录、G1 待评估，具体日期/随机规则及引用来源待后续明确。见 [需求记录](requirements/FINNS-REQ-019_DAILY_QUOTES.md)。本轮未操作 Plane、制作原型或开发业务功能。
 
@@ -396,4 +434,3 @@ REQ-012 第一阶段设计/交付见第 17 节；当前修复与运行状态见�
 验证：Vue/Vite 生产构建通过；H2 集成测试 21/21、隔离 PostgreSQL 17.11 集成测试 21/21、Node 行为测试 4/4。浏览器在隔离测试库验证移动端创建与章节编辑、无标题笔记发布、缺项定位、原文变化保护及页面内重整理；截图 `data/req012-ux-mobile-create.png`、`data/req012-ux-mobile-editor.png`。数据库无新迁移，主库维持 V1–V8。
 
 0.5.1 已部署到 `127.0.0.1:8080`，Java 17 / PostgreSQL 主库 `finns`，PID 与日志见 `docs/AI_HANDOFF.md` 最新记录。首页、专题广场、新建路由与最新 JS 资源返回 HTTP 200。部署前后 11 张业务表行数/摘要相同；部署备份已创建，未做主库业务写入，隔离库浏览器数据不进入主库。未远程发布。非技术用户真实试用和三分钟目标仍未验证。
-

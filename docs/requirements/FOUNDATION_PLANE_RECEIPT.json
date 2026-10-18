@@ -1,0 +1,53 @@
+{
+  "operation_id": "FND-P01",
+  "diff_revision": 1,
+  "approval_source": "本轮用户明确回复“写入”，确认此前已展示的FND-P01修订1，仅创建一条总工作项。",
+  "approved_date": "2026-10-17",
+  "timezone": "Asia/Singapore",
+  "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+  "workitem_id": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+  "identifier": "FINNS-14",
+  "name": "FINNS｜多人社区基础能力完善（未分版）",
+  "state_id": "5b7d9df4-8ce4-40be-b110-83515a957a2a",
+  "state_name": "Backlog",
+  "priority": "none",
+  "cycle_id": null,
+  "parent": null,
+  "start_date": null,
+  "target_date": null,
+  "assignee_count": 0,
+  "created_at": "2026-10-17T10:46:27.856329Z",
+  "readback_checks": {
+    "id": true,
+    "project": true,
+    "title": true,
+    "state": true,
+    "priority": true,
+    "description": true,
+    "parent_unset": true,
+    "cycle_unset": true,
+    "assignees_unset": true,
+    "dates_unset": true
+  },
+  "write_count": 1,
+  "execution_status": "succeeded",
+  "readback_status": "verified",
+  "preflight": {
+    "active_count": 5,
+    "archived_count": 1,
+    "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+    "project_identifier": "FINNS",
+    "duplicate_count": 0,
+    "state": {
+      "id": "5b7d9df4-8ce4-40be-b110-83515a957a2a",
+      "name": "Backlog",
+      "group": "backlog"
+    }
+  },
+  "local_mapping": {
+    "requirement_id": "FINNS-REQ-020",
+    "children_created": 0,
+    "child_items_synchronized": false,
+    "target_version": null
+  }
+}

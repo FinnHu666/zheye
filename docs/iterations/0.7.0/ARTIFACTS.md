@@ -1,3 +1,33 @@
+## FINNS-15账号实施（2026-10-18）
+
+[实施与验证记录](IMPLEMENTATION_ACCOUNT.md)含文件清单、偏差、验证结果、事故与未验项；[契约修订2](CONTRACT_ACCOUNT.md)已回写实施偏差。代码改动未提交，验证jar仅为本地产物。
+
+## FINNS-15账号开发设计（2026-10-18）
+
+[概要设计修订1](DESIGN_ACCOUNT.md)（G3）与[详设/接口契约草案修订1](CONTRACT_ACCOUNT.md)（G4待实施授权）基于原型R2.1和账号需规修订7。仅文档：未实施、未运行测试、无Plane写入。BCrypt行为依据本机会话临时目录中读取的Spring Security 6.3.6源码，未入库。
+
+## R2.1账号安全邮箱重置入口（2026-10-18）
+
+[当前原型记录](ACCOUNT_PROFILE_R2_REVIEW.md)补充已登录忘记原密码入口、当前邮箱绑定、申请/完成会话区别及本轮验证。12项模拟测试和Vite构建通过；浏览器申请保持登录、刷新冷却、邮件重置后退出及390px面板无横向溢出已核对。仅本地原型，真实邮件/业务/数据库未验，Plane待同步且本轮未操作，具体原型R2.1待用户确认。截图与源码哈希位于忽略目录target/prototypes/account-r21-proof，可重建。
+
+## 2026-10-18账号与资料局部原型R2
+
+[当前变更、用户批注映射、评审步骤和验证](ACCOUNT_PROFILE_R2_REVIEW.md)为本轮持久记录；原site-access源码继续使用，新ProfilePage和validation辅助文件位于其src下。R2待用户确认，F05整体G1未通过；账号需规修订7记录用户已明确的注册顺序/密码上限变更，旧修订5快照保留。Plane上次回执只覆盖修订6，本轮没有远程操作，新差异待处理。
+
+11项模拟测试及构建通过；浏览器注册先验证、无原生校验气泡、资料只读/独立编辑/保存失败保留/取消、会话失效换账号隔离、桌面手机平板已检查；实际邮件/后端/真实库/真人手机未验。最终引用/证据和范围检查另见本轮结果。截图及源码SHA256快照位于忽略目录target/prototypes/account-r2-proof，可清理重建。
+
+## FINNS-15账号原型R1（2026-10-17）
+
+[原型记录/评审步骤/验证](PROTOTYPE_ACCOUNT.md)、[现有原型扩展源码入口](../../prototypes/site-access/README.md)已形成。G2待用户确认R1，模拟测试7/7、构建和浏览器桌面/手机检查通过；没有业务交付或Plane写入。详细边界和最终检查见[基础索引](../../requirements/FOUNDATION_ARTIFACTS.md)。
+
+## 本轮已执行的Plane回执（2026-10-17）
+
+[15项回执](FOUNDATION_PLANE_RECEIPT.json)记录本轮确认、6项更新、7项创建、2项关联及每项回读；全部succeeded/verified。只有必要元数据、实际ID及检查结果，不保存完整工具响应。Cycle/Release各11项，八子项G1待评审；下方“零写入/待确认”是准备阶段记录。
+
+## 当前地基规划产物（2026-10-17）
+
+[计划修订5](PLAN.md)、[需规汇总修订7](REQUIREMENTS.md)、[基础索引](../../requirements/FOUNDATION_ARTIFACTS.md)为当前入口。[Plane逐项差异](FOUNDATION_PLANE_DIFF.md)及[精确载荷](FOUNDATION_PLANE_DIFF.json)是本轮生成的脱敏管理草稿，零写入、待逐项确认；不含完整工具响应/凭据。以下原交付证据保留，不因新范围重写已完成行为。
+
 # AI 工作产物索引：0.7.0 规划及流程规范
 
 日期：2026-10-10。目的：让下一位 AI 直接定位权威资料和未完成事项。保留既有路径，不批量移动、删除或复制历史 AI 文件。

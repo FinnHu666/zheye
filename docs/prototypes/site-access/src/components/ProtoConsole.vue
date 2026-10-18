@@ -46,10 +46,10 @@ const callRoleApi = async () => {
 const registerWithRole = async () => {
   await fetch('/api/auth/csrf')
   const email = `test${Date.now() % 100000}@finns.test`
-  const res = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-XSRF-TOKEN': decodeURIComponent(csrf()) }, body: JSON.stringify({ email, password: 'demo-only', displayName: '提权测试', role: 'ADMIN' }) })
+  const res = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-XSRF-TOKEN': decodeURIComponent(csrf()) }, body: JSON.stringify({ email, password: 'demo-only', confirmPassword: 'demo-only', displayName: '提权测试', role: 'ADMIN' }) })
   const body = await res.json().catch(() => ({}))
-  probe.value = `注册时提交 role=ADMIN → ${res.status}，实际角色：${body.roleLabel || body.message}。页面将以新账号刷新。`
-  setTimeout(() => location.reload(), 1600)
+  const created = proto.db().users.find((u) => u.email === email)
+  probe.value = `注册时提交 role=ADMIN → ${res.status}，实际角色：${created ? roleLabel(created.role) : body.message}；未提供已验证邮箱凭据时不能直接注册或提权。`
 }
 
 const decisions = [
