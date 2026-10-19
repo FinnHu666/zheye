@@ -39,7 +39,7 @@ Windows PowerShell：
 .\scripts\run.ps1
 ```
 
-项目自带 `.mvn/settings.xml`，用于隔离本机 Maven 镜像配置并直接使用 Maven Central。启动后访问 <http://localhost:8080>。演示账号：`demo@aitome.dev`，密码：`aitome123`。
+项目自带 `.mvn/settings.xml`，用于隔离本机 Maven 镜像配置并直接使用 Maven Central。启动后访问 <http://localhost:8080>。本地开发库会自动种入内容示例（作者账号 `demo@aitome.dev` 的密码每次随机生成、不可用于登录）；需要登录请按注册流程创建自己的账号（本机开发用 `FINNS_MAIL_MODE=outbox`，见 docs/DEPLOYMENT.md）。
 
 ## 版本与迭代记录
 

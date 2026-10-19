@@ -313,7 +313,7 @@
           "evidence": [
             {
               "path": "docs/RELEASE_0.7.0.md",
-              "sha256": "27cfde5c9b935b79960afd75b4f3e9a3acb88a080f2e14837a41d278bd9f2296"
+              "sha256": "814b5e0a08b62ed044469d95add806e00d5fb1858a89e593f792f52328591d27"
             },
             {
               "path": "docs/iterations/0.7.0/DECISIONS.md",
@@ -486,7 +486,7 @@
           "evidence": [
             {
               "path": "docs/RELEASE_0.7.0.md",
-              "sha256": "27cfde5c9b935b79960afd75b4f3e9a3acb88a080f2e14837a41d278bd9f2296"
+              "sha256": "814b5e0a08b62ed044469d95add806e00d5fb1858a89e593f792f52328591d27"
             },
             {
               "path": "docs/iterations/0.7.0/DECISIONS.md",
@@ -963,7 +963,7 @@
           "evidence": [
             {
               "path": "docs/RELEASE_0.7.0.md",
-              "sha256": "27cfde5c9b935b79960afd75b4f3e9a3acb88a080f2e14837a41d278bd9f2296"
+              "sha256": "814b5e0a08b62ed044469d95add806e00d5fb1858a89e593f792f52328591d27"
             },
             {
               "path": "docs/requirements/FOUNDATION_DECISIONS.md",
@@ -980,7 +980,7 @@
           "evidence": [
             {
               "path": "docs/RELEASE_0.7.0.md",
-              "sha256": "27cfde5c9b935b79960afd75b4f3e9a3acb88a080f2e14837a41d278bd9f2296"
+              "sha256": "814b5e0a08b62ed044469d95add806e00d5fb1858a89e593f792f52328591d27"
             },
             {
               "path": "docs/requirements/FOUNDATION_USER_ADMIN_PLANE_P04_RECEIPT.json",
@@ -1871,7 +1871,7 @@
           "evidence": [
             {
               "path": "docs/RELEASE_0.7.0.md",
-              "sha256": "27cfde5c9b935b79960afd75b4f3e9a3acb88a080f2e14837a41d278bd9f2296"
+              "sha256": "814b5e0a08b62ed044469d95add806e00d5fb1858a89e593f792f52328591d27"
             },
             {
               "path": "docs/requirements/FOUNDATION_DECISIONS.md",
@@ -1888,7 +1888,7 @@
           "evidence": [
             {
               "path": "docs/RELEASE_0.7.0.md",
-              "sha256": "27cfde5c9b935b79960afd75b4f3e9a3acb88a080f2e14837a41d278bd9f2296"
+              "sha256": "814b5e0a08b62ed044469d95add806e00d5fb1858a89e593f792f52328591d27"
             },
             {
               "path": "docs/requirements/FOUNDATION_USER_ADMIN_PLANE_P04_RECEIPT.json",

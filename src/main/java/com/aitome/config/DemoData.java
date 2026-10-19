@@ -15,7 +15,9 @@ public class DemoData {
     @Bean @Profile("!postgres") CommandLineRunner seed(UserRepository users,ContentPostRepository posts,CollectionRepository collections,VpsRepository vps,BCryptPasswordEncoder encoder,CollectionPublicationService publications){
         return args->{
             if(users.count()>0)return;
-            UserAccount user=users.save(UserAccount.verified("demo@aitome.dev",encoder.encode("aitome123"),"纸飞机",java.time.Instant.now())); // 种子账号创建即已验证
+            // 种子账号创建即已验证。密码每次启动随机生成且不输出：源码中不再有可登录的固定演示密码；本地需要登录请通过邮件流程注册自己的账号。
+            byte[] random=new byte[24]; new java.security.SecureRandom().nextBytes(random);
+            UserAccount user=users.save(UserAccount.verified("demo@aitome.dev",encoder.encode(java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(random)),"纸飞机",java.time.Instant.now()));
             posts.save(new ContentPost(ContentPost.Type.ARTICLE,"把 AI 变成可靠的结对开发者","从上下文、任务拆分到验收闭环，一套能复用的 AI 协作方法。","# 从规格开始\n\n真正高效的 AI 开发，不是一次生成更多代码，而是让每一步都有清晰输入与可验证输出。\n\n## 三个原则\n\n1. 小步垂直切片\n2. 契约先行\n3. 每次改动都能测试",user.getId(),user.getDisplayName()));
             posts.save(new ContentPost(ContentPost.Type.TOPIC,"你在生产环境中如何选择 Java LTS？","17、21 还是更激进的新版本？欢迎分享迁移成本与收益。","聊聊你所在团队的版本选择，以及最让你意外的兼容性问题。",user.getId(),user.getDisplayName()));
             posts.save(new ContentPost(ContentPost.Type.ARTICLE,"轻量社区的缓存设计笔记","从读多写少出发，避免缓存成为第二套数据库。","热门内容采用短 TTL，计数聚合走异步，数据库仍是事实来源。",user.getId(),user.getDisplayName()));
