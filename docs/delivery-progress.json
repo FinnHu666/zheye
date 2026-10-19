@@ -1925,7 +1925,7 @@
       },
       "design_review_path": "docs/iterations/0.7.0/DESIGN_REVIEW_USER_ADMIN.md",
       "implementation_record": "docs/iterations/0.7.0/IMPLEMENTATION_USER_ADMIN.md",
-      "implementation_status": "released to local main 8080 (0.7.0 supplemental); committed locally 94eaca3/b26c995, not pushed",
+      "implementation_status": "released to local main 8080 (0.7.0 supplemental); committed locally 94eaca3/506a59e, not pushed",
       "acceptance_status": "passed_by_user_2026-10-18",
       "user_next": "决定Git提交、Plane改Done、真实邮件验证",
       "plane_progress_receipt_path": "docs/requirements/FOUNDATION_USER_ADMIN_PLANE_P03_RECEIPT.json",
