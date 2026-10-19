@@ -1,7 +1,7 @@
 ## FINNS-15/16 已发布到本机 8080（2026-10-18）
 
 用户“验收通过，进行发布”：账号功能（FINNS-15）+ 用户管理（FINNS-16）以**同版本号 0.7.0** 发布到本机 8080（PID 34880，JAR SHA256 `A7F58983…A1F4`，Flyway V14）。记录：[发布记录补充节](RELEASE_0.7.0.md)、[部署手册（换机器部署用）](DEPLOYMENT.md)。生产站长账号已指定（邮箱不入库）；**不支持回退旧包**；邮件为 Brevo SMTP，邮件链接前缀是 `http://127.0.0.1:8080`（只能本机打开）。主库已备份（`data/deployments/20261018-account-useradmin-0.7.0/finns-before-account-useradmin.dump`）并在恢复库演练通过。
-- **未做/待办**：①真实邮件：2026-10-19 已验证 8080→Brevo→Gmail 可收到重置邮件（昨晚两次发送失败根因未确认，见发布记录末节）；QQ/163/Outlook、垃圾箱/SPF/DKIM/DMARC 仍未验证；②站长本人用自己的密码登录核对管理页；③演示账户 `demo@aitome.dev` 仍在，可在用户管理页停用；④Git 已本地提交（`release/0.7.0`：`94eaca3` 代码、`506a59e` 文档，**未推送**、未合并 main；`.claude/` 未入库）；⑤Plane：2026-10-19 经用户单项确认，FINNS-15/16 均已 Done 并追加发布说明（[回执](requirements/FOUNDATION_USER_ADMIN_PLANE_P04_RECEIPT.json)；FINNS-15 远程此前已被改为 Done，与本地旧记录不一致，已核对）；⑥旧的 Brevo 密钥应在控制台删除。
+- **未做/待办**：①真实邮件：2026-10-19 已验证 8080→Brevo→Gmail 可收到重置邮件（昨晚两次发送失败根因未确认，见发布记录末节）；QQ/163/Outlook、垃圾箱/SPF/DKIM/DMARC 仍未验证；②站长本人用自己的密码登录核对管理页；③演示账户 `demo@aitome.dev` 仍在，可在用户管理页停用；④Git 已本地提交（`release/0.7.0`：`94eaca3` 代码、`506a59e` 文档，已推送到 origin/release/0.7.0（2026-10-19，快进）、未合并 main；`.claude/` 未入库）；⑤Plane：2026-10-19 经用户单项确认，FINNS-15/16 均已 Done 并追加发布说明（[回执](requirements/FOUNDATION_USER_ADMIN_PLANE_P04_RECEIPT.json)；FINNS-15 远程此前已被改为 Done，与本地旧记录不一致，已核对）；⑥旧的 Brevo 密钥应在控制台删除。
 - 验收预览 8091 与隔离库仍在，可用 `scripts\start-account-preview.ps1 ... -Stop` 停止。
 
 ## FINNS-16：已按契约B1–B5实施，等待用户验收G7（2026-10-18）

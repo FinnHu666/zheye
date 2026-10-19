@@ -1,0 +1,27 @@
+{
+  "operation": "USER-ADMIN-P05 / ACCOUNT-P05",
+  "date": "2026-10-19",
+  "confirmation": "用户回复“更新确认”：清理 FINNS-15/16 正文里过时的状态/验收/下一步段落，需求条款原样保留。",
+  "before": {
+    "FINNS-16": "updated_at 2026-10-19T10:51:46Z，Done",
+    "FINNS-15": "updated_at 2026-10-19T10:52:08Z，Done"
+  },
+  "writes": [
+    {
+      "item": "FINNS-16",
+      "updated_at_after": "2026-10-19T15:07:49.251331Z",
+      "change": "仅 description_html：状态段改为已完成/已发布/不支持回退，更新实施与验证、验收段，删除旧“尚未实现/下一步/P03进度”段；需求1–12、依赖、排除不变"
+    },
+    {
+      "item": "FINNS-15",
+      "updated_at_after": "2026-10-19T15:08:03.741361Z",
+      "change": "仅 description_html：同上，写明真实邮件仅验证Gmail、其他邮箱由用户决定暂不测试；需求1–8不变"
+    }
+  ],
+  "readback": "两项状态仍为 Done（completed）；Cycle 完整11项、各项状态未变",
+  "not_touched": [
+    "状态字段",
+    "Cycle/父项/Release",
+    "其他工作项"
+  ]
+}

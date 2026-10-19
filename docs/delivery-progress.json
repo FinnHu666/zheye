@@ -1884,7 +1884,7 @@
           "status": "pass",
           "next_action": "无；后续事项见交接",
           "user_action": "无需操作；可选：决定是否推送/合并 release/0.7.0",
-          "reason": "交接收尾完成：发布记录与部署手册、实施/验证/验收记录、决定D12–D15、Plane P03/P04（FINNS-16 Done，回读通过）、交接与进度均已落盘，下一位AI不读聊天可继续；Git已本地提交（未推送）。遗留的后续事项不属于本项范围：推送/合并分支、补测QQ/163/Outlook、停用演示账户",
+          "reason": "交接收尾完成：发布记录与部署手册、实施/验证/验收记录、决定D12–D15、Plane P03/P04（FINNS-16 Done，回读通过）、交接与进度均已落盘，下一位AI不读聊天可继续；Git已提交并推送 origin/release/0.7.0（未合并main）。遗留的后续事项不属于本项范围：推送/合并分支、补测QQ/163/Outlook、停用演示账户",
           "evidence": [
             {
               "path": "docs/RELEASE_0.7.0.md",
@@ -1953,7 +1953,7 @@
       },
       "design_review_path": "docs/iterations/0.7.0/DESIGN_REVIEW_USER_ADMIN.md",
       "implementation_record": "docs/iterations/0.7.0/IMPLEMENTATION_USER_ADMIN.md",
-      "implementation_status": "released to local main 8080 (0.7.0 supplemental); committed locally 94eaca3/506a59e, not pushed",
+      "implementation_status": "released to local main 8080 (0.7.0 supplemental); committed and pushed to origin/release/0.7.0 (94eaca3/506a59e), not merged to main",
       "acceptance_status": "passed_by_user_2026-10-18",
       "user_next": "决定Git提交、Plane改Done、真实邮件验证",
       "plane_progress_receipt_path": "docs/requirements/FOUNDATION_USER_ADMIN_PLANE_P03_RECEIPT.json",
