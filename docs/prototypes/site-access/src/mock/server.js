@@ -3,6 +3,7 @@
 import { getDb, reloadDb, saveDb, now, nextId, MINUTE, DAY } from './db'
 import { CATALOG, permLabel, isLocked, MAX_ROLES } from './roles'
 import { handleAccount, ensureAccount } from './account'
+import { ensureUserAdmin, currentPrototypeUser, normalManagerCount, changeAccountStatus, isSiteOwner, protectedRole, managementRestriction, ownershipOptions, transferOwnership } from './user-admin'
 
 // 角色清单保存在服务端（R3 起可新增、改名、删除）。
 const allRoles = () => getDb().roles
@@ -10,7 +11,7 @@ const roleKeys = () => allRoles().map((role) => role.key)
 const findRole = (key) => allRoles().find((role) => role.key === key)
 const roleLabel = (key) => !key || key === 'GUEST' ? '游客' : findRole(key)?.label || '已删除的角色'
 // “最后一位管理者”= 角色拥有“管理角色”权限的用户。至少保留一位，防止无人能再管理。
-const managerCount = (permissions = getDb().permissions, users = getDb().users) => users.filter((u) => (permissions[u.role] || []).includes('admin.roles')).length
+const managerCount = normalManagerCount
 
 // 权限以服务端保存的角色权限为准；管理员修改后，下一次请求即生效。
 const permissionsOf = (role) => role === 'GUEST' ? CATALOG.filter((perm) => perm.guest).map((perm) => perm.key) : [...(getDb().permissions[role] || [])]
@@ -22,7 +23,7 @@ class Problem extends Error { constructor(status, message) { super(message); thi
 const fail = (status, message) => { throw new Problem(status, message) }
 
 const userById = (id) => getDb().users.find((user) => user.id === id)
-const currentUser = () => { const id = getDb().session.userId; return id ? userById(id) || null : null }
+const currentUser = currentPrototypeUser
 const roleOf = (user) => user?.role || 'GUEST'
 const can = (user, perm) => permissionsOf(roleOf(user)).includes(perm)
 
@@ -44,7 +45,7 @@ const postSummary = (post) => ({ id: post.id, type: post.type, title: post.title
 const postView = (post) => ({ ...postSummary(post), body: post.body, authorId: post.authorId })
 const collectionView = (c) => ({ id: c.id, name: c.name, description: c.description, ownerName: userById(c.ownerId)?.displayName, itemCount: c.postIds.length, updatedAt: new Date(now()).toISOString(), visibility: c.visibility })
 const me = (user) => ({ id: user.id, email: user.email, displayName: user.displayName, role: user.role, roleLabel: roleLabel(user.role), permissions: permissionsOf(user.role) })
-const adminUserView = (user) => ({ id: user.id, displayName: user.displayName, email: user.email, role: user.role, roleLabel: roleLabel(user.role), createdAt: user.createdAt })
+const adminUserView = (user) => { const operator = currentUser(); const restriction = managementRestriction(operator, user); const self = user.id === operator?.id; return ({ id: user.id, displayName: user.displayName, email: user.email, role: user.role, roleLabel: roleLabel(user.role), createdAt: user.createdAt, accountStatus: user.accountStatus, statusVersion: user.statusVersion, canManage: permissionsOf(user.role).includes('admin.roles'), isOwner: user.id === getDb().siteOwnerId, canAssignRole: !restriction, roleBlockReason: restriction, canChangeStatus: !restriction && !self, statusBlockReason: restriction || (self ? '不能停用自己的账号。' : '') }) }
 
 function outline(c) {
   const posts = c.postIds.map((id) => getDb().posts.find((p) => p.id === id)).filter(Boolean)
@@ -162,18 +163,29 @@ on('PATCH', /^\/api\/me\/collections\/selected\/order$/, ({ body }) => { const u
 on('GET', /^\/api\/me\/ai-settings\/deepseek$/, () => { requirePerm('ai.use', '当前角色不能使用 AI 功能'); return { configured: false, lastFour: null, storageAvailable: true } })
 
 // —— FINNS-11：管理接口（只对管理员开放） ——
-on('GET', /^\/api\/admin\/users$/, ({ params }) => {
+on('GET', /^\/api\/admin\/users$/, async ({ params }) => {
   requirePerm('admin.users', '只有管理员可以查看用户列表')
-  const q = (params.get('q') || '').trim().toLowerCase(); const role = params.get('role') || ''
-  const list = getDb().users.filter((u) => (!q || `${u.displayName} ${u.email}`.toLowerCase().includes(q)) && (!role || u.role === role))
+  const settings = ensureUserAdmin()
+  if (settings.slowList) await new Promise(resolve => setTimeout(resolve, 1400))
+  if (settings.failLoadOnce) { settings.failLoadOnce = false; fail(503, '用户列表暂时无法加载，请重试。') }
+  const q = (params.get('q') || '').trim().toLowerCase(); const role = params.get('role') || ''; const status = params.get('status') || ''
+  const list = getDb().users.filter((u) => (!q || `${u.displayName} ${u.email}`.toLowerCase().includes(q)) && (!role || u.role === role) && (!status || u.accountStatus === status))
   const result = page(list, params, 10)
   return { ...result, items: result.items.map((u) => ({ ...adminUserView(u), canManage: permissionsOf(u.role).includes('admin.roles') })), managerCount: managerCount() }
+})
+on('GET', /^\/api\/admin\/ownership$/, () => ownershipOptions())
+on('POST', /^\/api\/admin\/ownership$/, ({ body }) => transferOwnership(body))
+on('PATCH', /^\/api\/admin\/users\/(\d+)\/status$/, ({ match, body }) => {
+  requirePerm('admin.users')
+  return adminUserView(changeAccountStatus(Number(match[1]), body))
 })
 on('PATCH', /^\/api\/admin\/users\/(\d+)\/role$/, ({ match, body }) => {
   const operator = requirePerm('admin.users', '只有管理员可以调整角色')
   const d = getDb(); const target = userById(Number(match[1]))
   if (!target) fail(404, '用户不存在')
   if (!findRole(body.role)) fail(400, '目标角色不存在，可能已被删除，请刷新后重试')
+  const restriction = managementRestriction(operator, target, body.role)
+  if (restriction) fail(403, restriction)
   if (body.expectedRole && body.expectedRole !== target.role) fail(409, `该用户角色已被修改为「${roleLabel(target.role)}」，请核对后重试`)
   if (managerCount(d.permissions, d.users.map((u) => u.id === target.id ? { ...u, role: body.role } : u)) < 1) fail(422, '这是最后一位能管理角色的用户，不能改为没有管理权限的角色；请先指定另一位管理员')
   if (d.settings.failRoleSaveOnce) { d.settings.failRoleSaveOnce = false; fail(500, '保存失败（模拟服务异常），请重试；已填写内容未丢失') }
@@ -187,7 +199,7 @@ const rolesView = () => ({
   catalog: CATALOG,
   guest: permissionsOf('GUEST'),
   maxRoles: MAX_ROLES,
-  roles: allRoles().map((role) => ({ ...role, permissions: permissionsOf(role.key), userCount: getDb().users.filter((u) => u.role === role.key).length })),
+  roles: allRoles().map((role) => ({ ...role, assignable: role.key !== 'OWNER' && (isSiteOwner(currentUser()) || !protectedRole(role.key)), permissions: permissionsOf(role.key), userCount: getDb().users.filter((u) => u.role === role.key).length })),
 })
 on('GET', /^\/api\/admin\/roles$/, () => { requirePerm('admin.users', '只有管理员可以查看角色权限'); return rolesView() })
 on('PUT', /^\/api\/admin\/roles$/, ({ body }) => {
@@ -202,6 +214,13 @@ on('PUT', /^\/api\/admin\/roles$/, ({ body }) => {
       if (isLocked(role, c) && !requested.has(c.key)) fail(422, `「${roleLabel(role)}」的「${c.label}」不可关闭（防止锁死管理入口或影响基本登录能力）`)
     }
     next[role] = CATALOG.map((c) => c.key).filter((key) => requested.has(key))
+  }
+  if (!isSiteOwner(operator)) {
+    for (const role of roleKeys()) {
+      const changed = JSON.stringify(next[role]) !== JSON.stringify(d.permissions[role])
+      if (changed && protectedRole(role)) fail(403, '只有站长可以调整管理员角色的权限。')
+      if (next[role].some(p => p.startsWith('admin.') && !d.permissions[role].includes(p))) fail(403, '只有站长可以授予管理权限。')
+    }
   }
   if (managerCount(next) < 1) fail(422, '保存后将没有任何用户能管理角色，请保留至少一位管理者')
   const changes = roleKeys().map((role) => ({ role, added: next[role].filter((k) => !d.permissions[role].includes(k)), removed: d.permissions[role].filter((k) => !next[role].includes(k)) })).filter((c) => c.added.length || c.removed.length)
@@ -236,6 +255,8 @@ on('POST', /^\/api\/admin\/roles\/definitions$/, ({ body }) => {
   const text = cleanRoleText(body)
   const source = body.copyFrom ? findRole(body.copyFrom) : null
   if (body.copyFrom && !source) fail(400, '要复制的角色不存在')
+  if (source?.key === 'OWNER') fail(403, '站长角色不能复制。')
+  if (source && protectedRole(source.key) && !isSiteOwner(operator)) fail(403, '只有站长可以创建具有管理权限的角色。')
   simulatedFailure('保存失败（模拟服务异常），请重试；已填写内容未丢失')
   const key = `R${nextId()}`
   const base = source ? permissionsOf(source.key) : []
@@ -248,6 +269,8 @@ on('POST', /^\/api\/admin\/roles\/definitions$/, ({ body }) => {
 on('PATCH', /^\/api\/admin\/roles\/definitions\/(\w+)$/, ({ match, body }) => {
   const operator = requireRoleAdmin(body); const d = getDb(); const role = findRole(match[1])
   if (!role) fail(404, '角色不存在，可能已被删除')
+  if (role.key === 'OWNER') fail(403, '站长身份及说明固定，不能在这里修改。')
+  if (protectedRole(role.key) && !isSiteOwner(operator)) fail(403, '只有站长可以编辑管理员角色。')
   const text = cleanRoleText(body, role.key)
   if (text.label === role.label && text.description === (role.description || '')) return rolesView()
   simulatedFailure('保存失败（模拟服务异常），请重试；已填写内容未丢失')
@@ -258,11 +281,15 @@ on('PATCH', /^\/api\/admin\/roles\/definitions\/(\w+)$/, ({ match, body }) => {
 on('DELETE', /^\/api\/admin\/roles\/definitions\/(\w+)$/, ({ match, body }) => {
   const operator = requireRoleAdmin(body); const d = getDb(); const role = findRole(match[1])
   if (!role) fail(404, '角色不存在，可能已被删除')
+  if (role.system === 'owner') fail(403, '站长角色不能删除。')
+  if (protectedRole(role.key) && !isSiteOwner(operator)) fail(403, '只有站长可以处置具有管理权限的角色。')
   if (role.system === 'admin') fail(422, '管理员角色不能删除')
   if (role.system === 'default') fail(422, '注册默认角色不能删除，可以改名或调整权限')
   const members = d.users.filter((u) => u.role === role.key)
   const moveTo = members.length ? findRole(body.moveTo) : null
   if (members.length && (!moveTo || moveTo.key === role.key)) fail(400, `该角色下还有 ${members.length} 位用户，请选择他们改用的角色`)
+  if (members.some(u => u.id === d.siteOwnerId) || moveTo?.key === 'OWNER') fail(403, '站长身份不能通过删除角色或迁移用户改变。')
+  if (moveTo && protectedRole(moveTo.key) && !isSiteOwner(operator)) fail(403, '只有站长可以授予管理员身份。')
   if (members.length && managerCount(d.permissions, d.users.map((u) => u.role === role.key ? { ...u, role: moveTo.key } : u)) < 1) fail(422, '删除后将没有任何用户能管理角色')
   simulatedFailure('删除失败（模拟服务异常），角色和用户均未改变，请重试')
   for (const u of members) u.role = moveTo.key
@@ -366,7 +393,9 @@ async function handle(url, init) {
     else {
       const route = routes.find((r) => r.method === method && r.pattern.test(path))
       if (!route) fail(404, '接口不存在')
-      data = await route.handler({ match: path.match(route.pattern), params: parsed.searchParams, body })
+      const result = route.handler({ match: path.match(route.pattern), params: parsed.searchParams, body })
+      // Synchronous mock mutations must commit before another request can reload storage.
+      data = result && typeof result.then === 'function' ? await result : result
     }
     if (data === null) status = 204
     if (path === '/api/site-visits') note = data.reason
@@ -377,6 +406,7 @@ async function handle(url, init) {
   const safeSearch = new URLSearchParams(parsed.search); if (safeSearch.has('token')) safeSearch.set('token', '[hidden]')
   log({ method, path: path + (safeSearch.size ? '?' + safeSearch : ''), status, note, role: roleLabel(currentUser()?.role) })
   saveDb(); emit()
+  if ((/^\/api\/admin\/users\/\d+\/status$/.test(path) || path === '/api/admin/ownership' && method === 'POST') && status === 200) window.dispatchEvent(new Event('finns-account-session'))
   await new Promise((resolve) => setTimeout(resolve, 120)) // 让加载状态可见
   return json(status, data)
 }

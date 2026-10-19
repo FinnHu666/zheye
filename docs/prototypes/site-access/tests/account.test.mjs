@@ -9,7 +9,7 @@ const dom = new JSDOM('', { url: 'http://localhost/' })
 globalThis.window = dom.window
 globalThis.localStorage = dom.window.localStorage
 globalThis.Event = dom.window.Event
-const server = await createServer({ configFile: fileURLToPath(new URL('../vite.config.mjs', import.meta.url)), server: { middlewareMode: true } })
+const server = await createServer({ configFile: fileURLToPath(new URL('../vite.config.mjs', import.meta.url)), server: { middlewareMode: true, hmr: false } })
 const db = await server.ssrLoadModule('/src/mock/db.js')
 const account = await server.ssrLoadModule('/src/mock/account.js')
 const call = (method, path, body = {}, query = {}) => account.handleAccount(method, path, body, new URLSearchParams(query)).data

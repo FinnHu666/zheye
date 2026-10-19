@@ -29,6 +29,7 @@ import { sessionUser } from './proto/session'
 import '@finns/assets/styles.css'
 import './proto.css'
 import './account.css'
+import './user-admin.css'
 
 installMockServer()
 

@@ -1,0 +1,43 @@
+{
+  "operation": "USER-ADMIN-P04 / ACCOUNT-P04",
+  "date": "2026-10-19",
+  "confirmation": "用户本轮明确确认：FINNS-15 和 FINNS-16 状态都改为 Done，各追加一句发布说明；FINNS-15 正文写明真实邮件仅验证了 Gmail，QQ/163/Outlook 待补；写前重读、写后回读。",
+  "findings_before_write": {
+    "FINNS-15": "远程已是 Done（completed_at 2026-10-18T08:06:53Z，updated_at 2026-10-18T08:07:19Z），与本地记录的 In Progress 不一致（远程在此前被改过）；因此只追加正文，未再写状态",
+    "FINNS-16": "updated_at 2026-10-18T09:48:48Z、In Progress，与 P03 回执一致"
+  },
+  "writes": [
+    {
+      "item": "FINNS-16",
+      "workitem_id": "bf836bf4-f306-4a64-8b56-1e571939d14e",
+      "fields": [
+        "state",
+        "description_html"
+      ],
+      "state_to": "Done (2de86d4f-ff59-4d61-9a84-1df4f49c6973)",
+      "body": "原正文逐字保留，末尾追加“发布更新（USER-ADMIN-P04）”并声明取代过时表述",
+      "updated_at_after": "2026-10-19T10:51:46.365589Z"
+    },
+    {
+      "item": "FINNS-15",
+      "workitem_id": "fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d",
+      "fields": [
+        "description_html"
+      ],
+      "body": "原正文逐字保留，末尾追加“发布更新（ACCOUNT-P04）”：已发布、取代过时表述、真实邮件仅验证 Gmail，QQ/163/Outlook 待补",
+      "updated_at_after": "2026-10-19T10:52:08.606634Z"
+    }
+  ],
+  "post_write_readback": {
+    "FINNS-16": "Done / completed，completed_at 2026-10-19T10:51:46Z，父项 FINNS-14",
+    "FINNS-15": "Done / completed（completed_at 保持 2026-10-18T08:06:53Z），正文含新增段",
+    "cycle": "e6eb9092-424a-4c10-a472-bd29f4a2b063 仍为完整 11 项（FINNS-10/11/14–22），其余项状态与父项未变",
+    "note": "更新响应里 cycle_id 为空是响应假象，Cycle 列表与独立回读均确认仍在周期内"
+  },
+  "not_touched": [
+    "Release 关联（成员读取此前 HTTP 402，未核实）",
+    "其他工作项",
+    "评论",
+    "FINNS-14 父项"
+  ]
+}

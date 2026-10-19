@@ -1,3 +1,41 @@
+## FINNS-15/16 已发布到本机 8080（2026-10-18）
+
+用户“验收通过，进行发布”：账号功能（FINNS-15）+ 用户管理（FINNS-16）以**同版本号 0.7.0** 发布到本机 8080（PID 34880，JAR SHA256 `A7F58983…A1F4`，Flyway V14）。记录：[发布记录补充节](RELEASE_0.7.0.md)、[部署手册（换机器部署用）](DEPLOYMENT.md)。生产站长账号已指定（邮箱不入库）；**不支持回退旧包**；邮件为 Brevo SMTP，邮件链接前缀是 `http://127.0.0.1:8080`（只能本机打开）。主库已备份（`data/deployments/20261018-account-useradmin-0.7.0/finns-before-account-useradmin.dump`）并在恢复库演练通过。
+- **未做/待办**：①真实邮件：2026-10-19 已验证 8080→Brevo→Gmail 可收到重置邮件（昨晚两次发送失败根因未确认，见发布记录末节）；QQ/163/Outlook、垃圾箱/SPF/DKIM/DMARC 仍未验证；②站长本人用自己的密码登录核对管理页；③演示账户 `demo@aitome.dev` 仍在，可在用户管理页停用；④Git 已本地提交（`release/0.7.0`：`94eaca3` 代码、`b26c995` 文档，**未推送**、未合并 main；`.claude/` 未入库）；⑤Plane：2026-10-19 经用户单项确认，FINNS-15/16 均已 Done 并追加发布说明（[回执](requirements/FOUNDATION_USER_ADMIN_PLANE_P04_RECEIPT.json)；FINNS-15 远程此前已被改为 Done，与本地旧记录不一致，已核对）；⑥旧的 Brevo 密钥应在控制台删除。
+- 验收预览 8091 与隔离库仍在，可用 `scripts\start-account-preview.ps1 ... -Stop` 停止。
+
+## FINNS-16：已按契约B1–B5实施，等待用户验收G7（2026-10-18）
+
+用户要求“完成这个Plane上的任务”，AI据此（USER-ADMIN-D12）完成概设+自评设计评审、契约、后端/前端实施与验证；**未验收、未发布、未提交Git、未写Plane**。入口：[概设](iterations/0.7.0/DESIGN_USER_ADMIN.md)、[设计评审](iterations/0.7.0/DESIGN_REVIEW_USER_ADMIN.md)、[契约](iterations/0.7.0/CONTRACT_USER_ADMIN.md)、[实施与验证记录](iterations/0.7.0/IMPLEMENTATION_USER_ADMIN.md)、[用户验收清单V1–V10](iterations/0.7.0/ACCEPTANCE_USER_ADMIN.md)。
+
+- 实现：V14迁移（账号状态、唯一站长系统角色与`owner_user_id`、扩展操作记录）；登录/会话/权限三处强制停用；停用/恢复与站长转交接口，全部在锁定`access_control_state`的同一事务内，操作者锁内重读；层级规则（站长>管理员>成员）接入既有角色/权限/角色定义接口；启动时站长初始化与自愈；前端三管理页共用外壳与弹窗。无新依赖，四处版本未改。
+- 验证：H2全量107/107（基线88）；PostgreSQL隔离库全量106/106，新增两类在全新PG库各自通过（含并发）；V13复制库升级到V14演练通过；前端38/38与构建；变异检查5项均被抓到；本机浏览器（站长视角）停用/转交/审计/角色页与390px。**未验**：真人手机、多窗口F07专项演练、768px逐页、真实邮件。
+- 验收环境：预览 <http://127.0.0.1:8091/admin/users> 运行中（PID见`target/account-preview.pid`），隔离库`finns_test_070_useradmin_upgrade`，演示账号owner@demo.finns.test等（`scripts/seed-user-admin-preview.*`重置）；用完停止：`scripts\start-account-preview.ps1 -DatabaseName finns_test_070_useradmin_upgrade -Stop`。8080与`finns`主库未触碰。
+- 待用户：①按清单V1–V10验收并反馈；②生产站长账号与“不回退旧包”已由用户决定（USER-ADMIN-D13，邮箱不入库；发布时经`FINNS_BOOTSTRAP_ADMIN_EMAIL`配置），发布仍需另行授权；③[USER-ADMIN-P03](requirements/FOUNDATION_USER_ADMIN_PLANE_P03.md)已获用户单项确认并执行：FINNS-16 Plane状态Backlog→In Progress并追加实施进度正文，写前重读、写后回读通过（[回执](requirements/FOUNDATION_USER_ADMIN_PLANE_P03_RECEIPT.json)），Cycle11项与父项不变，Release成员HTTP402仍未核实；**不是Done**；④是否授权隔离上下文做独立设计评审（现为同作者自评）；⑤是否提交Git。
+- 注意：旧包不认识停用状态；PG隔离测试每次用新库名；新增文件含`scripts/seed-user-admin-preview.ps1`（带BOM，已在PowerShell 5.1运行）。构建输出`src/main/resources/static/`已重新生成。
+
+## FINNS-16：P02同步回读完成，下一步G3（2026-10-18）
+
+USER-ADMIN-P02差异修订1获用户“确认写入”，写前核对一致后仅正文更新一次并回读通过；[脱敏回执](requirements/FOUNDATION_USER_ADMIN_PLANE_P02_RECEIPT.json)保存正文比较、21项保护字段、Cycle11项前后集合及Release HTTP402限制。Backlog/其余字段不变，未写关联，Release当前成员无法核实。需求修订2与R3确认有效，G1/PLANE/G2通过，下一步概要设计与设计评审、详设/接口和验收映射；G3以后尚未开始，业务验收A01–A15全部未执行。
+
+本轮无业务/原型源码、数据库、主站或发布版本变化，未提交推送发布；仅同步正文与归档，未重跑原型/业务测试。P01/P02不重复执行，下方待P02授权措辞均为此前历史；其他功能（含FINNS-15）的门禁保持。
+
+## FINNS-16：R3及范围已通过（2026-10-18）
+
+用户在[R3展示](iterations/0.7.0/PROTOTYPE_USER_ADMIN_R3.md)后回复“通过”（USER-ADMIN-D11），需求修订2、G1增量与G2均通过，勿重复索要R3批准。站长转交候选/原因与邮箱确认/原站长降级/会话/审计按R3冻结；业务UA-A01–A15仍全部未执行。P02完整正文差异修订1已备妥，待单项核对写入授权，本轮未连接Plane；下一步处理P02，然后概要设计/设计评审与详设契约，不因原型批准直接开发或发布。仅本地文档记录，本轮未重跑原型测试/浏览器，历史25项模拟及构建证据保留；代码、数据库、主站和版本均未改。下方待R3评审为历史。
+
+# 当前任务：FINNS-16用户管理R3待评审（2026-10-18）
+
+站长管理管理员、管理员只管理普通成员及页面转交方向已获用户答复，固定不可转交不再适用。[R3具体交接方案/验证](iterations/0.7.0/PROTOTYPE_USER_ADMIN_R3.md)已制作；下一步体验并确认该流程，冻结增量需规/验收，然后核对[P02草案](requirements/FOUNDATION_USER_ADMIN_PLANE_P02.md)并逐项授权同步。当前不开发业务、不将模拟当验收；本轮未操作Plane。后文同日R2“两问未答”均为历史。
+
+# 当前任务：FINNS-16用户管理R2待范围确认与评审（2026-10-18）
+
+[三条批注修订、站长待确认方案与验证](iterations/0.7.0/PROTOTYPE_USER_ADMIN_R2.md)已形成。管理页和弹窗视觉修复完成；新增站长方向明确，具体权限/转交边界仍待回答，暂按推荐方案模拟。先完成受影响G1范围及R2确认，再准备P02同步，不开发业务。本轮无Plane操作，旧修订1未受影响条款及其他任务阶段保持。
+
+# 当前任务：FINNS-16用户管理原型R1待评审（2026-10-18）
+
+[可交互R1及评审步骤](iterations/0.7.0/PROTOTYPE_USER_ADMIN.md)已完成，入口 <http://127.0.0.1:4175/admin/users>。用户下一步确认具体R1与范围或反馈修改；G2仍pending，不进入业务开发。需规修订1不变、原同步检查点有效；本轮未操作Plane，后续R1进度增量待评审结果后核对/确认。真实后端/会话/邮件/数据库验收未执行，未部署主站。
+
 # 当前任务：FINNS-16管理同步已完成（2026-10-18）
 
 用户单项确认USER-ADMIN-P01，仅正文写入并回读通过，[回执](requirements/FOUNDATION_USER_ADMIN_PLANE_RECEIPT.json)已保存。G1/PLANE通过，下一步G2原型待制作/待确认；需求修订1不变，Backlog不变。实际原型仍待对应授权；未实施业务。Cycle11项集合不变；Release成员HTTP 402未核实，本次无关联写操作。下方待确认内容属于此前准备记录。

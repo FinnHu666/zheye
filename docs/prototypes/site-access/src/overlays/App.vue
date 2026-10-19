@@ -6,6 +6,7 @@ import { api } from '@finns/lib/api'
 import { sessionUser as user, can, siteVisit } from '../proto/session'
 import ProtoConsole from '../components/ProtoConsole.vue'
 import AccountLab from '../components/AccountLab.vue'
+import UserAdminLab from '../components/UserAdminLab.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -69,7 +70,7 @@ watch(() => route.query.create, (value) => { if (value === 'post' || value === '
       <div class="header-actions"><button class="icon-btn" aria-label="回到顶部" @click="router.push('/')">⌕</button><button v-if="!user" class="btn btn-ghost" @click="openAuth()">登录</button><template v-else><RouterLink class="btn btn-ghost user-button" to="/me">个人中心</RouterLink><span class="proto-role-chip" :title="`当前角色：${user.roleLabel}`">{{ user.roleLabel }}</span><button class="btn btn-ghost logout-button" :disabled="logoutBusy" @click="logout">退出</button></template><button v-if="!user || can('post.create')" class="btn btn-primary" @click="showWrite">开始创作 <span>↗</span></button></div>
     </header>
 
-    <div class="account-prototype-bar"><span>FINNS 0.7.0 · 账号与资料原型 R2.1 · 邮件与会话均为模拟</span><RouterLink :to="user ? '/me/security' : '/auth/login'">体验账号流程 →</RouterLink></div>
+    <div class="account-prototype-bar"><span>FINNS 0.7.0 · 用户管理原型 R3 / 账号 R2.1 · 仅浏览器模拟</span><RouterLink to="/admin/users">体验用户管理 →</RouterLink></div>
     <main>
       <section v-if="forbidden" class="page-hero personal-hero proto-forbidden" role="alert">
         <span class="kicker">403 · 无访问权限</span>
@@ -84,8 +85,9 @@ watch(() => route.query.create, (value) => { if (value === 'post' || value === '
 
     <div v-if="composerOpen" class="overlay" @click.self="composerOpen = false"><section class="modal modal-wide" role="dialog" aria-modal="true"><button class="modal-close" aria-label="关闭" @click="composerOpen = false">×</button><span class="kicker">CREATE</span><h2>分享新的内容</h2><ComposerForm @ai-collection="composerOpen = false; router.push('/me/collections/ai/new')" @collection="composerOpen = false; router.push('/me/collections/new')" @done="composerOpen = false; showToast('内容已发布')" @error="showToast" /></section></div>
     <div v-if="toastMessage" class="toast show" role="status">{{ toastMessage }}</div>
-    <ProtoConsole />
+    <ProtoConsole v-if="!route.path.startsWith('/admin')" />
     <AccountLab />
+    <UserAdminLab />
   </div>
 </template>
 

@@ -3,6 +3,7 @@
 // system：ADMIN 为管理角色、MEMBER 为注册默认角色，二者可改名但不可删除。
 
 export const ROLES = [
+  { key: 'OWNER', label: '站长', description: '唯一站点所有者，管理管理员；仅通过专门入口转交，不可直接分配或删除', system: 'owner' },
   { key: 'RESTRICTED', label: '受限成员', description: '可浏览，暂停发布与互动' },
   { key: 'MEMBER', label: '普通成员', description: '注册用户的默认角色', system: 'default' },
   { key: 'TRUSTED', label: '受信成员', description: '可阅读内部受限专题' },
@@ -31,9 +32,10 @@ export const DEFAULT_PERMISSIONS = {
   MEMBER: ['content.public', 'profile.manage', 'selection.manage', 'post.create', 'post.interact', 'collection.manage', 'ai.use'],
   TRUSTED: ['content.public', 'profile.manage', 'selection.manage', 'post.create', 'post.interact', 'collection.manage', 'ai.use', 'content.restricted'],
   ADMIN: CATALOG.map((perm) => perm.key),
+  OWNER: CATALOG.map((perm) => perm.key),
 }
 
-export const isLocked = (roleKey, perm) => !!(perm.lockAll || (perm.lockAdmin && roleKey === 'ADMIN'))
+export const isLocked = (roleKey, perm) => !!(roleKey === 'OWNER' || perm.lockAll || (perm.lockAdmin && roleKey === 'ADMIN'))
 export const MAX_ROLES = 12
 
 export const permLabel = (key) => CATALOG.find((perm) => perm.key === key)?.label || key

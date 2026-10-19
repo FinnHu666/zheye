@@ -2,7 +2,8 @@
 import { computed, onMounted, ref } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { api } from '@finns/lib/api'
-import AdminNav from '../components/AdminNav.vue'
+import AdminLayout from '../components/AdminLayout.vue'
+import AdminDialog from '../components/AdminDialog.vue'
 import { can, sessionUser } from '../proto/session'
 import { isLocked } from '../mock/roles'
 
@@ -18,7 +19,9 @@ const load = async () => {
 onMounted(load)
 
 const has = (role, perm) => (editing.value ? draft.value[role.key] : role.permissions).includes(perm.key)
-const locked = (role, perm) => isLocked(role.key, perm)
+const isOwner = computed(() => sessionUser.value?.role === 'OWNER')
+const protectedRole = r => r.system === 'owner' || r.system === 'admin' || r.permissions.includes('admin.roles')
+const locked = (role, perm) => isLocked(role.key, perm) || (!isOwner.value && (protectedRole(role) || perm.key.startsWith('admin.')))
 const original = (role, perm) => role.permissions.includes(perm.key)
 const startEdit = () => { draft.value = Object.fromEntries(state.value.roles.map((r) => [r.key, [...r.permissions]])); note.value = ''; saveError.value = ''; conflict.value = false; lastResult.value = ''; editing.value = true }
 const toggle = (role, perm) => {
@@ -59,7 +62,7 @@ const atMax = computed(() => state.value && state.value.roles.length >= state.va
 const openCreate = () => { dialog.value = { mode: 'create', label: '', description: '', copyFrom: 'MEMBER', note: '' }; dialogError.value = ''; lastResult.value = '' }
 const openEditRole = (role) => { dialog.value = { mode: 'edit', role, label: role.label, description: role.description || '', note: '' }; dialogError.value = ''; lastResult.value = '' }
 const openDelete = (role) => { dialog.value = { mode: 'delete', role, moveTo: '', note: '' }; dialogError.value = ''; lastResult.value = '' }
-const moveTargets = computed(() => dialog.value?.role ? state.value.roles.filter((r) => r.key !== dialog.value.role.key) : [])
+const moveTargets = computed(() => dialog.value?.role ? state.value.roles.filter((r) => r.key !== dialog.value.role.key && r.system !== 'owner' && (isOwner.value || !protectedRole(r))) : [])
 const submitDialog = async () => {
   if (dialogBusy.value || !dialog.value) return
   const d = dialog.value; dialogBusy.value = true; dialogError.value = ''
@@ -89,9 +92,7 @@ onBeforeRouteLeave(() => !changes.value.length || confirm('权限修改尚未保
 </script>
 
 <template>
-  <section class="page-hero personal-hero"><span class="kicker">ADMIN · 0.7.0 原型</span><h1>角色<br /><em>权限矩阵。</em></h1><p>每位用户一个角色。管理员可以调整每个角色拥有的权限，保存后立即对该角色的所有用户生效。</p></section>
-  <section class="section personal-section admin-section">
-    <AdminNav />
+  <AdminLayout title="角色权限" description="管理角色与可用权限，保存后在后续请求中生效。">
     <p v-if="error" class="form-error" role="alert">{{ error }} <button type="button" class="btn btn-outline" @click="load">重试</button></p>
     <div v-if="loading && !state" class="loading">正在加载角色权限…</div>
     <template v-else-if="state">
@@ -104,8 +105,8 @@ onBeforeRouteLeave(() => !changes.value.length || confirm('权限修改尚未保
         <article v-for="r in state.roles" :key="r.key" class="role-card">
           <span class="role-chip" :class="`role-${r.key.toLowerCase()}`">{{ r.label }}</span>
           <p v-if="r.description" class="role-desc">{{ r.description }}</p>
-          <p>{{ r.userCount }} 位用户 · {{ (editing ? draft[r.key] : r.permissions).length }} 项权限<template v-if="r.system === 'admin'"> · 管理角色，不可删除</template><template v-else-if="r.system === 'default'"> · 注册默认，不可删除</template></p>
-          <div v-if="canEdit" class="role-card-actions"><button type="button" class="text-link" :disabled="editing" @click="openEditRole(r)">编辑</button><button v-if="!r.system" type="button" class="text-link danger-link" :disabled="editing" @click="openDelete(r)">删除</button></div>
+          <p>{{ r.userCount }} 位用户 · {{ (editing ? draft[r.key] : r.permissions).length }} 项权限<template v-if="r.system === 'owner'"> · 唯一站长，使用专门入口转交</template><template v-else-if="r.system === 'admin'"> · 管理角色，不可删除</template><template v-else-if="r.system === 'default'"> · 注册默认，不可删除</template></p>
+          <div v-if="canEdit && r.system !== 'owner' && (isOwner || !protectedRole(r))" class="role-card-actions"><button type="button" class="text-link" :disabled="editing" @click="openEditRole(r)">编辑</button><button v-if="!r.system" type="button" class="text-link danger-link" :disabled="editing" @click="openDelete(r)">删除</button></div>
         </article>
       </div>
 
@@ -147,18 +148,16 @@ onBeforeRouteLeave(() => !changes.value.length || confirm('权限修改尚未保
         <div class="admin-dialog-actions"><button type="button" class="btn" :disabled="saving" @click="cancel">放弃修改</button><button class="btn btn-primary" :disabled="saving || !changes.length">{{ saving ? '保存中…' : '保存权限' }}</button></div>
       </form>
     </template>
-  </section>
+  </AdminLayout>
 
-  <div v-if="dialog" class="overlay" @click.self="!dialogBusy && (dialog = null)">
-    <section class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="role-def-title">
-      <button class="modal-close" aria-label="关闭" :disabled="dialogBusy" @click="dialog = null">×</button>
+  <AdminDialog v-if="dialog" labelledby="role-def-title" :busy="dialogBusy" wide @close="dialog = null">
       <span class="kicker">{{ { create: 'NEW ROLE', edit: 'EDIT ROLE', delete: 'DELETE ROLE' }[dialog.mode] }}</span>
       <h2 id="role-def-title">{{ dialog.mode === 'create' ? '新增角色' : dialog.mode === 'edit' ? `编辑「${dialog.role.label}」` : `删除「${dialog.role.label}」` }}</h2>
       <form @submit.prevent="submitDialog">
         <template v-if="dialog.mode !== 'delete'">
           <label>角色名称<input v-model="dialog.label" maxlength="20" required placeholder="例如：内容审核员" /></label>
           <label>说明（可选）<input v-model="dialog.description" maxlength="60" placeholder="一句话说明这个角色的用途" /></label>
-          <label v-if="dialog.mode === 'create'">权限起点<select v-model="dialog.copyFrom"><option v-for="r in state.roles" :key="r.key" :value="r.key">复制「{{ r.label }}」的权限</option><option value="">只含基本权限（浏览公开内容、个人资料）</option></select></label>
+          <label v-if="dialog.mode === 'create'">权限起点<select v-model="dialog.copyFrom"><option v-for="r in state.roles.filter(r => r.system !== 'owner' && (isOwner || !protectedRole(r)))" :key="r.key" :value="r.key">复制「{{ r.label }}」的权限</option><option value="">只含基本权限（浏览公开内容、个人资料）</option></select></label>
           <p v-if="dialog.mode === 'edit' && dialog.label.trim() !== dialog.role.label && dialog.role.userCount" class="page-note">改名后，该角色的 {{ dialog.role.userCount }} 位用户会显示新名称；权限不变。</p>
         </template>
         <template v-else>
@@ -171,6 +170,5 @@ onBeforeRouteLeave(() => !changes.value.length || confirm('权限修改尚未保
         <p class="form-error" role="alert">{{ dialogError }}</p>
         <div class="admin-dialog-actions"><button type="button" class="btn" :disabled="dialogBusy" @click="dialog = null">取消</button><button class="btn" :class="dialog.mode === 'delete' ? 'btn-danger' : 'btn-primary'" :disabled="dialogBusy || (dialog.mode !== 'delete' && !dialog.label.trim()) || (dialog.mode === 'delete' && !!dialog.role.userCount && !dialog.moveTo)">{{ dialogBusy ? '处理中…' : dialog.mode === 'create' ? '新增角色' : dialog.mode === 'edit' ? '保存' : '删除角色' }}</button></div>
       </form>
-    </section>
-  </div>
+  </AdminDialog>
 </template>

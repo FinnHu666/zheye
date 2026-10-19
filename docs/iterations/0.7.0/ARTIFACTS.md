@@ -1,3 +1,49 @@
+## FINNS-16：已按契约B1–B5实施，等待用户验收G7（2026-10-18）
+
+用户要求“完成这个Plane上的任务”，AI据此（USER-ADMIN-D12）完成概设+自评设计评审、契约、后端/前端实施与验证；**未验收、未发布、未提交Git、未写Plane**。入口：[概设](DESIGN_USER_ADMIN.md)、[设计评审](DESIGN_REVIEW_USER_ADMIN.md)、[契约](CONTRACT_USER_ADMIN.md)、[实施与验证记录](IMPLEMENTATION_USER_ADMIN.md)、[用户验收清单V1–V10](ACCEPTANCE_USER_ADMIN.md)。
+
+- 实现：V14迁移（账号状态、唯一站长系统角色与`owner_user_id`、扩展操作记录）；登录/会话/权限三处强制停用；停用/恢复与站长转交接口，全部在锁定`access_control_state`的同一事务内，操作者锁内重读；层级规则（站长>管理员>成员）接入既有角色/权限/角色定义接口；启动时站长初始化与自愈；前端三管理页共用外壳与弹窗。无新依赖，四处版本未改。
+- 验证：H2全量107/107（基线88）；PostgreSQL隔离库全量106/106，新增两类在全新PG库各自通过（含并发）；V13复制库升级到V14演练通过；前端38/38与构建；变异检查5项均被抓到；本机浏览器（站长视角）停用/转交/审计/角色页与390px。**未验**：真人手机、多窗口F07专项演练、768px逐页、真实邮件。
+- 验收环境：预览 <http://127.0.0.1:8091/admin/users> 运行中（PID见`target/account-preview.pid`），隔离库`finns_test_070_useradmin_upgrade`，演示账号owner@demo.finns.test等（`scripts/seed-user-admin-preview.*`重置）；用完停止：`scripts\start-account-preview.ps1 -DatabaseName finns_test_070_useradmin_upgrade -Stop`。8080与`finns`主库未触碰。
+- 待用户：①按清单V1–V10验收并反馈；②生产站长账号与“不回退旧包”已由用户决定（USER-ADMIN-D13，邮箱不入库；发布时经`FINNS_BOOTSTRAP_ADMIN_EMAIL`配置），发布仍需另行授权；③[USER-ADMIN-P03](../../requirements/FOUNDATION_USER_ADMIN_PLANE_P03.md)已获用户单项确认并执行：FINNS-16 Plane状态Backlog→In Progress并追加实施进度正文，写前重读、写后回读通过（[回执](../../requirements/FOUNDATION_USER_ADMIN_PLANE_P03_RECEIPT.json)），Cycle11项与父项不变，Release成员HTTP402仍未核实；**不是Done**；④是否授权隔离上下文做独立设计评审（现为同作者自评）；⑤是否提交Git。
+- 注意：旧包不认识停用状态；PG隔离测试每次用新库名；新增文件含`scripts/seed-user-admin-preview.ps1`（带BOM，已在PowerShell 5.1运行）。构建输出`src/main/resources/static/`已重新生成。
+
+## FINNS-16：P02同步回读完成，下一步G3（2026-10-18）
+
+USER-ADMIN-P02差异修订1获用户“确认写入”，写前核对一致后仅正文更新一次并回读通过；[脱敏回执](../../requirements/FOUNDATION_USER_ADMIN_PLANE_P02_RECEIPT.json)保存正文比较、21项保护字段、Cycle11项前后集合及Release HTTP402限制。Backlog/其余字段不变，未写关联，Release当前成员无法核实。需求修订2与R3确认有效，G1/PLANE/G2通过，下一步概要设计与设计评审、详设/接口和验收映射；G3以后尚未开始，业务验收A01–A15全部未执行。
+
+本轮无业务/原型源码、数据库、主站或发布版本变化，未提交推送发布；仅同步正文与归档，未重跑原型/业务测试。P01/P02不重复执行，下方待P02授权措辞均为此前历史；其他功能（含FINNS-15）的门禁保持。
+
+## FINNS-16：R3及范围已通过（2026-10-18）
+
+用户在[R3展示](PROTOTYPE_USER_ADMIN_R3.md)后回复“通过”（USER-ADMIN-D11），需求修订2、G1增量与G2均通过，勿重复索要R3批准。站长转交候选/原因与邮箱确认/原站长降级/会话/审计按R3冻结；业务UA-A01–A15仍全部未执行。P02完整正文差异修订1已备妥，待单项核对写入授权，本轮未连接Plane；下一步处理P02，然后概要设计/设计评审与详设契约，不因原型批准直接开发或发布。仅本地文档记录，本轮未重跑原型测试/浏览器，历史25项模拟及构建证据保留；代码、数据库、主站和版本均未改。下方待R3评审为历史。
+
+## FINNS-16用户管理R3（2026-10-18）
+
+[当前R3/确认来源/待评审方案/验证](PROTOTYPE_USER_ADMIN_R3.md)为入口。用户已确认站长管理边界及页面转交方向；R3提供独立交接、二次确认、失败一致性、原站长降级/会话及审计。25项模拟测试、构建和940/390px浏览器检查通过，证据在忽略目录`target/prototypes/user-admin-r3-proof/`，32文件快照摘要见R3。G1具体转交方案/PLANE/G2待办，业务验收全部未执行，未写Plane或改业务。R1/R2及其历史未答表述不再代表当前状态。
+
+## FINNS-16用户管理R2修订（2026-10-18）
+
+[R2记录/三条批注映射/两项待决/验证](PROTOTYPE_USER_ADMIN_R2.md)为当前入口；新增共用AdminLayout/AdminDialog，站长与管理员限制仅浏览器模拟。22项模拟测试、构建及940/390px布局测量通过，截图/测量/源码快照在忽略目录`target/prototypes/user-admin-r2-proof/`。R1记录保留历史，不支撑新代码。原型和详细站长边界未获整体确认；G1新增范围/PLANE/G2仍待办，真实业务验收未执行，未写Plane。
+
+最终归档验证：10处新增区域本地链接可达，31个原型源码/测试文件与R2快照哈希一致；940/390px三页标题坐标相同、文档不溢出，关闭按钮滚动前后坐标一致。进度检查器退出2，F07停在G1新增站长细节待确认，其余任务状态不变，证据哈希有效；`git diff --check`退出0，原型HTTP200。生产业务及四处版本文件无改动。
+
+## FINNS-16用户管理原型R1（2026-10-18）
+
+| 阶段/用途 | 产物 | 状态与来源 | 保存方式 |
+| --- | --- | --- | --- |
+| G3概设与评审 | [概要设计](DESIGN_USER_ADMIN.md)、[设计评审](DESIGN_REVIEW_USER_ADMIN.md) | 2026-10-18；同作者自评、带条件通过（C-02/C-04已在G6关闭，C-01/C-03转G8，C-05不采纳，C-06关闭） | 持久，无敏感信息 |
+| G4详设契约 | [契约](CONTRACT_USER_ADMIN.md)（V14、接口、错误、测试映射）、[USER-ADMIN-D12](../../requirements/FOUNDATION_DECISIONS.md) | 2026-10-18；实施授权按用户“完成这个Plane上的任务”的理解记录 | 持久 |
+| G5/G6实施与验证 | [实施与验证记录](IMPLEMENTATION_USER_ADMIN.md)；`src/main/resources/db/migration/V14__account_status_and_site_owner.sql`、`src/test/java/com/aitome/UserStatusTests.java`、`OwnerTransferTests.java`、`scripts/seed-user-admin-preview.*`、前端`AdminLayout/AdminDialog/admin.css`及三管理页 | 2026-10-18；H2 106/106，PG 106/106，浏览器主路径通过；未提交Git | 持久；工作树未提交 |
+| G7验收清单 | [ACCEPTANCE_USER_ADMIN.md](ACCEPTANCE_USER_ADMIN.md) V1–V10 | 待用户填写结果 | 持久 |
+| PLANE待确认 | [USER-ADMIN-P03差异](../../requirements/FOUNDATION_USER_ADMIN_PLANE_P03.md) | 只读核对后备妥，未执行 | 持久 |
+| G2产品原型 | [R1记录/验证/体验步骤](PROTOTYPE_USER_ADMIN.md)、[源码及运行入口](../../prototypes/site-access/README.md) | 本轮USER-ADMIN-D07授权制作，待用户确认具体R1/范围；需规修订1不变 | 本地持久文档与原型源码，均为模拟 |
+| 验证证据 | `target/prototypes/user-admin-r1-proof/`中的测试/构建日志、截图和源码快照 | 最终21/21模拟测试、构建退出0；浏览器主路径与1180/768/390px检查 | 忽略目录，可清理重建；快照摘要见R1记录 |
+
+G0/G1/PLANE既有通过，G2仍pending，未开始G3后业务。本轮未连接/写Plane，R1进度后续正文增量另行核对与确认；不把模拟证据写成真实认证、并发、邮件、数据库或真人验收。
+
+最终归档检查：14处本轮新增区域的本地链接可达，29个原型源码/测试文件与最终快照哈希一致；全部进度证据哈希有效，其他任务门禁状态与本轮HEAD一致。进度检查器退出2（真实待办），FINNS-16停在G2等待用户确认R1；`git diff --check`退出0。业务及四处版本文件无改动，入口HTTP200。
+
 ## FINNS-16同步执行产物（2026-10-18）
 
 | 阶段/用途 | 产物 | 修订/状态 | 来源与保存 |

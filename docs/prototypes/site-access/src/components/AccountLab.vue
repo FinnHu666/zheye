@@ -3,13 +3,14 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { proto } from '../mock/server'
 import { ensureAccount } from '../mock/account'
+import { simulateSignIn } from '../mock/user-admin'
 const router=useRouter(),open=ref(false),tab=ref('mail'),snapshot=ref(null)
 const refresh=()=>{const d=proto.db();ensureAccount(d);snapshot.value=JSON.parse(JSON.stringify(d))}
 onMounted(()=>{refresh();window.addEventListener('finns-proto-change',refresh);window.addEventListener('storage',refresh)})
 onBeforeUnmount(()=>{window.removeEventListener('finns-proto-change',refresh);window.removeEventListener('storage',refresh)})
 const account=computed(()=>snapshot.value?.account), current=computed(()=>snapshot.value?.users.find(u=>u.id===snapshot.value.session.userId))
 const setting=(k,v)=>proto.update(d=>{ensureAccount(d)[k]=v})
-const switchUser=(id)=>{proto.update(d=>{d.session.userId=id;const a=ensureAccount(d);if(id)a.devices[id].find(device=>device.current).active=true});window.dispatchEvent(new Event('finns-account-session'));router.push(id?'/me/security':'/auth/login');open.value=false}
+const switchUser=(id)=>{proto.update(d=>{simulateSignIn(id);const a=ensureAccount(d);if(id)a.devices[id].find(device=>device.current).active=true});window.dispatchEvent(new Event('finns-account-session'));router.push(id?'/me/security':'/auth/login');open.value=false}
 const legacyScene=()=>{proto.update(d=>{ensureAccount(d);const u=d.users.find(u=>u.id===3);u.emailVerified=false;u.legacy=true;d.account.devices[3]?.forEach(device=>device.active=true)});switchUser(3)}
 const expire=()=>{proto.update(d=>{d.session.userId=null});window.dispatchEvent(new Event('finns-account-session'))}
 const advance=(n)=>{proto.advance(n*60000);refresh()}

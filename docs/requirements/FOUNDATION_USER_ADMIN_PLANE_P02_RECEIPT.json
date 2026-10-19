@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "operation_id": "USER-ADMIN-P02",
+  "diff_revision": 1,
+  "requirement_revision": 2,
+  "prototype_revision": "R3",
+  "date": "2026-10-18",
+  "timezone": "Asia/Singapore",
+  "confirmation": {
+    "source": "用户在P02差异修订1展示后回复“确认写入”",
+    "confirmed": true,
+    "scope": "仅更新FINNS-16正文，保留Backlog及其他字段和关联"
+  },
+  "action": "workitem.update",
+  "changed_fields": [
+    "description_stripped"
+  ],
+  "workitem_identifier": "FINNS-16",
+  "workitem_id": "bf836bf4-f306-4a64-8b56-1e571939d14e",
+  "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+  "parent_workitem_id": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+  "write": {
+    "attempt_count": 1,
+    "successful_calls": 1,
+    "status": "succeeded",
+    "before_updated_at": "2026-10-18T07:21:33.265068Z",
+    "after_updated_at": "2026-10-18T08:30:37.024188Z"
+  },
+  "preflight": {
+    "body_matches_p01_after_whitespace_normalization": true,
+    "updated_at_matches_baseline": true,
+    "preserved_fields_match_baseline": true
+  },
+  "readback": {
+    "status": "verified",
+    "body_comparison": "equal_after_whitespace_normalization",
+    "protected_field_count": 21,
+    "protected_fields": {
+      "name": {
+        "before": "FINNS 0.7.0｜F07 账号停用与用户管理衔接",
+        "after": "FINNS 0.7.0｜F07 账号停用与用户管理衔接",
+        "unchanged": true
+      },
+      "state": {
+        "before": "5b7d9df4-8ce4-40be-b110-83515a957a2a",
+        "after": "5b7d9df4-8ce4-40be-b110-83515a957a2a",
+        "unchanged": true
+      },
+      "priority": {
+        "before": "none",
+        "after": "none",
+        "unchanged": true
+      },
+      "project": {
+        "before": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "after": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+        "unchanged": true
+      },
+      "parent": {
+        "before": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+        "after": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+        "unchanged": true
+      },
+      "assignees": {
+        "before": [],
+        "after": [],
+        "unchanged": true
+      },
+      "labels": {
+        "before": [],
+        "after": [],
+        "unchanged": true
+      },
+      "start_date": {
+        "before": null,
+        "after": null,
+        "unchanged": true
+      },
+      "target_date": {
+        "before": null,
+        "after": null,
+        "unchanged": true
+      },
+      "type_id": {
+        "before": null,
+        "after": null,
+        "unchanged": true
+      },
+      "type": {
+        "before": null,
+        "after": null,
+        "unchanged": true
+      },
+      "point": {
+        "before": null,
+        "after": null,
+        "unchanged": true
+      },
+      "estimate_point": {
+        "before": null,
+        "after": null,
+        "unchanged": true
+      },
+      "sort_order": {
+        "before": 95535,
+        "after": 95535,
+        "unchanged": true
+      },
+      "is_draft": {
+        "before": false,
+        "after": false,
+        "unchanged": true
+      },
+      "archived_at": {
+        "before": null,
+        "after": null,
+        "unchanged": true
+      },
+      "deleted_at": {
+        "before": null,
+        "after": null,
+        "unchanged": true
+      },
+      "external_source": {
+        "before": null,
+        "after": null,
+        "unchanged": true
+      },
+      "external_id": {
+        "before": null,
+        "after": null,
+        "unchanged": true
+      },
+      "cycle_id": {
+        "before": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+        "after": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+        "unchanged": true
+      },
+      "workspace": {
+        "before": "9626c056-e247-4a76-97f1-96802796a4da",
+        "after": "9626c056-e247-4a76-97f1-96802796a4da",
+        "unchanged": true
+      }
+    }
+  },
+  "cycle": {
+    "id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+    "before_member_ids": [
+      "02da68ea-0375-4776-8e26-68c20fbe64c6",
+      "26ba60d7-9746-44e6-b135-9dc60100ea54",
+      "5531f40a-0693-4be3-a9f5-82c197a7ec6c",
+      "6ac45b07-b338-4944-b957-cf9928cc72a0",
+      "7f0caa7b-5ae5-4980-8aa0-55edcb67d375",
+      "923e172c-6b67-4def-bfe5-745e68441ded",
+      "9615eed1-2ebf-452f-8073-33ed2fe0719d",
+      "bf836bf4-f306-4a64-8b56-1e571939d14e",
+      "c1217a72-fb2a-4c84-9cab-069432392240",
+      "f40d22a9-ace3-4ab1-9050-abc7f4260f3a",
+      "fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d"
+    ],
+    "after_member_ids": [
+      "02da68ea-0375-4776-8e26-68c20fbe64c6",
+      "26ba60d7-9746-44e6-b135-9dc60100ea54",
+      "5531f40a-0693-4be3-a9f5-82c197a7ec6c",
+      "6ac45b07-b338-4944-b957-cf9928cc72a0",
+      "7f0caa7b-5ae5-4980-8aa0-55edcb67d375",
+      "923e172c-6b67-4def-bfe5-745e68441ded",
+      "9615eed1-2ebf-452f-8073-33ed2fe0719d",
+      "bf836bf4-f306-4a64-8b56-1e571939d14e",
+      "c1217a72-fb2a-4c84-9cab-069432392240",
+      "f40d22a9-ace3-4ab1-9050-abc7f4260f3a",
+      "fa92d4bc-da4b-4f69-9d5c-1e05bf6d5a1d"
+    ],
+    "count": 11,
+    "complete_pages": true,
+    "unchanged": true
+  },
+  "release": {
+    "id": "4bf00c13-cccb-4762-9eb8-c6ef8e7f8a79",
+    "before_read": "HTTP 402 Payment Required",
+    "after_read": "HTTP 402 Payment Required",
+    "membership_verified": false,
+    "association_write_calls": 0
+  },
+  "limitations": [
+    "无API条件更新，存在写前重读与实际写入之间的并发窗口；写后正文和保护字段已核对一致",
+    "Release成员无法读取，不将历史关联当作本次已核实"
+  ],
+  "local_boundaries": {
+    "business_code_changed": false,
+    "database_touched": false,
+    "main_site_changed": false,
+    "version_changed": false,
+    "git_commit_push_or_release": false
+  },
+  "next_stage": "G3概要设计与设计评审待开始，不代表业务实现或验收"
+}

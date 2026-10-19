@@ -21,7 +21,7 @@ const visitorState = computed(() => snapshot.value.visits.visitors[visitorId.val
 const minutesSince = computed(() => visitorState.value?.lastSeen ? Math.round((Date.now() + snapshot.value.clockOffset - visitorState.value.lastSeen) / 60000) : null)
 const clockLabel = computed(() => { const m = Math.round(snapshot.value.clockOffset / 60000); return m ? `模拟时钟已快进 ${m >= 1440 ? `${Math.floor(m / 1440)} 天 ` : ''}${m % 1440} 分钟` : '模拟时钟 = 实际时间' })
 
-const switchTo = (id) => { proto.update((d) => { d.session.userId = id }); location.reload() }
+const switchTo = (id) => { proto.update((d) => { d.session = { userId: id, epoch: d.users.find(u => u.id === id)?.sessionEpoch || 0 } }); location.reload() }
 const set = (key, value) => proto.update((d) => { d.settings[key] = value })
 const advance = (minutes) => proto.advance(minutes * 60000)
 const reloadPage = () => location.reload()

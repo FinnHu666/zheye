@@ -1,0 +1,45 @@
+{
+  "operation": "USER-ADMIN-P03",
+  "date": "2026-10-18",
+  "confirmation": "用户本轮明确回复：确认 USER-ADMIN-P03，仅把 FINNS-16 状态改为 In Progress 并追加实施进度正文，写前重读、写后回读。",
+  "target": {
+    "identifier": "FINNS-16",
+    "workitem_id": "bf836bf4-f306-4a64-8b56-1e571939d14e",
+    "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f"
+  },
+  "pre_write_read": {
+    "updated_at": "2026-10-18T08:30:37.024188Z",
+    "state": "Backlog (5b7d9df4-8ce4-40be-b110-83515a957a2a)",
+    "body": "与P02回执一致，未被他人改动",
+    "cycle": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+    "parent": "FINNS-14"
+  },
+  "write": {
+    "calls": 1,
+    "action": "workitem update",
+    "fields_changed": [
+      "state",
+      "description_html"
+    ],
+    "state_to": "In Progress (71236130-c4d8-4d18-9a59-4106619bf8c6, group started)",
+    "body_change": "原正文逐字保留，末尾追加“实施进度（USER-ADMIN-P03）”段；声明取代上文过时的“尚未实现/当前阶段/下一步”；不含账号、密码、邮箱或密钥"
+  },
+  "post_write_readback": {
+    "updated_at": "2026-10-18T09:48:48.517161Z",
+    "state": "In Progress",
+    "state_group": "started",
+    "cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+    "parent": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+    "priority": "none",
+    "assignees": [],
+    "labels": [],
+    "dates": "空",
+    "cycle_items": "完整11项集合（FINNS-10/11/14–22）保持，FINNS-16 在内",
+    "body": "回读正文含新增进度段，原文未变"
+  },
+  "notes": [
+    "update 响应里 cycle_id 为空、state_group 显示 backlog 是响应序列化假象；独立按 ID 回读与周期列表均显示 started 且仍在周期内",
+    "未调用任何关联/Release/评论/其他工作项写操作；Release 成员此前 HTTP 402，本次未核实也未触碰",
+    "仍不是 Done：用户验收（G7）未进行"
+  ]
+}

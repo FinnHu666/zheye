@@ -58,3 +58,48 @@
 ## 保留的数据库与演练进程
 
 新建并保留：`finns_restore_check_070_release_20261017`（本次备份恢复与迁移演练）及此前验证库 `finns_test_070_access*`、`finns_restore_check_070_upgrade`。演练应用（8094）已停止。测试实例 8090 已停止。主密钥 `FINNS_AI_CREDENTIAL_SECRET` 沿用既有（来自服务端用户环境变量），本次未读取、输出或更换。
+
+---
+
+# 补充发布（2026-10-18）：账号功能（FINNS-15）+ 用户管理（FINNS-16）
+
+日期：2026-10-18（Asia/Shanghai）。用户回复“验收通过，进行发布”；版本号**仍为 0.7.0**（用户决定，四处版本未改，新旧包同名，以 SHA256 区分）；生产站长账号与“不回退旧包”由用户决定（USER-ADMIN-D13，邮箱不入库）；邮件由用户自行在用户级环境变量中设置 SMTP 凭据（本记录不含任何密钥）。目标仍是本机 8080，使用现有主库。部署流程见 [部署手册](DEPLOYMENT.md)。
+
+| 项目 | 状态 |
+| --- | --- |
+| 发布目录 | `data/deployments/20261018-account-useradmin-0.7.0/`（Git 忽略） |
+| JAR | `finns-0.7.0.jar`，SHA256 `A7F58983A56411C7873D70BF767A43AED095F92D88D3EFD302322377E788A1F4`（含 V13、V14；前端入口 `index-DuIkGitI.js` / `index-DNPT71H9.css`） |
+| 主站 | PID 34880，仅 127.0.0.1:8080，postgres profile；邮件 `smtp`（Brevo，587，日预算 240），`FINNS_PUBLIC_BASE_URL=http://127.0.0.1:8080`（邮件链接只能在本机打开） |
+| 数据库 | 127.0.0.1:5432/finns，Flyway 到 V14 |
+
+## 备份、恢复与迁移演练
+
+1. 备份：`finns-before-account-useradmin.dump`（pg_dump 自定义格式，71,269 字节），SHA256 `6B838FA2B0FFF9DF570B6B25C416BCDE6775A28818B5FED4819E3BA00C8D956A`；`pg_restore -l` 可读（160 行，`backup-contents.txt`）。
+2. 恢复校验：恢复到 `finns_restore_check_070_useradmin_20261018`，22 张表行数与主库逐表一致（0 差异，`restore-compare.txt`）。
+3. 迁移演练：在恢复库上用发布包（8094）启动：V13、V14 成功，日志 0 个 ERROR；按 `FINNS_BOOTSTRAP_ADMIN_EMAIL` 把用户 2 指定为唯一站长（“系统初始化”记录 1 条），既有账号状态正常、仍为旧账号过渡标记。演练进程已停止。
+4. 主库迁移：切换时应用 V13、V14；发布前主库只有 2 个账号（演示账户 + 用户本人，后者本就是管理员）。
+
+## 过程记录
+
+第一次切换启动失败：`smtp` 模式缺 `FINNS_PUBLIC_BASE_URL`（启动即拒绝，数据未受影响，日志保留为 `main-server-attempt1-failed.log`）；补上后第二次启动成功（约 27 秒）。旧进程（PID 30184）按 `main.pid`、8080 归属与命令行核对后精确停止。
+
+## 发布后验证
+
+| 检查 | 结果 |
+| --- | --- |
+| 数据 | Flyway 最高版本 14；用户 1 普通成员/正常，用户 2 站长/正常；站长指针=用户 2 |
+| 页面/API | `/`、`/admin/users`、`/auth/login`、`/api/stats`、`/api/posts`、`/api/collections` 均 200；入口资源在 JAR 内 |
+| 权限 | 游客访问 `/api/admin/users`、`/api/admin/ownership`、`/api/account/security`、`/api/auth/me` 均 401；无 CSRF 的登录 403 |
+| 日志 | 0 个 ERROR，错误输出 0 字节 |
+
+**未做**：真实邮件送达验证（垃圾箱、SPF/DKIM/DMARC、QQ/163/Outlook；FINNS-15 的 ACCOUNT-D12 延后项，用户可注册新账号触发）；在 8080 上登录站长账号的浏览器检查（避免计入访问量与在生产登录）；站长账号需本人用自己的密码登录核对管理页；演示账户 `demo@aitome.dev` 仍存在（密码写在源码里，建议降级或停用——现在可在用户管理页停用）。
+
+## 回退
+
+**不支持回退到更早的程序包**（USER-ADMIN-D13）：旧包不认识账号停用状态。出问题时前向修复；如需恢复数据，用 `finns-before-account-useradmin.dump` 恢复到新库并核对，不覆盖主库。
+
+## 发布后的真实邮件验证（2026-10-18 夜至 2026-10-19）
+
+- 8080 上两次“找回密码”（21:31、21:33，令牌 1、2）发送失败（状态 FAILED）；应用日志按设计只记“发送失败”，未记原因，**根因未能确认**。排查时用同一套用户级环境变量直连 Brevo：连接、STARTTLS、登录成功，并向用户 Gmail 发了一封诊断邮件，**用户在收件箱收到**；本机出口 IP 当时可登录。推测失败时的出口 IP 尚未被 Brevo 授权或其后改过，**未证实**。
+- 2026-10-19 12:46 用户再次在 8080 申请找回密码：令牌 3 为 ACTIVE，日志“账号邮件已发送”，用户随后**收到重置链接邮件**。结论：生产站经 Brevo 向 Gmail 发信可用；**仅验证了 Gmail 一个收件方**，QQ/163/Outlook、垃圾箱比例、SPF/DKIM/DMARC 判定、HTTPS 链接影响仍未验证。邮件链接前缀为 `http://127.0.0.1:8080`，只能在本机打开。
+- 遗留改进（未做，需用户同意后重启 8080）：发送失败时把 SMTP 异常类型和回复码（不含收件人与密钥）写入日志，便于下次定位。

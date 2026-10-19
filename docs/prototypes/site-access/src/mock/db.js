@@ -12,8 +12,8 @@ const NAMES = ['林思远', '周以宁', '阿远', '陈默', '何小满', '许�
 
 function seedUsers() {
   const fixed = [
-    { id: 1, displayName: '你（站长）', email: 'admin@finns.test', role: 'ADMIN', createdAt: daysAgo(210), bio: '维护 FINNS。' },
-    { id: 2, displayName: '周以宁', email: 'zhou@finns.test', role: 'TRUSTED', createdAt: daysAgo(160), bio: '运维与部署笔记。' },
+    { id: 1, displayName: '你', email: 'admin@finns.test', role: 'OWNER', createdAt: daysAgo(210), bio: '维护 FINNS。' },
+    { id: 2, displayName: '周以宁', email: 'zhou@finns.test', role: 'ADMIN', createdAt: daysAgo(160), bio: '运维与部署笔记。' },
     { id: 3, displayName: '阿远', email: 'yuan@finns.test', role: 'MEMBER', createdAt: daysAgo(120), bio: '' },
     { id: 4, displayName: '陈默', email: 'chen@finns.test', role: 'RESTRICTED', createdAt: daysAgo(90), bio: '' },
   ]
@@ -80,7 +80,7 @@ export function seed() {
   launch.setHours(0, 0, 0, 0)
   return {
     version: 4,
-    users: seedUsers(),
+    users: seedUsers().map(u => ({ ...u, accountStatus: u.id === 7 ? 'DISABLED' : 'ACTIVE', statusVersion: 1, sessionEpoch: 0 })),
     posts: seedPosts(),
     comments: [
       { id: 1, postId: 201, authorId: 3, body: '备份那一节太有用了，收藏。', createdAt: daysAgo(1) },

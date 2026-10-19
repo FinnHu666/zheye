@@ -1,10 +1,12 @@
 // FINNS-15 product simulation only. No real password, mail, session or security service.
 import { getDb, now, nextId, MINUTE, DAY } from './db'
+import { ensureUserAdmin, currentPrototypeUser, simulateSignIn } from './user-admin'
 
 export const RECOVERY_MESSAGE = '如果该邮箱可以接收账号邮件，我们会发送操作链接，请检查收件箱。'
 const error = (status, message) => { throw Object.assign(new Error(message), { status }) }
 const emitSession = () => queueMicrotask(() => window.dispatchEvent(new Event('finns-account-session')))
 export function ensureAccount(d = getDb()) {
+  ensureUserAdmin(d)
   d.account ||= { links: [], mail: [], sent: {}, devices: {}, failSend: false, failSave: false, wrongOld: false, failNotice: false }
   for (const u of d.users) {
     if (u.legacy === undefined) u.legacy = true
@@ -20,7 +22,7 @@ export function accountView(u) {
   return { id: u.id, email: u.email, displayName: u.displayName, role: u.role, roleLabel: role?.label, permissions: [...(d.permissions[u.role] || [])], emailVerified: u.emailVerified, legacy: u.legacy }
 }
 function user() {
-  const d = getDb(), u = d.users.find(u => u.id === d.session.userId)
+  const d = getDb(), u = currentPrototypeUser()
   if (!u) error(401, '登录已失效，请重新登录。未提交的内容仍留在当前页面。')
   if (!u.legacy && !u.emailVerified) error(403, '请先完成邮箱验证。')
   return u
@@ -64,7 +66,8 @@ function updatePassword(u, isReset) {
   if (a.failSave) { a.failSave = false; error(503, '暂时无法保存，请重试。原密码未改变。') }
   a.links.filter(l => l.userId === u.id && l.purpose === 'reset').forEach(l => { l.revoked = true })
   a.devices[u.id].forEach(device => { if (isReset || !device.current) device.active = false })
-  if (isReset) d.session.userId = null
+  u.sessionEpoch += 1
+  if (d.session.userId === u.id) { if (isReset) d.session.userId = null; else d.session.epoch = u.sessionEpoch }
   u.passwordChangedAt = now() // 只存模拟事件，不保存/散列/传出输入密码
   if (!a.failNotice) a.mail.unshift({ id: nextId(), email: u.email, title: '你的 FINNS 密码已更新', body: '如果这不是你的操作，请立即通过找回密码恢复账号。本邮件不含密码或恢复凭据。', at: now() })
   emitSession()
@@ -77,9 +80,10 @@ export function handleAccount(method, path, body, params) {
   if (method === 'GET' && path === '/api/auth/me') data = accountView(user())
   else if (method === 'POST' && path === '/api/auth/login') {
     const u = d.users.find(u => u.email.toLowerCase() === String(body.email || '').trim().toLowerCase())
-    if (!u || !body.password) error(401, '邮箱或密码不正确。')
+    if (!u || !body.password || a.wrongLogin) error(401, '邮箱或密码不正确。')
+    if (u.accountStatus === 'DISABLED') error(403, '账号已停用，请联系站点管理员')
     if (!u.legacy && !u.emailVerified) error(403, '请先验证邮箱，再返回登录。')
-    d.session.userId = u.id
+    simulateSignIn(u.id)
     a.devices[u.id].find(device => device.current).active = true
     data = accountView(u); emitSession()
   } else if (method === 'POST' && path === '/api/auth/signup-link') {
