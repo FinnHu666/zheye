@@ -973,10 +973,24 @@
         },
         {
           "id": "G9",
-          "status": "pending",
-          "next_action": "可选补测QQ/163/Outlook；推送/合并待用户决定；通过后可将G9置pass",
-          "user_action": "决定是否推送/合并 release/0.7.0；可选补测其他邮箱",
-          "reason": "已发布；Git已本地提交（未推送）；Plane已Done（P04回读通过）；真实邮件仅验证Gmail，QQ/163/Outlook待补"
+          "status": "pass",
+          "next_action": "可选：补测QQ/163/Outlook",
+          "user_action": "无需操作；可选：补测其他邮箱",
+          "reason": "交接收尾完成：随FINNS-16一并发布，发布记录/部署手册/回读后的Plane Done（P04）与交接已落盘；真实邮件送达仅验证了Gmail，QQ/163/Outlook及垃圾箱/SPF/DKIM/DMARC判定仍未验证，已列为发布后待办（用户此前延后）",
+          "evidence": [
+            {
+              "path": "docs/RELEASE_0.7.0.md",
+              "sha256": "fab7a7a87076e86e7ceb442729ec76cf1a1bc232216628c099f97e033b0f23b0"
+            },
+            {
+              "path": "docs/requirements/FOUNDATION_USER_ADMIN_PLANE_P04_RECEIPT.json",
+              "sha256": "50344131f9f4a62441bae2c9cef44d919ddec1225bfa15c84936b196643cc70b"
+            },
+            {
+              "path": "docs/iterations/0.7.0/IMPLEMENTATION_USER_ADMIN.md",
+              "sha256": "9a3aeae8049b89650afc8264971d5d5d72671dfb9b5c381313465d79a60ed266"
+            }
+          ]
         }
       ],
       "plane_parent_identifier": "FINNS-14",
@@ -1867,10 +1881,24 @@
         },
         {
           "id": "G9",
-          "status": "pending",
-          "next_action": "可选补测QQ/163/Outlook；推送/合并待用户决定；通过后可将G9置pass",
-          "user_action": "决定是否推送/合并 release/0.7.0；可选补测其他邮箱",
-          "reason": "已发布；Git已本地提交（未推送）；Plane已Done（P04回读通过）；真实邮件仅验证Gmail，QQ/163/Outlook待补"
+          "status": "pass",
+          "next_action": "无；后续事项见交接",
+          "user_action": "无需操作；可选：决定是否推送/合并 release/0.7.0",
+          "reason": "交接收尾完成：发布记录与部署手册、实施/验证/验收记录、决定D12–D15、Plane P03/P04（FINNS-16 Done，回读通过）、交接与进度均已落盘，下一位AI不读聊天可继续；Git已本地提交（未推送）。遗留的后续事项不属于本项范围：推送/合并分支、补测QQ/163/Outlook、停用演示账户",
+          "evidence": [
+            {
+              "path": "docs/RELEASE_0.7.0.md",
+              "sha256": "fab7a7a87076e86e7ceb442729ec76cf1a1bc232216628c099f97e033b0f23b0"
+            },
+            {
+              "path": "docs/requirements/FOUNDATION_USER_ADMIN_PLANE_P04_RECEIPT.json",
+              "sha256": "50344131f9f4a62441bae2c9cef44d919ddec1225bfa15c84936b196643cc70b"
+            },
+            {
+              "path": "docs/iterations/0.7.0/IMPLEMENTATION_USER_ADMIN.md",
+              "sha256": "9a3aeae8049b89650afc8264971d5d5d72671dfb9b5c381313465d79a60ed266"
+            }
+          ]
         }
       ],
       "plane_parent_identifier": "FINNS-14",
