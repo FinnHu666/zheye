@@ -11,6 +11,10 @@ spring:
     open-in-view: false
   flyway:
     enabled: false
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 3MB
   web:
     resources:
       cache:

@@ -11,8 +11,8 @@ public class SiteStatsController {
     private static final String STATS_SQL = """
             select
               (select count(*) from user_accounts) as creator_count,
-              (select count(*) from content_posts) as content_count,
-              (select count(*) from community_collections c join collection_publications p on p.collection_id=c.id where c.status='PUBLISHED' and p.visibility='PUBLIC') as collection_count
+              (select count(*) from content_posts where moderation_state='VISIBLE') as content_count,
+              (select count(*) from community_collections c join collection_publications p on p.collection_id=c.id where c.status='PUBLISHED' and c.moderation_state='VISIBLE' and p.visibility='PUBLIC') as collection_count
             """;
 
     private final JdbcTemplate jdbc;

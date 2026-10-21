@@ -40,7 +40,7 @@ class CollectionImportTests {
         return (ObjectNode)write(post("/api/me/collection-imports/commit"),session,Map.of("idempotencyKey",UUID.randomUUID().toString(),"document",parsed.get("document")),201);
     }
     ObjectNode current(MockHttpSession session,long id)throws Exception {return (ObjectNode)json.readTree(mvc.perform(get("/api/me/collections/"+id+"/draft").session(session)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8));}
-    void publish(MockHttpSession session,JsonNode doc)throws Exception {write(post("/api/me/collections/"+doc.get("id").asLong()+"/publish"),session,Map.of("revision",doc.get("revision").asLong()),200);}
+    void publish(MockHttpSession session,JsonNode doc)throws Exception {TestReviewConfig.preapprove(jdbc, doc.get("id").asLong());write(post("/api/me/collections/"+doc.get("id").asLong()+"/publish"),session,Map.of("revision",doc.get("revision").asLong()),200);}
 
     @Test void parsesFourScenariosAndPreservesLongTextWithoutTruncation() throws Exception {
         MockHttpSession session=user();

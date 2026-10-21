@@ -8,6 +8,7 @@ import { publicationIssues } from '../lib/collectionDraft'
 import CollectionOutlineEditor from '../components/CollectionOutlineEditor.vue'
 import ReauthPanel from '../components/ReauthPanel.vue'
 import { useSessionGuard } from '../lib/sessionGuard'
+import { submitNotice, outcomeNotice } from '../lib/reviewText'
 const route = useRoute(), router = useRouter()
 const guard = useSessionGuard() // 登录失效时保留编辑内容并就地重新登录
 const draft = ref(null), posts = ref([]), loading = ref(true), saving = ref(false), error = ref(''), saveState = ref(''), operation = ref(false)
@@ -54,11 +55,12 @@ const transition = async action => {
   operation.value = true
   try {
     if (!await save()) return
-    const result = await api(`/api/me/collections/${draft.value.id}/${action}`, { method: 'POST', body: JSON.stringify({ revision: draft.value.revision }) })
+    const result = await api(`/api/me/collections/${draft.value.id}/${action}`, { method: 'POST', body: JSON.stringify({ revision: draft.value.revision, ...(action === 'publish' ? { requestId: globalThis.crypto?.randomUUID?.() ?? String(Date.now()) } : {}) }) })
+    if (result?.outcome === 'PENDING' || result?.outcome === 'AUTO_REJECTED') { saveState.value = outcomeNotice(result); attemptedPublish.value = false; return }
     acknowledging = true; draft.value.revision = result.revision; draft.value.status = result.status; draft.value.publishedAt = result.publishedAt; draft.value.publishedVisibility = result.publishedVisibility; acknowledging = false
     saveState.value = action === 'publish' ? '已更新公开版本' : '已归档'
     attemptedPublish.value = false
-  } catch (e) { error.value = e.message; guard.handle(e) } finally { operation.value = false }
+  } catch (e) { error.value = submitNotice(e); guard.handle(e) } finally { operation.value = false }
 }
 const copyContent = async () => { try { await navigator.clipboard.writeText([draft.value.name, ...draft.value.sections.flatMap(s => [s.title, ...s.entries.map(e => `${e.title || ''}\n${e.body || e.externalUrl || e.postTitle || ''}\n${e.annotation || ''}`)])].join('\n\n')); saveState.value = '已复制当前内容，可保留后再处理版本冲突' } catch { error.value = '无法访问剪贴板，请直接选择并复制编辑区内容' } }
 onBeforeRouteLeave(async () => !queue.dirty || await save() || window.confirm('保存未成功。确认离开会丢失未保存的修改，请先复制内容。'))

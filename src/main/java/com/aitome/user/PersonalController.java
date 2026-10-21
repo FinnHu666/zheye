@@ -82,7 +82,7 @@ public class PersonalController {
         UserAccount user = currentUser(session);
         CommunityCollection selectedCollection = collections.findById(collectionId).orElseThrow(() -> new ApiProblem(HttpStatus.NOT_FOUND, "专题不存在"));
         // 受限专题对无权限者表现为不存在，避免泄漏
-        if (selectedCollection.getStatus() != CommunityCollection.Status.PUBLISHED || jdbc.queryForObject("select count(*) from collection_publications where collection_id=? and (visibility='PUBLIC' or ?)",Integer.class,collectionId,canReadRestricted(session))==0) throw new ApiProblem(HttpStatus.NOT_FOUND, "专题不存在");
+        if (selectedCollection.getStatus() != CommunityCollection.Status.PUBLISHED || jdbc.queryForObject("select count(*) from collection_publications p join community_collections c on c.id=p.collection_id where p.collection_id=? and c.moderation_state='VISIBLE' and (p.visibility='PUBLIC' or ?)",Integer.class,collectionId,canReadRestricted(session))==0) throw new ApiProblem(HttpStatus.NOT_FOUND, "专题不存在");
         long version = lockPreference(user.getId());
         Integer exists = jdbc.queryForObject("select count(*) from user_collection_selections where user_id=? and collection_id=?", Integer.class, user.getId(), collectionId);
         if (exists == null || exists == 0) {
@@ -204,7 +204,7 @@ public class PersonalController {
         long version;
         try { version = jdbc.queryForObject("select version from user_collection_preferences where user_id=?", Long.class, userId); }
         catch (EmptyResultDataAccessException missing) { version = 0; }
-        List<SelectedCollection> rows = jdbc.query("select c.id,p.name,p.description,p.owner_name,c.created_at,p.updated_at,s.sort_order,p.item_count as post_count from user_collection_selections s join community_collections c on c.id=s.collection_id join collection_publications p on p.collection_id=c.id where s.user_id=? and c.status='PUBLISHED' and (p.visibility='PUBLIC' or ?) order by s.sort_order", (rs, row) ->
+        List<SelectedCollection> rows = jdbc.query("select c.id,p.name,p.description,p.owner_name,c.created_at,p.updated_at,s.sort_order,p.item_count as post_count from user_collection_selections s join community_collections c on c.id=s.collection_id join collection_publications p on p.collection_id=c.id where s.user_id=? and c.status='PUBLISHED' and c.moderation_state='VISIBLE' and (p.visibility='PUBLIC' or ?) order by s.sort_order", (rs, row) ->
                 new SelectedCollection(rs.getLong("id"), rs.getString("name"), rs.getString("description"), rs.getString("owner_name"), rs.getInt("post_count"), rs.getInt("sort_order")), userId, canReadRestricted(userId));
         return new SelectionView(version, rows);
     }

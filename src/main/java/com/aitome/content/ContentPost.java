@@ -20,6 +20,8 @@ public class ContentPost {
     @Column(nullable = false) private Instant createdAt = Instant.now();
     @Column(nullable = false) private int likes;
 
+    @Column(name = "moderation_state", nullable = false, length = 10, columnDefinition = "varchar(10) default 'VISIBLE' not null") private String moderationState = "VISIBLE";
+    @Column(name = "review_submission_id") private Long reviewSubmissionId;
     protected ContentPost() {}
     public ContentPost(Type type, String title, String summary, String body, Long authorId, String authorName) {
         this.type=type; this.title=title; this.summary=summary; this.body=body; this.authorId=authorId; this.authorName=authorName;
@@ -28,4 +30,5 @@ public class ContentPost {
     public String getSummary(){return summary;} public String getBody(){return body;} public Long getAuthorId(){return authorId;}
     public String getAuthorName(){return authorName;} public Instant getCreatedAt(){return createdAt;} public int getLikes(){return likes;}
     public void like(){likes++;}
+    @com.fasterxml.jackson.annotation.JsonIgnore public String getModerationState(){return moderationState;}
 }

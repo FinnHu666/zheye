@@ -55,7 +55,7 @@ class RestrictedContentTests {
         mvc.perform(get("/api/collections/" + id).session(member.session())).andExpect(status().isForbidden());
         mvc.perform(get("/api/collections/" + id + "/posts").session(member.session())).andExpect(status().isForbidden());
 
-        long statsPublic = jdbc.queryForObject("select count(*) from community_collections c join collection_publications p on p.collection_id=c.id where c.status='PUBLISHED' and p.visibility='PUBLIC'", Long.class);
+        long statsPublic = jdbc.queryForObject("select count(*) from community_collections c join collection_publications p on p.collection_id=c.id where c.status='PUBLISHED' and c.moderation_state='VISIBLE' and p.visibility='PUBLIC'", Long.class);
         mvc.perform(get("/api/stats").session(trusted.session())).andExpect(jsonPath("$.collectionCount").value(statsPublic));
 
         JsonNode selections = json.readTree(mvc.perform(get("/api/me/collections/selected").session(member.session())).andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8));
@@ -126,6 +126,7 @@ class RestrictedContentTests {
 
     private void publish(MockHttpSession session, long id) throws Exception {
         long revision = draft(session, id).path("revision").asLong();
+        TestReviewConfig.preapprove(jdbc, id);
         mvc.perform(t.write(post("/api/me/collections/" + id + "/publish"), session, Map.of("revision", revision))).andExpect(status().isOk());
     }
 

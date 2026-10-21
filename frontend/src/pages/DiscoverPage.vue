@@ -5,6 +5,7 @@ import { api, dateLabel } from '../lib/api'
 import { latestVisitTotal } from '../lib/siteVisit'
 import { can } from '../lib/session'
 import { useSessionGuard } from '../lib/sessionGuard'
+import { submitNotice, outcomeNotice } from '../lib/reviewText'
 import ReauthPanel from '../components/ReauthPanel.vue'
 const emit = defineEmits(['write', 'toast'])
 const props = defineProps({ user: { type: Object, default: null } })
@@ -127,6 +128,8 @@ const retryComments = () => loadComments(commentsPage.value < 0)
 const loadMoreComments = () => { if (hasMoreComments.value) loadComments() }
 const addToCollection = async () => { if (!selectedCollectionId.value || !detail.value) return; try { const result = await api(`/api/me/collections/${selectedCollectionId.value}/posts/${detail.value.id}`, { method: 'PUT' }); collectionMessage.value = `已加入「${result.name}」`; emit('toast', collectionMessage.value) } catch (error) { collectionMessage.value = error.message } }
 const like = async () => { const postId = detail.value?.id; if (!postId) return; const updated = await api(`/api/posts/${postId}/like`, { method: 'POST' }); if (detail.value?.id !== postId) return; detail.value = updated; const index = posts.value.findIndex(p => p.id === postId); if (index >= 0) posts.value[index] = { ...posts.value[index], likes: updated.likes } }
+const newCommentKey = () => (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`)
+let commentKey = newCommentKey()
 const comment = async () => {
   const postId = detail.value?.id
   if (!commentBody.value.trim() || !postId || commentSending.value) return
@@ -136,14 +139,16 @@ const comment = async () => {
   }
   commentSending.value = true
   try {
-    const created = await api(`/api/posts/${postId}/comments`, { method: 'POST', body: JSON.stringify({ body: commentBody.value }) })
+    const created = await api(`/api/posts/${postId}/comments`, { method: 'POST', body: JSON.stringify({ body: commentBody.value, draftKey: commentKey, requestId: newCommentKey() }) })
+    commentKey = newCommentKey()
+    if (created?.outcome === 'PENDING' || created?.outcome === 'AUTO_REJECTED') { emit('toast', outcomeNotice(created)); commentBody.value = ''; return }
     if (detail.value?.id === postId) {
       comments.value = sortComments([...new Map([...comments.value, created].map(item => [item.id, item])).values()])
       commentsTotal.value += 1
       commentBody.value = ''
     }
   } catch (error) {
-    if (!commentGuard.value?.handle(error)) emit('toast', error.message) // 401 时评论留在输入框并出现重新登录面板
+    if (!commentGuard.value?.handle(error)) emit('toast', submitNotice(error)) // 401 时评论留在输入框并出现重新登录面板
   } finally { commentSending.value = false }
 }
 onMounted(() => { loadPosts(true); loadStats() })

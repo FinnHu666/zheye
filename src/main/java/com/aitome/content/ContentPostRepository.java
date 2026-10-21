@@ -7,11 +7,11 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 public interface ContentPostRepository extends JpaRepository<ContentPost,Long>{
     @Query("select new com.aitome.content.ContentPostSummary(p.id, p.type, p.title, p.summary, p.authorName, p.createdAt, p.likes) " +
-            "from ContentPost p order by p.createdAt desc, p.id desc")
+            "from ContentPost p where p.moderationState = 'VISIBLE' order by p.createdAt desc, p.id desc")
     Page<ContentPostSummary> findAllSummaries(Pageable pageable);
 
     @Query("select new com.aitome.content.ContentPostSummary(p.id, p.type, p.title, p.summary, p.authorName, p.createdAt, p.likes) " +
-            "from ContentPost p where p.type = :type order by p.createdAt desc, p.id desc")
+            "from ContentPost p where p.type = :type and p.moderationState = 'VISIBLE' order by p.createdAt desc, p.id desc")
     Page<ContentPostSummary> findSummariesByType(@Param("type") ContentPost.Type type, Pageable pageable);
 
     @Query("select new com.aitome.content.ContentPostSummary(p.id, p.type, p.title, p.summary, p.authorName, p.createdAt, p.likes) " +

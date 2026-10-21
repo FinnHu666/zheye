@@ -34,7 +34,7 @@ public class AccessBootstrap {
             new SeedRole("TRUSTED", "受信成员", "可阅读内部受限专题", null, 30,
                     List.of(Permission.CONTENT_PUBLIC, Permission.PROFILE_MANAGE, Permission.SELECTION_MANAGE, Permission.POST_CREATE,
                             Permission.POST_INTERACT, Permission.COLLECTION_MANAGE, Permission.AI_USE, Permission.CONTENT_RESTRICTED)),
-            new SeedRole("ADMIN", "管理员", "管理用户、角色与权限", Role.KIND_ADMIN, 1000, Arrays.asList(Permission.values())));
+            new SeedRole("ADMIN", "管理员", "管理用户、角色与权限", Role.KIND_ADMIN, 1000, Arrays.stream(Permission.values()).filter(p -> p != Permission.CONTENT_REVIEW).toList()));
 
     private final JdbcTemplate jdbc;
     private final TransactionTemplate tx;

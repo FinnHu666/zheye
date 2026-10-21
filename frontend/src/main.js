@@ -9,9 +9,7 @@ import PersonalPage from './pages/PersonalPage.vue'
 import AccountFlowPage from './pages/AccountFlowPage.vue'
 import AccountSecurityPage from './pages/AccountSecurityPage.vue'
 import AiSettingsPage from './pages/AiSettingsPage.vue'
-import MyPostsPage from './pages/MyPostsPage.vue'
-import MyCollectionsPage from './pages/MyCollectionsPage.vue'
-import SelectedCollectionsPage from './pages/SelectedCollectionsPage.vue'
+import MyContentPage from './pages/MyContentPage.vue'
 import CollectionDetailPage from './pages/CollectionDetailPage.vue'
 import CollectionImportPage from './pages/CollectionImportPage.vue'
 import CollectionNewPage from './pages/CollectionNewPage.vue'
@@ -20,10 +18,14 @@ import TopicBuilderPage from './pages/TopicBuilderPage.vue'
 import AdminUsersPage from './pages/admin/AdminUsersPage.vue'
 import AdminRolesPage from './pages/admin/AdminRolesPage.vue'
 import AdminAuditPage from './pages/admin/AdminAuditPage.vue'
+import AdminReviewsPage from './pages/admin/AdminReviewsPage.vue'
+import AdminReviewDetailPage from './pages/admin/AdminReviewDetailPage.vue'
+import AdminRulesPage from './pages/admin/AdminRulesPage.vue'
 import { refreshSession } from './lib/session'
 import './assets/styles.css'
 import './assets/account.css'
 import './assets/admin.css'
+import './assets/review.css'
 
 // meta.perm：页面所需权限（FINNS-11）。无权限时 App 保留地址显示 403；接口另由服务端检查。
 const own = { requiresAuth: true, perm: 'collection.manage' }
@@ -40,8 +42,8 @@ const router = createRouter({
     { path: '/me', component: PersonalPage, meta: { requiresAuth: true } },
     { path: '/me/security', component: AccountSecurityPage, meta: { requiresAuth: true } },
     { path: '/me/ai-settings', component: AiSettingsPage, meta: { requiresAuth: true, perm: 'ai.use' } },
-    { path: '/me/posts', component: MyPostsPage, meta: { requiresAuth: true } },
-    { path: '/me/collections', component: MyCollectionsPage, meta: own },
+    { path: '/me/posts', component: MyContentPage, meta: { requiresAuth: true } },
+    { path: '/me/collections', redirect: { path: '/me/posts', query: { type: 'COLLECTION' } } },
     { path: '/me/collections/ai/new', component: TopicBuilderPage, meta: { ...own, perm: 'ai.use' } },
     { path: '/me/collections/:id(\\d+)/builder', component: TopicBuilderPage, meta: { ...own, perm: 'ai.use' } },
     { path: '/me/collections/:id(\\d+)/builder/preview', component: TopicBuilderPage, meta: { ...own, perm: 'ai.use', builderPreview: true } },
@@ -49,10 +51,15 @@ const router = createRouter({
     { path: '/me/collections/:id(\\d+)/preview', component: CollectionDetailPage, meta: { ...own, privatePreview: true } },
     { path: '/me/collections/new', component: CollectionNewPage, meta: own },
     { path: '/me/collections/:id(\\d+)/edit', component: CollectionEditorPage, meta: own },
-    { path: '/my/collections', component: SelectedCollectionsPage, meta: { requiresAuth: true, perm: 'selection.manage' } },
+    { path: '/my/collections', redirect: { path: '/me/posts', query: { type: 'SELECTED' } } },
     { path: '/admin', redirect: '/admin/users' },
     { path: '/admin/users', component: AdminUsersPage, meta: admin },
     { path: '/admin/roles', component: AdminRolesPage, meta: admin },
+    { path: '/admin/reviews', component: AdminReviewsPage, meta: { requiresAuth: true, perm: 'content.review' } },
+    { path: '/admin/reviews/tasks/:id(\\d+)', component: AdminReviewDetailPage, meta: { requiresAuth: true, perm: 'content.review', reviewMode: 'TASK' } },
+    { path: '/admin/reviews/publications/:type(ARTICLE|COMMENT|COLLECTION)/:id(\\d+)', component: AdminReviewDetailPage, meta: { requiresAuth: true, perm: 'content.review', reviewMode: 'PUBLICATION' } },
+    { path: '/admin/sensitive-rules', component: AdminRulesPage, meta: { requiresAuth: true, ownerOnly: true } },
+    { path: '/me/reviews', redirect: '/me/posts' },
     { path: '/admin/audit', component: AdminAuditPage, meta: { requiresAuth: true, perm: 'admin.audit' } },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],

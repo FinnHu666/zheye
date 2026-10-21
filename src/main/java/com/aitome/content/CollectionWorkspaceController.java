@@ -5,6 +5,8 @@ import com.aitome.access.RequirePermission;
 import com.aitome.access.PublicEndpoint;
 import com.aitome.access.AccessService;
 import com.aitome.common.ApiExceptionHandler.ApiProblem;
+import com.aitome.review.ReviewService;
+import com.aitome.review.ReviewService.SubmitResult;
 import com.aitome.user.AuthController;
 import com.aitome.user.UserAccount;
 import com.aitome.user.UserRepository;
@@ -14,6 +16,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -37,9 +40,11 @@ public class CollectionWorkspaceController {
     private final JdbcTemplate jdbc;
     private final CollectionPublicationService publications;
     private final AccessService access;
+    private final ReviewService review;
 
-    public CollectionWorkspaceController(CollectionRepository collections, ContentPostRepository posts, UserRepository users, JdbcTemplate jdbc, CollectionPublicationService publications, AccessService access) {
+    public CollectionWorkspaceController(CollectionRepository collections, ContentPostRepository posts, UserRepository users, JdbcTemplate jdbc, CollectionPublicationService publications, AccessService access, ReviewService review) {
         this.access = access;
+        this.review = review;
         this.collections = collections;
         this.posts = posts;
         this.users = users;
@@ -111,7 +116,7 @@ public class CollectionWorkspaceController {
 
     @PostMapping("/api/me/collections/{id}/publish")
     @Transactional
-    public DraftDocument publish(@PathVariable long id, @Valid @RequestBody VersionRequest request, HttpSession session) {
+    public ResponseEntity<Object> publish(@PathVariable long id, @Valid @RequestBody PublishRequest request, HttpSession session) {
         UserAccount user = currentUser(session);
         OwnedCollection row = owned(id, user.getId());
         jdbc.queryForObject("select id from community_collections where id=? for update", Long.class, id);
@@ -124,11 +129,17 @@ public class CollectionWorkspaceController {
         Integer entryCount = jdbc.queryForObject("select count(*) from collection_entries where collection_id=?", Integer.class, id);
         if (sectionCount == null || sectionCount == 0 || entryCount == null || entryCount == 0)
             throw new ApiProblem(HttpStatus.BAD_REQUEST, "发布前至少需要一个章节和一个有效条目");
+        Long currentRevision = jdbc.queryForObject("select revision from community_collections where id=?", Long.class, id);
+        if (currentRevision == null || currentRevision != request.revision()) throw new ApiProblem(HttpStatus.CONFLICT, "专题版本已变化，请刷新后重试（当前版本 " + currentRevision + "）");
+        // 敏感检测与首次审批（FINNS-17）：只有“已发布”时才执行下面的原有发布流程；转人工时发布稿保持原样
+        SubmitResult result = review.submitCollection(user.getId(), user.getDisplayName(), id, request.requestId(), publications.capture(id), visibilityOf(id), request.revision());
+        if ("PUBLISHED".equals(result.outcome()) && result.replay()) return ResponseEntity.ok(draft(id, user.getId()));
+        if (!"PUBLISHED".equals(result.outcome())) return ContentController.respond(result, () -> null, HttpStatus.OK);
         int updated = jdbc.update("update community_collections set status='PUBLISHED',published_at=current_timestamp,updated_at=current_timestamp,revision=revision+1 where id=? and owner_id=? and revision=?",
                 id, user.getId(), request.revision());
         if (updated == 0) throw new ApiProblem(HttpStatus.CONFLICT, "专题版本已变化，请刷新后重试（当前版本 " + row.revision() + "）");
         publications.publishSnapshot(id);
-        return draft(id, user.getId());
+        return ResponseEntity.ok(draft(id, user.getId()));
     }
 
     @PostMapping("/api/me/collections/{id}/archive")
@@ -140,6 +151,7 @@ public class CollectionWorkspaceController {
                 id, user.getId(), request.revision());
         if (updated == 0) throw new ApiProblem(HttpStatus.CONFLICT, "专题版本已变化，请刷新后重试（当前版本 " + row.revision() + "）");
         jdbc.update("delete from user_collection_selections where collection_id=?", id);
+        review.collectionWithdrawn(id, user.getId(), user.getDisplayName());
         return draft(id, user.getId());
     }
 
@@ -329,6 +341,7 @@ public class CollectionWorkspaceController {
                              @Size(max = 1000) String annotation, @Size(max = 4000) String body,
                              Long postId, @Size(max = 2000) String externalUrl) {}
     public record VersionRequest(long revision) {}
+    public record PublishRequest(long revision, @Size(max = 64) String requestId) {}
     private record OwnedCollection(long id, String name, String description, Long ownerId, String ownerName,
                                    CommunityCollection.Format format, CommunityCollection.Status status, String audience,
                                    String goal, long revision, Instant updatedAt, Instant publishedAt) {}

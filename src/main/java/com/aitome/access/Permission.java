@@ -18,7 +18,9 @@ public enum Permission {
     CONTENT_RESTRICTED("content.restricted", "内容", "阅读受限专题", "列表、总数、详情、直达、自选", false, false, false),
     ADMIN_USERS("admin.users", "管理", "用户与角色分配", "查看用户、调整用户角色", false, true, false),
     ADMIN_AUDIT("admin.audit", "管理", "查看操作记录", "筛选、查询角色与权限变更", false, true, false),
-    ADMIN_ROLES("admin.roles", "管理", "管理角色", "修改权限，新增、改名、删除角色", false, true, false);
+    ADMIN_ROLES("admin.roles", "管理", "管理角色", "修改权限，新增、改名、删除角色", false, true, false),
+    /** FINNS-17：独立于用户管理的内容审批权限；默认仅站长拥有，其他角色手动授予。 */
+    CONTENT_REVIEW("content.review", "管理", "内容审批", "审批待审内容、下架与恢复；不含敏感规则维护", false, false, false);
 
     private final String code, group, label, detail;
     private final boolean lockAll, lockAdmin, guest;

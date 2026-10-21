@@ -35,10 +35,14 @@ public class CollectionPublicationService {
 
     /** Caller owns the transaction and has locked the collection. */
     public void publishSnapshot(long id) {
-        PublicOutline outline = capture(id);
+        String visibility = jdbc.queryForObject("select visibility from community_collections where id=?", String.class, id);
+        publishFrozen(id, capture(id), visibility);
+    }
+
+    /** 发布已冻结的快照（FINNS-17 审批通过时使用）：不读取当前工作稿。 */
+    public void publishFrozen(long id, PublicOutline outline, String visibility) {
         try {
             jdbc.update("delete from collection_publications where collection_id=?", id);
-            String visibility = jdbc.queryForObject("select visibility from community_collections where id=?", String.class, id);
             jdbc.update("insert into collection_publications(collection_id,name,description,owner_name,item_count,schema_version,document,updated_at,visibility) values(?,?,?,?,?,1,?,?,?)",
                 id, outline.collection().name(), outline.collection().description(), outline.collection().ownerName(),
                 outline.sections().stream().mapToInt(s -> s.entries().size()).sum(), json.writeValueAsString(outline), java.sql.Timestamp.from(outline.collection().updatedAt()), visibility);
@@ -47,7 +51,7 @@ public class CollectionPublicationService {
 
     /** 读取公开版本；受限专题对无权限者拒绝（未登录 401，已登录 403）。 */
     public PublicOutline read(long id, AccessContext viewer) {
-        List<String[]> rows = jdbc.query("select p.document,p.visibility from collection_publications p join community_collections c on c.id=p.collection_id where c.id=? and c.status='PUBLISHED'",
+        List<String[]> rows = jdbc.query("select p.document,p.visibility from collection_publications p join community_collections c on c.id=p.collection_id where c.id=? and c.status='PUBLISHED' and c.moderation_state='VISIBLE'",
                 (rs, n) -> new String[]{rs.getString(1), rs.getString(2)}, id);
         if (rows.isEmpty()) throw new ApiProblem(HttpStatus.NOT_FOUND, "专题不存在");
         if ("RESTRICTED".equals(rows.get(0)[1]) && !viewer.has(Permission.CONTENT_RESTRICTED)) {
@@ -63,7 +67,7 @@ public class CollectionPublicationService {
             Set<Long> available = new HashSet<>();
             if (!refs.isEmpty()) {
                 String placeholders = String.join(",", Collections.nCopies(refs.size(), "?"));
-                available.addAll(jdbc.query("select id from content_posts where id in (" + placeholders + ")", (rs,n) -> rs.getLong(1), refs.toArray()));
+                available.addAll(jdbc.query("select id from content_posts where moderation_state='VISIBLE' and id in (" + placeholders + ")", (rs,n) -> rs.getLong(1), refs.toArray()));
             }
             return new PublicOutline(outline.collection(), outline.sections().stream().map(s -> new PublicSection(s.id(), s.title(), s.description(), s.sortOrder(),
                 s.entries().stream().map(e -> e.kind() == CollectionEntry.Kind.POST && !available.contains(e.postId())

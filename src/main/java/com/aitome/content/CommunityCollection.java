@@ -26,6 +26,7 @@ public class CommunityCollection {
     private Instant publishedAt;
     /** 工作稿中的可见范围（PUBLIC/RESTRICTED），发布时复制到公开版本（FINNS-11）。 */
     @Column(nullable=false,length=12) private String visibility="PUBLIC";
+    @Column(name = "moderation_state", nullable = false, length = 10, columnDefinition = "varchar(10) default 'VISIBLE' not null") private String moderationState = "VISIBLE";
     protected CommunityCollection(){}
     public CommunityCollection(String name,String description,String ownerName,int itemCount){this(name,description,ownerName,itemCount,null);}
     public CommunityCollection(String name,String description,String ownerName,int itemCount,Long ownerId){this.name=name;this.description=description;this.ownerName=ownerName;this.itemCount=itemCount;this.ownerId=ownerId;}

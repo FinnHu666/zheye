@@ -5,6 +5,8 @@ import com.aitome.access.RequirePermission;
 import com.aitome.access.PublicEndpoint;
 import com.aitome.access.AccessService;
 import com.aitome.common.ApiExceptionHandler.ApiProblem;
+import com.aitome.review.ReviewService;
+import com.aitome.review.ReviewService.SubmitResult;
 import com.aitome.user.AuthController;
 import com.aitome.user.UserAccount;
 import com.aitome.user.UserRepository;
@@ -15,11 +17,14 @@ import jakarta.validation.constraints.Size;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -31,9 +36,10 @@ public class ContentController {
     private final JdbcTemplate jdbc;
     private final CollectionPublicationService publications;
     private final AccessService access;
+    private final ReviewService review;
 
-    public ContentController(ContentPostRepository posts, CommentRepository comments, CollectionRepository collections, UserRepository users, JdbcTemplate jdbc, CollectionPublicationService publications, AccessService access) {
-        this.posts = posts; this.comments = comments; this.collections = collections; this.users = users; this.jdbc = jdbc; this.publications = publications; this.access = access;
+    public ContentController(ContentPostRepository posts, CommentRepository comments, CollectionRepository collections, UserRepository users, JdbcTemplate jdbc, CollectionPublicationService publications, AccessService access, ReviewService review) {
+        this.posts = posts; this.comments = comments; this.collections = collections; this.users = users; this.jdbc = jdbc; this.publications = publications; this.access = access; this.review = review;
     }
 
     @GetMapping("/posts") @PublicEndpoint("公开内容") 
@@ -52,10 +58,25 @@ public class ContentController {
 
     @GetMapping("/posts/{id}") @PublicEndpoint("公开内容") public ContentPost post(@PathVariable Long id) { return requirePost(id); }
 
-    @PostMapping("/posts") @ResponseStatus(HttpStatus.CREATED) @RequirePermission(Permission.POST_CREATE)
-    public ContentPost create(@Valid @RequestBody PostRequest request, HttpSession session) {
+    @PostMapping("/posts") @RequirePermission(Permission.POST_CREATE)
+    public ResponseEntity<Object> create(@Valid @RequestBody PostRequest request, HttpSession session) {
         UserAccount user = AuthController.requireUser(session, users);
-        return posts.save(new ContentPost(request.type(), request.title(), request.summary(), request.body(), user.getId(), user.getDisplayName()));
+        // 普通话题是否纳入审核由 F02 另行评审，保持直接发布；文章经敏感检测（FINNS-17）
+        if (request.type() == ContentPost.Type.TOPIC)
+            return ResponseEntity.status(HttpStatus.CREATED).body(posts.save(new ContentPost(request.type(), request.title(), request.summary(), request.body(), user.getId(), user.getDisplayName())));
+        SubmitResult result = review.submitArticle(user.getId(), user.getDisplayName(), request.draftKey(), request.requestId(), request.title(), request.summary(), request.body());
+        return respond(result, () -> posts.findById(result.targetId()).orElseThrow(() -> new ApiProblem(HttpStatus.NOT_FOUND, "内容不存在")), HttpStatus.CREATED);
+    }
+
+    /** 把提交结果转成响应：已发布 → 原有成功响应；送审/自动不通过 → 202（outcome 区分）。不抛异常，避免回滚流转记录。 */
+    public static ResponseEntity<Object> respond(SubmitResult result, java.util.function.Supplier<Object> published, HttpStatus successStatus) {
+        if ("PUBLISHED".equals(result.outcome())) return ResponseEntity.status(successStatus).body(published.get());
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("status", 202);
+        body.put("message", result.message());
+        body.put("outcome", result.outcome());
+        body.put("flowId", result.flowId());
+        return ResponseEntity.accepted().body(body);
     }
 
     @PostMapping("/posts/{id}/like") @Transactional @RequirePermission(Permission.POST_INTERACT)
@@ -68,15 +89,16 @@ public class ContentController {
         requirePost(id);
         int safePage = Math.max(0, Math.min(page, 10_000));
         int safeSize = Math.max(1, Math.min(size, 50));
-        List<Comment> items = comments.findByPostIdOrderByCreatedAtAscIdAsc(id, PageRequest.of(safePage, safeSize));
-        return new CommentPage(items, safePage, safeSize, comments.countByPostId(id));
+        List<Comment> items = comments.findByPostIdAndModerationStateOrderByCreatedAtAscIdAsc(id, "VISIBLE", PageRequest.of(safePage, safeSize));
+        return new CommentPage(items, safePage, safeSize, comments.countByPostIdAndModerationState(id, "VISIBLE"));
     }
 
-    @PostMapping("/posts/{id}/comments") @ResponseStatus(HttpStatus.CREATED) @RequirePermission(Permission.POST_INTERACT)
-    public Comment comment(@PathVariable Long id, @Valid @RequestBody CommentRequest request, HttpSession session) {
-        requirePost(id);
+    @PostMapping("/posts/{id}/comments") @RequirePermission(Permission.POST_INTERACT)
+    public ResponseEntity<Object> comment(@PathVariable Long id, @Valid @RequestBody CommentRequest request, HttpSession session) {
+        ContentPost post = requirePost(id);
         UserAccount user = AuthController.requireUser(session, users);
-        return comments.save(new Comment(id, user.getId(), user.getDisplayName(), request.body()));
+        SubmitResult result = review.submitComment(user.getId(), user.getDisplayName(), id, request.draftKey(), request.requestId(), post.getTitle(), request.body());
+        return respond(result, () -> comments.findById(result.targetId()).orElseThrow(() -> new ApiProblem(HttpStatus.NOT_FOUND, "评论不存在")), HttpStatus.CREATED);
     }
 
     @GetMapping("/collections") @PublicEndpoint("公开专题；受限专题按权限过滤")
@@ -88,10 +110,10 @@ public class ContentController {
         long offset = (long) safePage * safeSize;
         List<CollectionView> items = jdbc.query(
                 "select c.id,p.name,p.description,p.owner_name,p.updated_at,p.item_count " +
-                        "from community_collections c join collection_publications p on p.collection_id=c.id where c.status='PUBLISHED' and (p.visibility='PUBLIC' or ?) order by p.updated_at desc,c.id desc limit ? offset ?",
+                        "from community_collections c join collection_publications p on p.collection_id=c.id where c.status='PUBLISHED' and c.moderation_state='VISIBLE' and (p.visibility='PUBLIC' or ?) order by p.updated_at desc,c.id desc limit ? offset ?",
                 (rs, row) -> new CollectionView(rs.getLong("id"), rs.getString("name"), rs.getString("description"), rs.getString("owner_name"), rs.getInt("item_count"), rs.getTimestamp("updated_at").toInstant()),
                 restricted, safeSize, offset);
-        Long total = jdbc.queryForObject("select count(*) from community_collections c join collection_publications p on p.collection_id=c.id where c.status='PUBLISHED' and (p.visibility='PUBLIC' or ?)", Long.class, restricted);
+        Long total = jdbc.queryForObject("select count(*) from community_collections c join collection_publications p on p.collection_id=c.id where c.status='PUBLISHED' and c.moderation_state='VISIBLE' and (p.visibility='PUBLIC' or ?)", Long.class, restricted);
         return new CollectionPage(items, safePage, safeSize, total == null ? 0 : total);
     }
 
@@ -113,7 +135,7 @@ public class ContentController {
             .filter(e -> e.kind() == CollectionEntry.Kind.POST && e.postId() != null).toList();
         int start = Math.min(entries.size(), safePage * safeSize);
         List<ContentPostSummary> items = entries.subList(start, Math.min(entries.size(),start+safeSize)).stream().map(e -> {
-            List<ContentPostSummary> summaries = jdbc.query("select id,type,created_at,likes from content_posts where id=?", (rs,n) -> new ContentPostSummary(rs.getLong("id"),ContentPost.Type.valueOf(rs.getString("type")),e.postTitle(),e.postSummary(),e.postAuthor(),rs.getTimestamp("created_at").toInstant(),rs.getInt("likes")),e.postId());
+            List<ContentPostSummary> summaries = jdbc.query("select id,type,created_at,likes from content_posts where id=? and moderation_state='VISIBLE'", (rs,n) -> new ContentPostSummary(rs.getLong("id"),ContentPost.Type.valueOf(rs.getString("type")),e.postTitle(),e.postSummary(),e.postAuthor(),rs.getTimestamp("created_at").toInstant(),rs.getInt("likes")),e.postId());
             return summaries.isEmpty() ? null : summaries.get(0);
         }).filter(java.util.Objects::nonNull).toList();
         return new CollectionPostsPage(items,safePage,safeSize,entries.size());
@@ -127,10 +149,10 @@ public class ContentController {
         return new CollectionView(saved.getId(), saved.getName(), saved.getDescription(), saved.getOwnerName(), 0, saved.getUpdatedAt());
     }
 
-    private ContentPost requirePost(Long id) { return posts.findById(id).orElseThrow(() -> new ApiProblem(HttpStatus.NOT_FOUND, "内容不存在")); }
+    private ContentPost requirePost(Long id) { return posts.findById(id).filter(p -> "VISIBLE".equals(p.getModerationState())).orElseThrow(() -> new ApiProblem(HttpStatus.NOT_FOUND, "内容不存在")); }
 
-    public record PostRequest(ContentPost.Type type, @NotBlank @Size(max = 120) String title, @NotBlank @Size(max = 280) String summary, @NotBlank @Size(max = 20000) String body) {}
-    public record CommentRequest(@NotBlank @Size(max = 1000) String body) {}
+    public record PostRequest(ContentPost.Type type, @NotBlank @Size(max = 120) String title, @NotBlank @Size(max = 280) String summary, @NotBlank @Size(max = 20000) String body, @Size(max = 64) String requestId, @Size(max = 64) String draftKey) {}
+    public record CommentRequest(@NotBlank @Size(max = 1000) String body, @Size(max = 64) String requestId, @Size(max = 64) String draftKey) {}
     public record CommentPage(List<Comment> items, int page, int size, long total) {}
     public record PostPage(List<ContentPostSummary> items, int page, int size, long total) {}
     public record CollectionPostsPage(List<ContentPostSummary> items, int page, int size, long total) {}

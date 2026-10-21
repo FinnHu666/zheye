@@ -168,7 +168,7 @@ class AiTomeApplicationTests {
     }
 
     @Test void publicCollectionsArePagedAndStableForMatchingTimestamps() throws Exception {
-        long baseline = jdbc.queryForObject("select count(*) from collection_publications p join community_collections c on c.id=p.collection_id where c.status='PUBLISHED'",Long.class);
+        long baseline = jdbc.queryForObject("select count(*) from collection_publications p join community_collections c on c.id=p.collection_id where c.status='PUBLISHED' and c.moderation_state='VISIBLE'",Long.class);
         String prefix = "分页专题-" + UUID.randomUUID().toString().replace("-", "");
         List<CommunityCollection> saved = collectionRepository.saveAll(java.util.stream.IntStream.range(0, 55)
                 .mapToObj(i -> new CommunityCollection(prefix + "-" + i, "分页目录测试", "分页测试用户", 0))
@@ -208,8 +208,8 @@ class AiTomeApplicationTests {
         String response = mvc.perform(get("/api/stats")).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         var stats = json.readTree(response);
         org.junit.jupiter.api.Assertions.assertEquals(jdbc.queryForObject("select count(*) from user_accounts", Long.class), stats.get("creatorCount").asLong());
-        org.junit.jupiter.api.Assertions.assertEquals(jdbc.queryForObject("select count(*) from content_posts", Long.class), stats.get("contentCount").asLong());
-        org.junit.jupiter.api.Assertions.assertEquals(jdbc.queryForObject("select count(*) from community_collections c join collection_publications p on p.collection_id=c.id where c.status='PUBLISHED'", Long.class), stats.get("collectionCount").asLong());
+        org.junit.jupiter.api.Assertions.assertEquals(jdbc.queryForObject("select count(*) from content_posts where moderation_state='VISIBLE'", Long.class), stats.get("contentCount").asLong());
+        org.junit.jupiter.api.Assertions.assertEquals(jdbc.queryForObject("select count(*) from community_collections c join collection_publications p on p.collection_id=c.id where c.status='PUBLISHED' and c.moderation_state='VISIBLE'", Long.class), stats.get("collectionCount").asLong());
     }
     @Test void userCanRegisterPublishAndComment() throws Exception {
         MockHttpSession session=new MockHttpSession();
@@ -460,6 +460,7 @@ class AiTomeApplicationTests {
         mvc.perform(get("/api/me/collections/" + collectionId + "/draft").session(other)).andExpect(status().isForbidden());
 
         csrf = csrfCookie();
+        TestReviewConfig.preapprove(jdbc, collectionId);
         mvc.perform(post("/api/me/collections/" + collectionId + "/publish").session(owner).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue())
                         .contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(Map.of("revision", savedRevision))))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.status").value("PUBLISHED"));
@@ -479,6 +480,7 @@ class AiTomeApplicationTests {
             d=json.readTree(mvc.perform(put("/api/me/collections/"+id+"/draft").session(session).cookie(token).header("X-XSRF-TOKEN",token.getValue()).contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(d))).andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
         }
         Cookie token=csrfCookie();
+        TestReviewConfig.preapprove(jdbc, id);
         mvc.perform(post("/api/me/collections/"+id+"/publish").session(session).cookie(token).header("X-XSRF-TOKEN",token.getValue()).contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(Map.of("revision",d.get("revision").asLong())))).andExpect(status().isOk());
     }
 
