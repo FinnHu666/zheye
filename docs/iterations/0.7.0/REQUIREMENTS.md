@@ -1,3 +1,7 @@
+## FINNS-17：需规修订3通过（2026-10-18）
+
+用户REVIEW-D10整项批准[F08需规修订3](../../requirements/FOUNDATION_REVIEW_REQUIREMENTS.md)含P01–P04：文章/评论仅敏感检测；专题首次对外发布审批、后续更新仅检测；前2次命中拦截、第3次人工；独立审批权限、禁止自审；站内词库/规则、旧内容保留及人工恢复。旧全量人工审批与更新必审条款在本轮范围内失效。F08 G1通过，F02/F03/F06审核契约引用同步调整，其余分项仍独立评审。[REVIEW-SYNC-P01](../../requirements/FOUNDATION_REVIEW_PLANE_P01.md)已获单项确认，仅FINNS-17标题/正文更新并回读通过；G1/PLANE通过，G2以后未开始，13项业务验收未执行，未实施/发布。
+
 ## FINNS-16：P02同步回读完成，下一步G3（2026-10-18）
 
 USER-ADMIN-P02差异修订1获用户“确认写入”，写前核对一致后仅正文更新一次并回读通过；[脱敏回执](../../requirements/FOUNDATION_USER_ADMIN_PLANE_P02_RECEIPT.json)保存正文比较、21项保护字段、Cycle11项前后集合及Release HTTP402限制。Backlog/其余字段不变，未写关联，Release当前成员无法核实。需求修订2与R3确认有效，G1/PLANE/G2通过，下一步概要设计与设计评审、详设/接口和验收映射；G3以后尚未开始，业务验收A01–A15全部未执行。

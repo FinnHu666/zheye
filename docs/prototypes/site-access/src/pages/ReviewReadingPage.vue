@@ -1,0 +1,11 @@
+<script setup>
+import { ref, onMounted } from 'vue'
+import { api } from '@finns/lib/api'
+import { RouterLink } from 'vue-router'
+import AdminDialog from '../components/AdminDialog.vue'
+const q=ref(''), result=ref(null), error=ref(''), loading=ref(true), detail=ref(null)
+const typeLabel=t=>({ARTICLE:'文章',COLLECTION:'专题',COMMENT:'评论'}[t])
+async function load(){loading.value=true;error.value='';try{result.value=await api('/api/review/public?q='+encodeURIComponent(q.value))}catch(e){error.value=e.message}finally{loading.value=false}}
+onMounted(load)
+</script>
+<template><section class="rv-author section"><div class="rv-topline"><span>发现 / 读者预览</span><RouterLink to="/me/submissions">回到发布与审核 ↗</RouterLink></div><header class="rv-author-heading"><span class="kicker">READ · WHAT IS PUBLIC</span><h1>值得分享的内容，<br><em>从这里被看见。</em></h1><p>这里只显示当前身份有权阅读的有效发布版；私人稿、待审和下架内容不会出现在结果或数量中。</p></header><form class="rv-filters" @submit.prevent="load"><label class="rv-search">标题与摘要<input v-model="q" placeholder="搜索已发布内容"/></label><button class="btn btn-primary">搜索</button></form><div v-if="loading" class="rv-empty">正在读取</div><div v-else-if="error" class="rv-empty" role="alert">{{error}}<button class="btn btn-ghost" @click="load">重试</button></div><template v-else><p class="rv-result-count">{{result?.total || 0}} 条可见内容</p><div v-if="!result?.items.length" class="rv-empty"><h2>没有找到可见内容</h2><p>试试其他关键词，或等待内容完成处理。</p></div><div class="rv-reading-grid"><article v-for="item in result?.items" :key="item.id" class="rv-reading-card"><div class="rv-tags"><span class="rv-badge">{{typeLabel(item.type)}}</span><span v-if="item.visibility==='RESTRICTED'" class="rv-badge neutral">受限</span></div><h2>{{item.title}}</h2><p>{{item.summary || item.body}}</p><small>{{item.authorName}} · v{{item.version}}</small><button class="text-link" @click="detail=item">阅读全文 ↗</button></article></div></template><p class="rv-footnote">本页是 FINNS-17 的读取场景片段；样例与现有发现页的数据分开，用于评审发布可见性。</p><AdminDialog v-if="detail" labelledby="rv-reading-title" context="FINNS · 阅读" wide @close="detail=null"><span class="kicker">{{typeLabel(detail.type)}} · v{{detail.version}}</span><h2 id="rv-reading-title">{{detail.title}}</h2><p>{{detail.authorName}}</p><p class="rv-body">{{detail.body}}</p><button class="btn btn-ghost" @click="detail=null">返回列表</button></AdminDialog></section></template>

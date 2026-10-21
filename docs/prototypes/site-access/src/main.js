@@ -24,12 +24,18 @@ import AdminAuditPage from './pages/AdminAuditPage.vue'
 import AccountFlowPage from './pages/AccountFlowPage.vue'
 import AccountSecurityPage from './pages/AccountSecurityPage.vue'
 import AccountDraftPage from './pages/AccountDraftPage.vue'
+import AdminReviewsPage from './pages/AdminReviewsPage.vue'
+import ReviewDetailPage from './pages/ReviewDetailPage.vue'
+import SensitiveRulesPage from './pages/SensitiveRulesPage.vue'
+import ReviewSubmissionsPage from './pages/ReviewSubmissionsPage.vue'
+import ReviewReadingPage from './pages/ReviewReadingPage.vue'
 import { api } from '@finns/lib/api'
 import { sessionUser } from './proto/session'
 import '@finns/assets/styles.css'
 import './proto.css'
 import './account.css'
 import './user-admin.css'
+import './review.css'
 
 installMockServer()
 
@@ -42,6 +48,8 @@ const router = createRouter({
     ...['login', 'register', 'forgot', 'pending', 'verify', 'reset', 'setup'].map(mode => ({ path: '/auth/' + mode, component: AccountFlowPage, meta: { accountMode: mode } })),
     { path: '/me/security', component: AccountSecurityPage, meta: { requiresAuth: true } },
     { path: '/me/security/draft', component: AccountDraftPage, meta: { requiresAuth: true } },
+    { path: '/me/submissions', component: ReviewSubmissionsPage, meta: { requiresAuth: true } },
+    { path: '/review/reading', component: ReviewReadingPage },
     { path: '/collections', component: CollectionsPage },
     { path: '/collections/:id(\\d+)', component: CollectionDetailPage },
     { path: '/vps', component: VpsPage },
@@ -64,6 +72,10 @@ const router = createRouter({
     { path: '/admin/users', component: AdminUsersPage, meta: admin },
     { path: '/admin/roles', component: AdminRolesPage, meta: admin },
     { path: '/admin/audit', component: AdminAuditPage, meta: admin },
+    { path: '/admin/reviews', component: AdminReviewsPage, meta: { requiresAuth: true, perm: 'content.review' } },
+    { path: '/admin/reviews/tasks/:id(\\d+)', component: ReviewDetailPage, meta: { requiresAuth: true, perm: 'content.review' } },
+    { path: '/admin/reviews/publications/:id(\\d+)', component: ReviewDetailPage, meta: { requiresAuth: true, perm: 'content.review', reviewMode: 'PUBLICATION' } },
+    { path: '/admin/sensitive-rules', component: SensitiveRulesPage, meta: { requiresAuth: true, ownerOnly: true } },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
   scrollBehavior: () => ({ top: 0 }),

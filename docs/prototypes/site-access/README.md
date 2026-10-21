@@ -1,3 +1,19 @@
+FINNS-17 原型 R3（需规修订6，待评审）：[记录与体验步骤](../../iterations/0.7.0/PROTOTYPE_REVIEW_R3.md)。审批队列 <http://127.0.0.1:4175/admin/reviews>、规则与词库导入预览 <http://127.0.0.1:4175/admin/sensitive-rules>、作者流转 `/me/submissions`；右下“审核演示 · R3”。三级敏感、统一流程、流转时间线（含预留阶段）、重做的审批页；52项模拟测试与构建通过，全部为浏览器虚构数据。以下 R1/R2 内容为历史。
+
+# 当前：FINNS-17 内容审核原型 R2（待评审）
+
+[具体范围与验证](../../iterations/0.7.0/PROTOTYPE_REVIEW_R2.md)。内容审批 <http://127.0.0.1:4175/admin/reviews>、规则管理 <http://127.0.0.1:4175/admin/sensitive-rules>；右下“审核演示 · R2”→“载入长文审阅样例”体验完整阅读。首次无旧版栏，已有发布版单独切换。规则支持搜索/状态/分页/新增/编辑/启停/删除确认和操作记录。
+
+运行命令沿用下方，当前50项模拟与97模块构建通过；证据 `target/prototypes/review-r2-proof/`。G2待用户评审，CRUD增量未冻结/写Plane，真实业务未实施。下方R1及其他原型记录为历史。
+
+# 当前新增：FINNS-17内容审核原型R1（2026-10-18）
+
+入口 <http://127.0.0.1:4175/admin/reviews>；首次体验可先到 <http://127.0.0.1:4175/review/reading>，右下“审核演示 · R1”→“载入审核协作样例”。可切换站长/作者/独立审核员/无审批权管理员/游客，无需真实凭据。新增独立路由：`/admin/reviews`、`/admin/sensitive-rules`、`/me/submissions`、`/review/reading`；具体步骤见[R1记录](../../iterations/0.7.0/PROTOTYPE_REVIEW.md)。
+
+前两次敏感命中拦截、第3次人工；专题仅首次对外发布审批、禁止自审；规则只有站长能维护；旧版、下架恢复、失败/冲突/停用场景均可模拟。作者/读者是F08片段，未接入真实业务。需规修订3已通过，**R1仍待用户评审**，不以模拟当作实际验收或发布。
+
+运行复用现有4175服务与前端依赖，无需安装；在本目录运行 `node --test tests/account.test.mjs tests/user-admin.test.mjs tests/review.test.mjs`（44项模拟）和 `node ../../../frontend/node_modules/vite/bin/vite.js build`。最终检查通过；截图/日志/18文件快照位于忽略目录`target/prototypes/review-r1-proof/`，可被清理。旧用户/账号原型仍可使用，下方原说明保留历史。
+
 ## FINNS-16：R3及范围已通过（2026-10-18）
 
 用户在[R3展示](../../iterations/0.7.0/PROTOTYPE_USER_ADMIN_R3.md)后回复“通过”（USER-ADMIN-D11），需求修订2、G1增量与G2均通过，勿重复索要R3批准。站长转交候选/原因与邮箱确认/原站长降级/会话/审计按R3冻结；业务UA-A01–A15仍全部未执行。P02完整正文差异修订1已备妥，待单项核对写入授权，本轮未连接Plane；下一步处理P02，然后概要设计/设计评审与详设契约，不因原型批准直接开发或发布。仅本地文档记录，本轮未重跑原型测试/浏览器，历史25项模拟及构建证据保留；代码、数据库、主站和版本均未改。下方待R3评审为历史。

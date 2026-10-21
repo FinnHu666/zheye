@@ -1,8 +1,36 @@
+## 开发流程更新：先识别任务及并行方式（2026-10-19）
+
+[开发skill任务识别与隔离](../.agents/skills/finns-development/references/task-planning.md)已补齐，[验证记录](iterations/0.7.0/WORKFLOW_TASK_PLANNING_VALIDATION.md)包含10场景边界走查。后续规划/继续/原型/实施先核对任务、版本、授权、阶段、依赖与共享资源；按实际风险复用、串行或独立工作树执行。这里只完成流程优化，17/18/19现有任务未迁移、阶段未改变；不将规划中的环境写成已隔离。
+
+## FINNS-19：传统专题需求评审已形成草案（2026-10-18）
+
+[需规修订1](requirements/FOUNDATION_COLLECTION_REQUIREMENTS.md)待确认，G1仍pending。沿用已批准F08首次审批/更新检测规则；本项需确认取消送审与撤回发布、独立副本首次审批、失效引用提交/读取处置三项细化建议及16项验收定义。FINNS-19远程只读核对仍Backlog、正文旧概述；G1通过后主动提出正文完整差异并逐项确认，处理检查点后再按授权制作专题原型。未写Plane、未制作本项原型或改业务；F08 R2独立待评审，其他任务不受本轮评审影响。
+
+## FINNS-18：文章与普通话题需求修订1待整项评审（2026-10-18）
+
+用户已确认CONTENT-D01/D02：文章与普通话题一起覆盖，手动保存并在未保存离开时提醒。[需规修订1](requirements/FOUNDATION_CONTENT_REQUIREMENTS.md)整理草稿/发布/复审快照、Markdown、撤回与专题引用、会话/并发及CT-A01–13；其余具体行为待整项确认，G1仍pending。沿用FINNS-17已批准的检测通过直接发布、前2次拦截第3次人工，不恢复旧全量审核。
+
+本轮只读核对FINNS-18（Backlog，正文仍为旧审核表述）及FINNS-17；未核对Cycle/Release成员，未写Plane。需求整项通过后先提出标题/正文精确差异、单项确认及回读，再按授权制作原型。业务/原型源码、数据库、服务、四处版本与Git未改；其他工作树改动保留，CT-A01–13均未执行。下方FINNS-17 R2待评审及FINNS-15/16独立发布交接保持。
+
+## FINNS-17：原型 R2 已按阅读与 CRUD 反馈修订，待评审（2026-10-18）
+
+用户 REVIEW-D13 指出审批双栏难读，REVIEW-D14 明确敏感规则缺基础增删改查。已在4175既有Vue原型制作[R2](iterations/0.7.0/PROTOTYPE_REVIEW_R2.md)：独立全文审阅、首次无空旧版栏、有旧版单独切换；规则查询/筛选/分页、新增/编辑/启停/删除确认、失败/冲突及审计。50/50模拟、97模块构建、桌面/390/768px与详情导航已验证；截图与22文件快照在忽略目录 `target/prototypes/review-r2-proof/`。R1以下为历史。
+
+当前 G2 pending，等待用户对具体R2及CRUD增量反馈/确认；无须重批已确认的三次命中等规则。需规修订3/P01仅覆盖原范围，R2增量尚未冻结/同步；通过后先协调需规/验收与Plane差异检查点，再设计和业务开发。本轮未访问Plane、操作真实业务/数据库/主站/生产版本或Git；保留FINNS-15/16发布交接。真实13项业务验收和手机未执行。
+
+## FINNS-17：R1原型已制作，下一步用户评审（2026-10-18）
+
+[PROTOTYPE_REVIEW.md](iterations/0.7.0/PROTOTYPE_REVIEW.md)记录本轮REVIEW-D12授权、四个可交互入口及验证：4175内容审批、站长敏感规则、作者提交/读者预览片段；模拟44/44、构建93模块退出0，桌面/390px/768px及主要异常场景已检查。G1/前置PLANE有效，G2pending待用户明确R1及范围；不进入业务开发。未新增Plane读取/写入，未操作真实库/主站/生产版本/Git；FINNS-15/16独立发布事实保留于下方最新记录。原型不是业务验收。
+
 ## FINNS-15/16 已发布到本机 8080（2026-10-18）
 
 用户“验收通过，进行发布”：账号功能（FINNS-15）+ 用户管理（FINNS-16）以**同版本号 0.7.0** 发布到本机 8080（PID 34880，JAR SHA256 `A7F58983…A1F4`，Flyway V14）。记录：[发布记录补充节](RELEASE_0.7.0.md)、[部署手册（换机器部署用）](DEPLOYMENT.md)。生产站长账号已指定（邮箱不入库）；**不支持回退旧包**；邮件为 Brevo SMTP，邮件链接前缀是 `http://127.0.0.1:8080`（只能本机打开）。主库已备份（`data/deployments/20261018-account-useradmin-0.7.0/finns-before-account-useradmin.dump`）并在恢复库演练通过。
 - **未做/待办**：①真实邮件：2026-10-19 已验证 8080→Brevo→Gmail 可收到重置邮件（昨晚两次发送失败根因未确认，见发布记录末节）；QQ/163/Outlook、垃圾箱/SPF/DKIM/DMARC 仍未验证；②站长本人用自己的密码登录核对管理页；③演示账户 `demo@aitome.dev` 仍在，可在用户管理页停用；④Git 已本地提交（`release/0.7.0`：`94eaca3` 代码、`506a59e` 文档，已推送到 origin/release/0.7.0（2026-10-19，快进）、未合并 main；`.claude/` 未入库）；⑤Plane：2026-10-19 经用户单项确认，FINNS-15/16 均已 Done 并追加发布说明（[回执](requirements/FOUNDATION_USER_ADMIN_PLANE_P04_RECEIPT.json)；FINNS-15 远程此前已被改为 Done，与本地旧记录不一致，已核对）；⑥旧的 Brevo 密钥应在控制台删除。
 - 验收预览 8091 与隔离库仍在，可用 `scripts\start-account-preview.ps1 ... -Stop` 停止。
+
+## FINNS-17：需求评审及管理同步完成，下一阶段G2（2026-10-18）
+
+用户REVIEW-D10整项批准[内容敏感拦截与专题首次审批](requirements/FOUNDATION_REVIEW_REQUIREMENTS.md)及补充规则。文章/评论检测通过直接发布，专题首次对外发布审批、更新仅检测；前2次命中拦截、第3次人工；独立权限且禁止自审。[REVIEW-SYNC-P01](requirements/FOUNDATION_REVIEW_PLANE_P01.md)获REVIEW-D11单项确认后仅FINNS-17标题/正文更新一次，回读通过，19项保护字段保持，Backlog不变。下一步按新授权制作具体原型；未制作原型、未开发/发布，13项业务验收未执行；FINNS-16原有G7待验收不变。
 
 ## FINNS-16：已按契约B1–B5实施，等待用户验收G7（2026-10-18）
 

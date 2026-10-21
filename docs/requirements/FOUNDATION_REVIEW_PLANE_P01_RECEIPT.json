@@ -1,0 +1,55 @@
+{
+  "operation_id": "REVIEW-SYNC-P01",
+  "revision": 1,
+  "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+  "workitem_id": "6ac45b07-b338-4944-b957-cf9928cc72a0",
+  "identifier": "FINNS-17",
+  "source_requirement_revision": 3,
+  "requirement_approval": "REVIEW-D10",
+  "write_approval": {
+    "id": "REVIEW-D11",
+    "source": "用户在完整差异修订1展示后明确答复",
+    "confirmed_text": "确认执行 REVIEW-SYNC-P01，仅更新标题和正文",
+    "scope": [
+      "name",
+      "description_stripped"
+    ]
+  },
+  "preflight": {
+    "re_read": true,
+    "observed_updated_at": "2026-10-17T15:06:00.918701Z",
+    "material_changes": false
+  },
+  "execution": {
+    "calls": 1,
+    "action": "update",
+    "status": "succeeded",
+    "updated_at_utc": "2026-10-18T10:13:20.678216Z"
+  },
+  "readback": {
+    "retrieved_by_id": true,
+    "title_matches": true,
+    "body_matches_after_whitespace_normalization": true,
+    "protected_field_count": 19,
+    "protected_fields_unchanged": true,
+    "state_name": "Backlog",
+    "parent_unchanged": true
+  },
+  "associations": {
+    "mutated": false,
+    "cycle_release_members_rechecked": false,
+    "limitation": "未重新核对Cycle/Release成员；无关联写操作，不将成员标为本轮已验证"
+  },
+  "other_workitems": {
+    "queried": false,
+    "mutated": false
+  },
+  "business": {
+    "prototype_created": false,
+    "implemented": false,
+    "tested": false,
+    "deployed": false
+  },
+  "approved_payload_sha256": "0f6cdbc5ad38b098cde5ec61eeeed3dbcd957c9278c7d9a9ca9ffbace49346ff",
+  "target_body_sha256": "dd9b6c8ef3cb59761848e257718649a0530435a05a01488bc212c6dae2fa55f3"
+}

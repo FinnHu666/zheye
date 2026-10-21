@@ -25,13 +25,14 @@ export const CATALOG = [
   { key: 'admin.users', group: '管理', label: '用户与角色分配', detail: '查看用户、调整用户角色', lockAdmin: true },
   { key: 'admin.audit', group: '管理', label: '查看操作记录', detail: '筛选、查询角色与权限变更', lockAdmin: true },
   { key: 'admin.roles', group: '管理', label: '管理角色', detail: '修改权限，新增、改名、删除角色', lockAdmin: true },
+  { key: 'content.review', group: '管理', label: '内容审批', detail: '首次专题审批、敏感复审及内容下架恢复；禁止自审' },
 ]
 
 export const DEFAULT_PERMISSIONS = {
   RESTRICTED: ['content.public', 'profile.manage', 'selection.manage'],
   MEMBER: ['content.public', 'profile.manage', 'selection.manage', 'post.create', 'post.interact', 'collection.manage', 'ai.use'],
   TRUSTED: ['content.public', 'profile.manage', 'selection.manage', 'post.create', 'post.interact', 'collection.manage', 'ai.use', 'content.restricted'],
-  ADMIN: CATALOG.map((perm) => perm.key),
+  ADMIN: CATALOG.filter((perm) => perm.key !== 'content.review').map((perm) => perm.key),
   OWNER: CATALOG.map((perm) => perm.key),
 }
 

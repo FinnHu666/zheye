@@ -1,0 +1,45 @@
+{
+  "operation": "REVIEW-SYNC-P02",
+  "authorization": "REVIEW-SYNC-P02: user message “确认执行 REVIEW-SYNC-P02，仅更新FINNS-17正文。写前重读比对基线，写后回读并保存回执。”",
+  "executed_at": "2026-10-20",
+  "target": {
+    "identifier": "FINNS-17",
+    "workitem_id": "6ac45b07-b338-4944-b957-cf9928cc72a0",
+    "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f"
+  },
+  "pre_write_reread": {
+    "updated_at": "2026-10-20T05:34:55.838167Z",
+    "matches_baseline": true,
+    "protected": {
+      "state": "Backlog (5b7d9df4-8ce4-40be-b110-83515a957a2a)",
+      "parent": "FINNS-14",
+      "priority": "none",
+      "cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+      "assignees": [],
+      "labels": [],
+      "start_date": null,
+      "target_date": null
+    }
+  },
+  "write": {
+    "calls": 1,
+    "fields": [
+      "description_html"
+    ],
+    "other_writes": "none (no comment, state, relation, cycle or release write)"
+  },
+  "post_write_readback": {
+    "updated_at": "2026-10-20T11:01:23.692337Z",
+    "body_matches_payload": true,
+    "title_unchanged": true,
+    "state": "Backlog",
+    "parent": "FINNS-14",
+    "priority": "none",
+    "cycle_id": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
+    "assignees": [],
+    "labels": []
+  },
+  "note": "The update response itself reported cycle_id null (same as earlier update responses); the separate readback retrieve shows the Cycle association preserved. Release membership was not queried this round.",
+  "body_sha256_html_payload": "80e2a24ba5914ffed181f2af76358b40edd10d0c5709e1ca07536fdf2f9f494c",
+  "body_sha256_plain_text": "52d0442a4050af91e5212003d4b28f708e247444d4248b62a23089d172587d1c"
+}

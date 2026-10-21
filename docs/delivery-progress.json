@@ -3,7 +3,7 @@
   "project": {
     "name": "FINNS",
     "plane_project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
-    "last_remote_check": "2026-10-18：ACCOUNT-P02/P03经用户确认执行并回读（FINNS-15正文更新、状态In Progress）；0.7.0 Cycle 11项含FINNS-15；Release成员HTTP 402无法回读；2026-10-18 FINNS-16只读重读仍Backlog/G1待评审，Cycle11项包含本项，Release成员HTTP402；未写入；2026-10-18 USER-ADMIN-P01确认后仅FINNS-16正文更新并回读，Backlog/保护字段保持，Cycle11项集合不变，Release成员HTTP402未核实；2026-10-18 USER-ADMIN-P02确认后仅FINNS-16正文写入回读，需求修订2/R3通过，Backlog/21项保护字段/Cycle11项集合不变，Release成员写前写后HTTP402未核实，无关联写入；2026-10-18 USER-ADMIN-P03确认后仅FINNS-16状态Backlog→In Progress并追加实施进度正文，回读通过，Cycle11项集合/父项不变，Release成员HTTP402未核实、未写关联",
+    "last_remote_check": "2026-10-18：ACCOUNT-P02/P03经用户确认执行并回读（FINNS-15正文更新、状态In Progress）；0.7.0 Cycle 11项含FINNS-15；Release成员HTTP 402无法回读；2026-10-18 FINNS-16只读重读仍Backlog/G1待评审，Cycle11项包含本项，Release成员HTTP402；未写入；2026-10-18 USER-ADMIN-P01确认后仅FINNS-16正文更新并回读，Backlog/保护字段保持，Cycle11项集合不变，Release成员HTTP402未核实；2026-10-18 USER-ADMIN-P02确认后仅FINNS-16正文写入回读，需求修订2/R3通过，Backlog/21项保护字段/Cycle11项集合不变，Release成员写前写后HTTP402未核实，无关联写入；2026-10-18 USER-ADMIN-P03确认后仅FINNS-16状态Backlog→In Progress并追加实施进度正文，回读通过，Cycle11项集合/父项不变，Release成员HTTP402未核实、未写关联；2026-10-20 REVIEW-SYNC-P02确认后仅FINNS-17正文更新并回读，Cycle等保护字段保持，未核对Release成员，无其他写入",
     "cycles": {
       "0.7.0": "e6eb9092-424a-4c10-a472-bd29f4a2b063",
       "0.8.0": "74c326cb-9864-4405-89ed-8e1675483486"
@@ -73,10 +73,10 @@
           "evidence": [
             {
               "path": "docs/iterations/0.7.0/PLAN.md",
-              "sha256": "075883bda79953fee3c26be2643dcd347442a7ee765a9364b07adfbe0131c185"
+              "sha256": "c06887712c9106e7eba33c3c89f332c68c9f60f82a5b06fc32cbd9430748bf3b"
             }
           ],
-          "reason": "；2026-10-18仅新增F07需规/确认记录及同步准备入口，原有本门禁对应范围与批准证据未改，经语义复核刷新哈希；2026-10-18仅补F07同步执行记录，原批准范围不变，语义复核后刷新证据哈希"
+          "reason": "；2026-10-18仅新增F07需规/确认记录及同步准备入口，原有本门禁对应范围与批准证据未改，经语义复核刷新哈希；2026-10-18仅补F07同步执行记录，原批准范围不变，语义复核后刷新证据哈希；2026-10-18仅新增F07原型制作/待评审记录，原门禁对应范围及确认未改变，语义复核后刷新哈希；2026-10-18新增F07原型反馈/待确认站长方向，其他门禁原范围及批准未改，语义复核后更新哈希"
         },
         {
           "id": "G1",
@@ -175,10 +175,10 @@
           "evidence": [
             {
               "path": "docs/iterations/0.7.0/PLAN.md",
-              "sha256": "075883bda79953fee3c26be2643dcd347442a7ee765a9364b07adfbe0131c185"
+              "sha256": "c06887712c9106e7eba33c3c89f332c68c9f60f82a5b06fc32cbd9430748bf3b"
             }
           ],
-          "reason": "；2026-10-18仅新增F07需规/确认记录及同步准备入口，原有本门禁对应范围与批准证据未改，经语义复核刷新哈希；2026-10-18仅补F07同步执行记录，原批准范围不变，语义复核后刷新证据哈希"
+          "reason": "；2026-10-18仅新增F07需规/确认记录及同步准备入口，原有本门禁对应范围与批准证据未改，经语义复核刷新哈希；2026-10-18仅补F07同步执行记录，原批准范围不变，语义复核后刷新证据哈希；2026-10-18仅新增F07原型制作/待评审记录，原门禁对应范围及确认未改变，语义复核后刷新哈希；2026-10-18新增F07原型反馈/待确认站长方向，其他门禁原范围及批准未改，语义复核后更新哈希"
         },
         {
           "id": "G1",
@@ -188,14 +188,14 @@
           "evidence": [
             {
               "path": "docs/iterations/0.7.0/SCOPE_CHANGE_2026-10-14.md",
-              "sha256": "c872f54021256f1e19547ab93ffc978748faebead2b617c8943bd77463acbe7d"
+              "sha256": "f53771a857f1a9d66e853a44bc7b514c3f72d1c4d0a7fd1f8715afde35ed0e99"
             },
             {
               "path": "docs/iterations/0.7.0/REQUIREMENTS.md",
-              "sha256": "a1552dcb36a2e55bf339e69121e37d83a206a257963f0d2036e10a1e4fdd3d8a"
+              "sha256": "0a99114de49bf5db1a46afcecffae198460141714eabe307c515ccc994837068"
             }
           ],
-          "reason": "用户明确更新本项方向；具体参数仍待原型细化；2026-10-15 需规修订 4 按已确认原型细化同一方向，复核后更新哈希；2026-10-18仅新增F07需规/确认记录及同步准备入口，原有本门禁对应范围与批准证据未改，经语义复核刷新哈希；2026-10-18仅补F07同步执行记录，原批准范围不变，语义复核后刷新证据哈希"
+          "reason": "用户明确更新本项方向；具体参数仍待原型细化；2026-10-15 需规修订 4 按已确认原型细化同一方向，复核后更新哈希；2026-10-18仅新增F07需规/确认记录及同步准备入口，原有本门禁对应范围与批准证据未改，经语义复核刷新哈希；2026-10-18仅补F07同步执行记录，原批准范围不变，语义复核后刷新证据哈希；2026-10-18仅新增F07原型制作/待评审记录，原门禁对应范围及确认未改变，语义复核后刷新哈希；2026-10-18新增F07原型反馈/待确认站长方向，其他门禁原范围及批准未改，语义复核后更新哈希；2026-10-18语义复核：F08审核范围由用户整项批准修订3取代，其他分项已确认行为保持，仅刷新共享证据哈希"
         },
         {
           "id": "PLANE",
@@ -309,7 +309,7 @@
           "status": "pass",
           "next_action": "G9：交接收尾；首位管理员生效、Git 与 Plane 另行处理",
           "user_action": "注册所提供的管理员邮箱后告知以重启 8080；决定演示账户处理、Git 提交范围、Plane 状态与 U17",
-          "reason": "用户授权发布（DECISIONS D20）；四处版本 0.7.0、备份并恢复校验、迁移演练、8080 部署与发布后核对通过",
+          "reason": "用户授权发布（DECISIONS D20）；四处版本 0.7.0、备份并恢复校验、迁移演练、8080 部署与发布后核对通过；2026-10-18仅追加补充发布节/决定记录，原范围未改，语义复核后刷新哈希",
           "evidence": [
             {
               "path": "docs/RELEASE_0.7.0.md",
@@ -348,10 +348,10 @@
           "evidence": [
             {
               "path": "docs/iterations/0.7.0/PLAN.md",
-              "sha256": "075883bda79953fee3c26be2643dcd347442a7ee765a9364b07adfbe0131c185"
+              "sha256": "c06887712c9106e7eba33c3c89f332c68c9f60f82a5b06fc32cbd9430748bf3b"
             }
           ],
-          "reason": "；2026-10-18仅新增F07需规/确认记录及同步准备入口，原有本门禁对应范围与批准证据未改，经语义复核刷新哈希；2026-10-18仅补F07同步执行记录，原批准范围不变，语义复核后刷新证据哈希"
+          "reason": "；2026-10-18仅新增F07需规/确认记录及同步准备入口，原有本门禁对应范围与批准证据未改，经语义复核刷新哈希；2026-10-18仅补F07同步执行记录，原批准范围不变，语义复核后刷新证据哈希；2026-10-18仅新增F07原型制作/待评审记录，原门禁对应范围及确认未改变，语义复核后刷新哈希；2026-10-18新增F07原型反馈/待确认站长方向，其他门禁原范围及批准未改，语义复核后更新哈希"
         },
         {
           "id": "G1",
@@ -361,14 +361,14 @@
           "evidence": [
             {
               "path": "docs/iterations/0.7.0/SCOPE_CHANGE_2026-10-14.md",
-              "sha256": "c872f54021256f1e19547ab93ffc978748faebead2b617c8943bd77463acbe7d"
+              "sha256": "f53771a857f1a9d66e853a44bc7b514c3f72d1c4d0a7fd1f8715afde35ed0e99"
             },
             {
               "path": "docs/iterations/0.7.0/REQUIREMENTS.md",
-              "sha256": "a1552dcb36a2e55bf339e69121e37d83a206a257963f0d2036e10a1e4fdd3d8a"
+              "sha256": "0a99114de49bf5db1a46afcecffae198460141714eabe307c515ccc994837068"
             }
           ],
-          "reason": "用户明确更新本项方向；具体参数仍待原型细化；2026-10-15 需规修订 4 按已确认原型细化同一方向，复核后更新哈希；2026-10-18仅新增F07需规/确认记录及同步准备入口，原有本门禁对应范围与批准证据未改，经语义复核刷新哈希；2026-10-18仅补F07同步执行记录，原批准范围不变，语义复核后刷新证据哈希"
+          "reason": "用户明确更新本项方向；具体参数仍待原型细化；2026-10-15 需规修订 4 按已确认原型细化同一方向，复核后更新哈希；2026-10-18仅新增F07需规/确认记录及同步准备入口，原有本门禁对应范围与批准证据未改，经语义复核刷新哈希；2026-10-18仅补F07同步执行记录，原批准范围不变，语义复核后刷新证据哈希；2026-10-18仅新增F07原型制作/待评审记录，原门禁对应范围及确认未改变，语义复核后刷新哈希；2026-10-18新增F07原型反馈/待确认站长方向，其他门禁原范围及批准未改，语义复核后更新哈希；2026-10-18语义复核：F08审核范围由用户整项批准修订3取代，其他分项已确认行为保持，仅刷新共享证据哈希"
         },
         {
           "id": "PLANE",
@@ -482,7 +482,7 @@
           "status": "pass",
           "next_action": "G9：交接收尾；首位管理员生效、Git 与 Plane 另行处理",
           "user_action": "注册所提供的管理员邮箱后告知以重启 8080；决定演示账户处理、Git 提交范围、Plane 状态与 U17",
-          "reason": "用户授权发布（DECISIONS D20）；四处版本 0.7.0、备份并恢复校验、迁移演练、8080 部署与发布后核对通过",
+          "reason": "用户授权发布（DECISIONS D20）；四处版本 0.7.0、备份并恢复校验、迁移演练、8080 部署与发布后核对通过；2026-10-18仅追加补充发布节/决定记录，原范围未改，语义复核后刷新哈希",
           "evidence": [
             {
               "path": "docs/RELEASE_0.7.0.md",
@@ -826,7 +826,7 @@
           "evidence": [
             {
               "path": "docs/requirements/FOUNDATION_BASELINE.md",
-              "sha256": "10f6d00a7f768b908bc325ca7a00eaf596e1db54934ffce142d9626234f76f38"
+              "sha256": "cf9e63bb254f07382dbf6c5deddf1ef8a26c09dbba75f3d4ac8279f51834572a"
             }
           ]
         },
@@ -839,11 +839,11 @@
           "evidence": [
             {
               "path": "docs/requirements/FOUNDATION_ACCOUNT_REQUIREMENTS.md",
-              "sha256": "4548bedf412b09823abd1adb5c215a67d901eb4d5ea7cab8099fee067e65f0bb"
+              "sha256": "694968a0b5fb6a28b0f527d75c6a1031a5de2efad6c21cb1562a3e45cee5df18"
             },
             {
               "path": "docs/requirements/FOUNDATION_ACCOUNT_REQUIREMENTS_R5_APPROVED.md",
-              "sha256": "2082d4b5dc2371f9cc0464f18b511cb21a1f8505896924ee5bcf645b24730d3a"
+              "sha256": "29c51de1362c4ab01468dacd43bb647df93e18e81a4d48b141e71a80f58dd89b"
             }
           ]
         },
@@ -873,11 +873,11 @@
           "evidence": [
             {
               "path": "docs/iterations/0.7.0/ACCOUNT_PROFILE_R2_REVIEW.md",
-              "sha256": "bf8d3057fd49db8bf05ccb4dfe3ccd96a8a12873db1401aa13a2127473671aac"
+              "sha256": "0fb891a2f23742a76c699ff3d95e445f0709556cd45002a7121739593e616462"
             },
             {
               "path": "docs/requirements/FOUNDATION_DECISIONS.md",
-              "sha256": "d9daccc8d7ff756a79f21f0a2c3808cc0f872fde2de6ed10eb81915e0ad2935c"
+              "sha256": "1cdc1904a4b523fccc6c92c74d356a8387a3ce9103a8cec8221b9ac719e8f3bc"
             }
           ]
         },
@@ -911,7 +911,7 @@
             },
             {
               "path": "docs/requirements/FOUNDATION_DECISIONS.md",
-              "sha256": "d9daccc8d7ff756a79f21f0a2c3808cc0f872fde2de6ed10eb81915e0ad2935c"
+              "sha256": "1cdc1904a4b523fccc6c92c74d356a8387a3ce9103a8cec8221b9ac719e8f3bc"
             }
           ]
         },
@@ -967,7 +967,7 @@
             },
             {
               "path": "docs/requirements/FOUNDATION_DECISIONS.md",
-              "sha256": "d9daccc8d7ff756a79f21f0a2c3808cc0f872fde2de6ed10eb81915e0ad2935c"
+              "sha256": "1cdc1904a4b523fccc6c92c74d356a8387a3ce9103a8cec8221b9ac719e8f3bc"
             }
           ]
         },
@@ -1060,28 +1060,34 @@
           "id": "G0",
           "status": "pass",
           "next_action": "按 FOUNDATION_BASELINE.md 逐组评审分项细节",
-          "user_action": "无需重复批准已记录的定位与先审后发规则",
-          "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希",
+          "user_action": "无需重复确认已记录方向及CONTENT-D01/D02；审核规则沿用F08修订3",
+          "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希；2026-10-18语义复核：F08审核范围由用户整项批准修订3取代，其他分项已确认行为保持，仅刷新共享证据哈希",
           "evidence": [
             {
               "path": "docs/requirements/FOUNDATION_BASELINE.md",
-              "sha256": "10f6d00a7f768b908bc325ca7a00eaf596e1db54934ffce142d9626234f76f38"
+              "sha256": "cf9e63bb254f07382dbf6c5deddf1ef8a26c09dbba75f3d4ac8279f51834572a"
             }
           ]
         },
         {
           "id": "G1",
           "status": "pending",
-          "next_action": "按 FOUNDATION_TASKS.md 的 F02 澄清细节、形成该分项验收及确认记录",
-          "user_action": "确认话题是否同期、显式保存或自动保存的边界；沿用先审后发。",
-          "reason": "核心方向已确认，分项修订1及相关待决尚未完成评审"
+          "next_action": "收集需规修订1整体反馈/确认；沿用已确认的同期话题与手动保存，协调F08检测规则",
+          "user_action": "确认需规修订1整体行为或提出修改，不重复选择CONTENT-D01/D02",
+          "reason": "CONTENT-D01/D02已确认；需规修订1及CT-A01–13已形成，尚未整项批准",
+          "evidence": [
+            {
+              "path": "docs/requirements/FOUNDATION_CONTENT_REQUIREMENTS.md",
+              "sha256": "5bc20dbbfebba96d63a44d7587d60aa5660ac34ed21471f6035dfee2fcc50d5c"
+            }
+          ]
         },
         {
           "id": "PLANE",
           "status": "pending",
-          "next_action": "先完成本分项G1细节评审，再核对现有工作项；一致则记录无需变更，有差异才提出新的具体写入",
-          "user_action": "本轮管理写入无需重复确认；下一步只评审本分项未决产品细节",
-          "reason": "工作项及0.7.0Cycle/Release登记归版均已执行回读；G1细节尚未冻结，原型前仍需复核最终基线",
+          "next_action": "G1整项通过后展示FINNS-18标题/正文精确差异，单项确认后写入/回读；保留其余字段关联",
+          "user_action": "当前先评审需求；同步差异展示后再单项确认写入",
+          "reason": "本轮只读FINNS-18仍为旧全量审核表述；未核对Cycle/Release成员，未获新写入确认",
           "evidence": [
             {
               "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json",
@@ -1173,7 +1179,13 @@
         "V070-P14",
         "V070-P15"
       ],
-      "last_plane_verified": "2026-10-17"
+      "last_plane_verified": "2026-10-18",
+      "requirements_path": "docs/requirements/FOUNDATION_CONTENT_REQUIREMENTS.md",
+      "requirement_revision": 1,
+      "requirement_status": "draft_pending_overall_review",
+      "plane_state_name": "Backlog",
+      "plane_scope_sync_status": "pending_requirement_approval_and_per_operation_confirmation",
+      "plane_read_scope": "FINNS-18 and dependency FINNS-17 only; Cycle/Release members not read"
     },
     {
       "id": "foundation-collection",
@@ -1189,27 +1201,33 @@
           "status": "pass",
           "next_action": "按 FOUNDATION_BASELINE.md 逐组评审分项细节",
           "user_action": "无需重复批准已记录的定位与先审后发规则",
-          "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希",
+          "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希；2026-10-18语义复核：F08审核范围由用户整项批准修订3取代，其他分项已确认行为保持，仅刷新共享证据哈希",
           "evidence": [
             {
               "path": "docs/requirements/FOUNDATION_BASELINE.md",
-              "sha256": "10f6d00a7f768b908bc325ca7a00eaf596e1db54934ffce142d9626234f76f38"
+              "sha256": "cf9e63bb254f07382dbf6c5deddf1ef8a26c09dbba75f3d4ac8279f51834572a"
             }
           ]
         },
         {
           "id": "G1",
           "status": "pending",
-          "next_action": "按 FOUNDATION_TASKS.md 的 F03 澄清细节、形成该分项验收及确认记录",
-          "user_action": "核对既有专题与审核适配原型，复用已确认审核规则。",
-          "reason": "核心方向已确认，分项修订1及相关待决尚未完成评审"
+          "next_action": "收集修订1的三项细化决定，更新需规/验收；确认后处理FINNS-19正文差异检查点",
+          "user_action": "确认或修改修订1，尤其取消送审/撤回区分、副本首次审批、失效引用处置；不重批F08既定规则",
+          "reason": "修订1评审草案已形成；F08修订3直接复用，COL-P01–P03及专题分项范围尚未获用户确认",
+          "evidence": [
+            {
+              "path": "docs/requirements/FOUNDATION_COLLECTION_REQUIREMENTS.md",
+              "sha256": "fc6ff0ed384ab6e452e08fec6eefc080d23ad3809943fd62c0bb2c2c02a2ba82"
+            }
+          ]
         },
         {
           "id": "PLANE",
           "status": "pending",
-          "next_action": "先完成本分项G1细节评审，再核对现有工作项；一致则记录无需变更，有差异才提出新的具体写入",
-          "user_action": "本轮管理写入无需重复确认；下一步只评审本分项未决产品细节",
-          "reason": "工作项及0.7.0Cycle/Release登记归版均已执行回读；G1细节尚未冻结，原型前仍需复核最终基线",
+          "next_action": "G1通过后主动准备FINNS-19正文完整差异，保留标题/Backlog/父项/负责人/优先级/日期及关联；单项确认后更新回读",
+          "user_action": "先完成本项需求确认；正式差异列出后再单项决定写入或明确延期",
+          "reason": "2026-10-18只读核对：FINNS-19仍Backlog，旧正文未体现F08首次审批/更新检测规则；本项G1未通过，未获写入确认",
           "evidence": [
             {
               "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json",
@@ -1220,9 +1238,9 @@
         {
           "id": "G2",
           "status": "pending",
-          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
-          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
-          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+          "next_action": "G1及Plane检查点满足后，按授权在现有Vue专题编辑/管理流程制作具体原型",
+          "user_action": "到G2时评审具体原型修订与范围；本轮先确认需求",
+          "reason": "F03具体专题原型未制作；F08 R2待评审不能替代本项原型及批准"
         },
         {
           "id": "G3",
@@ -1301,7 +1319,11 @@
         "V070-P14",
         "V070-P15"
       ],
-      "last_plane_verified": "2026-10-17"
+      "last_plane_verified": "2026-10-18",
+      "requirements_path": "docs/requirements/FOUNDATION_COLLECTION_REQUIREMENTS.md",
+      "requirements_revision": 1,
+      "last_plane_read_scope": "FINNS-19正文/状态/父项及评论；依赖FINNS-17限定字段；未核对Cycle/Release成员",
+      "last_plane_observed_updated_at": "2026-10-17T15:06:13.496676Z"
     },
     {
       "id": "foundation-discovery",
@@ -1317,11 +1339,11 @@
           "status": "pass",
           "next_action": "按 FOUNDATION_BASELINE.md 逐组评审分项细节",
           "user_action": "无需重复批准已记录的定位与先审后发规则",
-          "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希",
+          "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希；2026-10-18语义复核：F08审核范围由用户整项批准修订3取代，其他分项已确认行为保持，仅刷新共享证据哈希",
           "evidence": [
             {
               "path": "docs/requirements/FOUNDATION_BASELINE.md",
-              "sha256": "10f6d00a7f768b908bc325ca7a00eaf596e1db54934ffce142d9626234f76f38"
+              "sha256": "cf9e63bb254f07382dbf6c5deddf1ef8a26c09dbba75f3d4ac8279f51834572a"
             }
           ]
         },
@@ -1445,15 +1467,15 @@
           "status": "pass",
           "next_action": "按 FOUNDATION_BASELINE.md 逐组评审分项细节",
           "user_action": "无需重复批准已记录的定位与先审后发规则",
-          "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希",
+          "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希；2026-10-18语义复核：F08审核范围由用户整项批准修订3取代，其他分项已确认行为保持，仅刷新共享证据哈希",
           "evidence": [
             {
               "path": "docs/requirements/FOUNDATION_BASELINE.md",
-              "sha256": "10f6d00a7f768b908bc325ca7a00eaf596e1db54934ffce142d9626234f76f38"
+              "sha256": "cf9e63bb254f07382dbf6c5deddf1ef8a26c09dbba75f3d4ac8279f51834572a"
             },
             {
               "path": "docs/requirements/FOUNDATION_PROFILE_REQUIREMENTS.md",
-              "sha256": "2fef976f0297cedddd6af094efd0b55fa3895534edbc5ac9422bf09abaa72836"
+              "sha256": "6c5870908ac06f7e499a9806d46ef57eb0e806ac62d54e19a2a653e48ba72956"
             }
           ]
         },
@@ -1587,11 +1609,11 @@
           "status": "pass",
           "next_action": "按 FOUNDATION_BASELINE.md 逐组评审分项细节",
           "user_action": "无需重复批准已记录的定位与先审后发规则",
-          "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希",
+          "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希；2026-10-18语义复核：F08审核范围由用户整项批准修订3取代，其他分项已确认行为保持，仅刷新共享证据哈希",
           "evidence": [
             {
               "path": "docs/requirements/FOUNDATION_BASELINE.md",
-              "sha256": "10f6d00a7f768b908bc325ca7a00eaf596e1db54934ffce142d9626234f76f38"
+              "sha256": "cf9e63bb254f07382dbf6c5deddf1ef8a26c09dbba75f3d4ac8279f51834572a"
             }
           ]
         },
@@ -1718,7 +1740,7 @@
           "evidence": [
             {
               "path": "docs/requirements/FOUNDATION_USER_ADMIN_REQUIREMENTS.md",
-              "sha256": "6d6e3f5ee224ca9e5bbc84c9ef0b87a7b9e8fb99204017a432b36f563358399d"
+              "sha256": "e2277857a24e3ed6e6826d081b99995085c41c468b5028a4110836d2714c4102"
             }
           ]
         },
@@ -1731,15 +1753,15 @@
           "evidence": [
             {
               "path": "docs/requirements/FOUNDATION_USER_ADMIN_REQUIREMENTS.md",
-              "sha256": "6d6e3f5ee224ca9e5bbc84c9ef0b87a7b9e8fb99204017a432b36f563358399d"
+              "sha256": "e2277857a24e3ed6e6826d081b99995085c41c468b5028a4110836d2714c4102"
             },
             {
               "path": "docs/iterations/0.7.0/PROTOTYPE_USER_ADMIN_R3.md",
-              "sha256": "3eba36de513a020d2a0c7de036520f106ca7310c3df09ad979436ab56d69d615"
+              "sha256": "178391ada54b077efa193dd4e62c3370d7bb0d511e257e9b74258f5d4d1f24a3"
             },
             {
               "path": "docs/requirements/FOUNDATION_DECISIONS.md",
-              "sha256": "d9daccc8d7ff756a79f21f0a2c3808cc0f872fde2de6ed10eb81915e0ad2935c"
+              "sha256": "1cdc1904a4b523fccc6c92c74d356a8387a3ce9103a8cec8221b9ac719e8f3bc"
             }
           ]
         },
@@ -1756,11 +1778,11 @@
             },
             {
               "path": "docs/requirements/FOUNDATION_USER_ADMIN_PLANE_P02.json",
-              "sha256": "6d59232ce61c37cba0312042f892aab5855d51c98b5d3efe20386e2e05dc6878"
+              "sha256": "566958f877265ade2d3ad1f5329ce6d5c83e1cb8efedc81340570cbad589c49f"
             },
             {
               "path": "docs/requirements/FOUNDATION_DECISIONS.md",
-              "sha256": "d9daccc8d7ff756a79f21f0a2c3808cc0f872fde2de6ed10eb81915e0ad2935c"
+              "sha256": "1cdc1904a4b523fccc6c92c74d356a8387a3ce9103a8cec8221b9ac719e8f3bc"
             }
           ]
         },
@@ -1773,15 +1795,15 @@
           "evidence": [
             {
               "path": "docs/requirements/FOUNDATION_USER_ADMIN_REQUIREMENTS.md",
-              "sha256": "6d6e3f5ee224ca9e5bbc84c9ef0b87a7b9e8fb99204017a432b36f563358399d"
+              "sha256": "e2277857a24e3ed6e6826d081b99995085c41c468b5028a4110836d2714c4102"
             },
             {
               "path": "docs/iterations/0.7.0/PROTOTYPE_USER_ADMIN_R3.md",
-              "sha256": "3eba36de513a020d2a0c7de036520f106ca7310c3df09ad979436ab56d69d615"
+              "sha256": "178391ada54b077efa193dd4e62c3370d7bb0d511e257e9b74258f5d4d1f24a3"
             },
             {
               "path": "docs/requirements/FOUNDATION_DECISIONS.md",
-              "sha256": "d9daccc8d7ff756a79f21f0a2c3808cc0f872fde2de6ed10eb81915e0ad2935c"
+              "sha256": "1cdc1904a4b523fccc6c92c74d356a8387a3ce9103a8cec8221b9ac719e8f3bc"
             }
           ]
         },
@@ -1815,7 +1837,7 @@
             },
             {
               "path": "docs/requirements/FOUNDATION_DECISIONS.md",
-              "sha256": "d9daccc8d7ff756a79f21f0a2c3808cc0f872fde2de6ed10eb81915e0ad2935c"
+              "sha256": "1cdc1904a4b523fccc6c92c74d356a8387a3ce9103a8cec8221b9ac719e8f3bc"
             }
           ]
         },
@@ -1858,7 +1880,7 @@
             },
             {
               "path": "docs/requirements/FOUNDATION_DECISIONS.md",
-              "sha256": "d9daccc8d7ff756a79f21f0a2c3808cc0f872fde2de6ed10eb81915e0ad2935c"
+              "sha256": "1cdc1904a4b523fccc6c92c74d356a8387a3ce9103a8cec8221b9ac719e8f3bc"
             }
           ]
         },
@@ -1875,7 +1897,7 @@
             },
             {
               "path": "docs/requirements/FOUNDATION_DECISIONS.md",
-              "sha256": "d9daccc8d7ff756a79f21f0a2c3808cc0f872fde2de6ed10eb81915e0ad2935c"
+              "sha256": "1cdc1904a4b523fccc6c92c74d356a8387a3ce9103a8cec8221b9ac719e8f3bc"
             }
           ]
         },
@@ -1964,7 +1986,7 @@
     {
       "id": "foundation-review",
       "requirement_id": "FINNS-REQ-020/REVIEW",
-      "name": "统一作品与评论审核管理",
+      "name": "内容敏感拦截与专题首次审批",
       "version": "0.7.0",
       "target_version": "0.7.0",
       "plane_workitem_id": "6ac45b07-b338-4944-b957-cf9928cc72a0",
@@ -1975,89 +1997,155 @@
           "status": "pass",
           "next_action": "按 FOUNDATION_BASELINE.md 逐组评审分项细节",
           "user_action": "无需重复批准已记录的定位与先审后发规则",
-          "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希",
+          "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希；2026-10-18语义复核：F08审核范围由用户整项批准修订3取代，其他分项已确认行为保持，仅刷新共享证据哈希",
           "evidence": [
             {
               "path": "docs/requirements/FOUNDATION_BASELINE.md",
-              "sha256": "10f6d00a7f768b908bc325ca7a00eaf596e1db54934ffce142d9626234f76f38"
+              "sha256": "cf9e63bb254f07382dbf6c5deddf1ef8a26c09dbba75f3d4ac8279f51834572a"
             }
           ]
         },
         {
           "id": "G1",
-          "status": "pending",
-          "next_action": "按 FOUNDATION_TASKS.md 的 F08 澄清细节、形成该分项验收及确认记录",
-          "user_action": "确认审核本人作品、审核权限、下架恢复与历史内容过渡。",
-          "reason": "核心方向已确认，分项修订1及相关待决尚未完成评审"
+          "status": "pass",
+          "next_action": "G1已通过（修订6）；处理PLANE同步检查点后制作原型",
+          "user_action": "无需重复确认修订6",
+          "reason": "REVIEW-D20：用户整项确认修订6（三级、取消命中计数与专题首次审批、时间线、词库导入）",
+          "evidence": [
+            {
+              "path": "docs/requirements/FOUNDATION_REVIEW_REQUIREMENTS.md",
+              "sha256": "6d4c86263b6e5463f345bdf07a0e2f255b54fb48c01fe3539581d5307ee2ebb6"
+            },
+            {
+              "path": "docs/requirements/FOUNDATION_DECISIONS.md",
+              "sha256": "1cdc1904a4b523fccc6c92c74d356a8387a3ce9103a8cec8221b9ac719e8f3bc"
+            }
+          ]
         },
         {
           "id": "PLANE",
-          "status": "pending",
-          "next_action": "先完成本分项G1细节评审，再核对现有工作项；一致则记录无需变更，有差异才提出新的具体写入",
-          "user_action": "本轮管理写入无需重复确认；下一步只评审本分项未决产品细节",
-          "reason": "工作项及0.7.0Cycle/Release登记归版均已执行回读；G1细节尚未冻结，原型前仍需复核最终基线",
+          "status": "pass",
+          "next_action": "PLANE已通过；后续范围/管理状态变化再提差异，不重复执行P02",
+          "user_action": "无需操作",
+          "reason": "REVIEW-SYNC-P02经用户单项确认后写前重读一致、仅更新FINNS-17正文一次，回读正文一致且保护字段（含Cycle）保持；Release成员未核对",
           "evidence": [
             {
-              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json",
-              "sha256": "8bf6c8d304d5263d46e3ffc823cd0ec0c9a175d21417f98dd18406a3be13ea29"
+              "path": "docs/requirements/FOUNDATION_REVIEW_PLANE_P02_RECEIPT.json",
+              "sha256": "047492ba3d5afadd9f2ab1c9a92a31e6956f7ce9deec03bda3214e1bfb491eef"
+            },
+            {
+              "path": "docs/requirements/FOUNDATION_REVIEW_PLANE_P02.md",
+              "sha256": "222ec8c5cb742a1380f06f6a79cdb6d02f6e6fc6919147313262fcea604a3ed9"
             }
           ]
         },
         {
           "id": "G2",
-          "status": "pending",
-          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
-          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
-          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+          "status": "pass",
+          "next_action": "G2已通过（R3）；完成G3设计评审待决项",
+          "user_action": "无需重复确认R3",
+          "reason": "REVIEW-D22：用户确认具体原型R3及§10.8范围；真实后端/并发/手机验收未执行",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/PROTOTYPE_REVIEW_R3.md",
+              "sha256": "7b193f25479685a426670a3364bf65b05bad816643af3718673fcf72a196db1b"
+            },
+            {
+              "path": "docs/requirements/FOUNDATION_DECISIONS.md",
+              "sha256": "1cdc1904a4b523fccc6c92c74d356a8387a3ce9103a8cec8221b9ac719e8f3bc"
+            }
+          ]
         },
         {
           "id": "G3",
-          "status": "pending",
-          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
-          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
-          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+          "status": "pass",
+          "next_action": "G3带条件通过：C7压测转入G6；C8/C9不采纳",
+          "user_action": "无需操作",
+          "reason": "修订6概设§8、契约§13、设计评审§6/§6.6（同作者自评，独立性有限）：遗留项L4–L8关闭或获批，U6–U9已答复；条件C7转入G6",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/DESIGN_CONTENT_REVIEW.md",
+              "sha256": "0aee4aa26dbba3d2d157ea15ada1659e28869892e678d94f19ae4cbc69ec9f7f"
+            },
+            {
+              "path": "docs/iterations/0.7.0/DESIGN_REVIEW_CONTENT_REVIEW.md",
+              "sha256": "63acbd2b00417d9b5f61ddf852951d13c9dbc295918f7df2c236381429ea85a5"
+            },
+            {
+              "path": "docs/iterations/0.7.0/SENSITIVE_LEXICON_CANDIDATE.md",
+              "sha256": "7fa68e018c950b576aa60b5244a1e16e3a103b5f48309d3ec7f973ff9dddbe48"
+            }
+          ]
         },
         {
           "id": "G4",
-          "status": "pending",
-          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
-          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
-          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+          "status": "pass",
+          "next_action": "按契约§13批次B7–B12实施",
+          "user_action": "无需操作",
+          "reason": "REVIEW-D23：用户授权按契约§13的B7–B12实施（含导入与上限调整）；不含发布与Plane写入",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/CONTRACT_CONTENT_REVIEW.md",
+              "sha256": "58a68626f6326a31b27824a9b056825f0d34dbe89f48bf0586bada9376acbc30"
+            },
+            {
+              "path": "docs/requirements/FOUNDATION_DECISIONS.md",
+              "sha256": "1cdc1904a4b523fccc6c92c74d356a8387a3ce9103a8cec8221b9ac719e8f3bc"
+            }
+          ]
         },
         {
           "id": "G5",
-          "status": "pending",
-          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
-          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
-          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+          "status": "pass",
+          "next_action": "G5已通过：B7–B12已实现，见IMPLEMENTATION_CONTENT_REVIEW.md §7",
+          "user_action": "无需操作",
+          "reason": "修订6（V17三级管线、流转时间线、词库导入、20,000规则缓存）已实现；H2与PG新库138/138、V16→V17升级演练、前端43/43；偏差已记录（§7.2）；未发布、未提交Git",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/IMPLEMENTATION_CONTENT_REVIEW.md",
+              "sha256": "f28ca21e3fe5c9afb4dfc54658809a0fac703eb8237955fc91885f4d5fe7d5b4"
+            }
+          ]
         },
         {
           "id": "G6",
-          "status": "pending",
-          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
-          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
-          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+          "status": "pass",
+          "next_action": "G6已通过：自动化与压测已过，登录态体验由用户在8091完成",
+          "user_action": "无需操作",
+          "reason": "自动化证据：H2 141/141（2026-10-21复跑）、PG新库138/138、V16→V17升级演练22/22、前端44/44、20,000规则首次945ms/缓存38ms；AI侧未取得登录态浏览器实测（测试账号验证链接被自动模式拦截，未绕过），该缺口由用户在8091用站长账号体验验收覆盖；真人手机/真实邮件未验",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/IMPLEMENTATION_CONTENT_REVIEW.md",
+              "sha256": "f28ca21e3fe5c9afb4dfc54658809a0fac703eb8237955fc91885f4d5fe7d5b4"
+            }
+          ]
         },
         {
           "id": "G7",
-          "status": "pending",
-          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
-          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
-          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+          "status": "pass",
+          "next_action": "G7已通过；发布(G8)需用户另行指定环境并授权，Plane P03待单项确认",
+          "user_action": "无需操作；如需发布或同步Plane请另行指示",
+          "reason": "2026-10-21用户在对话中明确回复“验收通过”（对象：修订6实现，见验收清单结论段）；限制：真人手机、真实邮件、主站部署未验",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/ACCEPTANCE_CONTENT_REVIEW.md",
+              "sha256": "4e8f22bc66b6ca9bcedb0ecd4bf2b3500d214fb4c07769bba92d97dba491a684"
+            }
+          ]
         },
         {
           "id": "G8",
           "status": "pending",
-          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
-          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
-          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+          "next_action": "待用户指定发布环境并授权；发布前备份主库并做恢复演练，四处版本与CHANGELOG按发布流程处理",
+          "user_action": "如需发布，请指定环境并授权；V15–V17不支持回退旧包",
+          "reason": "G7已通过，但未发布：版本仍0.7.0，未部署、未推送"
         },
         {
           "id": "G9",
           "status": "pending",
-          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
-          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
-          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+          "next_action": "发布后再补最终交接；Plane REVIEW-SYNC-P03待用户单项确认",
+          "user_action": "无需操作；需要同步Plane时单项确认P03",
+          "reason": "交接文档已更新到提交时状态（AI_HANDOFF.md），发布与Plane同步尚未发生"
         }
       ],
       "plane_parent_identifier": "FINNS-14",
@@ -2085,9 +2173,27 @@
       "completed_plane_operations": [
         "V070-P08",
         "V070-P14",
-        "V070-P15"
+        "V070-P15",
+        "REVIEW-SYNC-P01",
+        "REVIEW-SYNC-P02"
       ],
-      "last_plane_verified": "2026-10-17"
+      "last_plane_verified": "2026-10-20",
+      "requirement_path": "docs/requirements/FOUNDATION_REVIEW_REQUIREMENTS.md",
+      "plane_requirement_sync_status": "succeeded_and_verified",
+      "plane_requirement_sync_receipt_path": "docs/requirements/FOUNDATION_REVIEW_PLANE_P02_RECEIPT.json",
+      "plane_current_title": "FINNS 0.7.0｜F08 内容敏感拦截与专题首次审批",
+      "prototype_revision": "R3",
+      "prototype_record_path": "docs/iterations/0.7.0/PROTOTYPE_REVIEW_R3.md",
+      "prototype_status": "created_pending_user_review",
+      "prototype_authorization": "REVIEW-D20确认修订6后用户明确要求制作",
+      "plane_prototype_progress_sync_status": "not_synced_no_new_plane_access_this_round",
+      "prototype_scope_delta_status": "R2 CRUD/reading increment frozen in requirements revision 4 (P05/P06, RV-A14/15); Plane diff REVIEW-SYNC-P02 prepared, not written",
+      "design_record_path": "docs/iterations/0.7.0/DESIGN_CONTENT_REVIEW.md",
+      "contract_record_path": "docs/iterations/0.7.0/CONTRACT_CONTENT_REVIEW.md",
+      "implementation_record_path": "docs/iterations/0.7.0/IMPLEMENTATION_CONTENT_REVIEW.md",
+      "acceptance_path": "docs/iterations/0.7.0/ACCEPTANCE_CONTENT_REVIEW.md",
+      "requirement_revision": 6,
+      "plane_requirement_sync_pending": "docs/requirements/FOUNDATION_REVIEW_PLANE_P03.md"
     }
   ],
   "required_gates": [

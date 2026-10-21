@@ -21,7 +21,7 @@ onBeforeUnmount(() => { if (previousFocus?.isConnected) previousFocus.focus() })
 <template>
   <div class="overlay admin-overlay" @click.self="close">
     <section ref="panel" class="modal admin-dialog" :class="{ 'admin-dialog-wide': wide }" role="dialog" aria-modal="true" :aria-labelledby="labelledby" :aria-describedby="describedby" tabindex="-1" @keydown="onKey">
-      <header class="admin-dialog-bar"><span>FINNS · 账号与权限</span><button class="admin-dialog-close" type="button" aria-label="关闭" :disabled="busy" @click="close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button></header>
+      <header class="admin-dialog-bar"><span>{{ context }}</span><button class="admin-dialog-close" type="button" aria-label="关闭" :disabled="busy" @click="close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button></header>
       <div class="admin-dialog-content"><slot /></div>
     </section>
   </div>

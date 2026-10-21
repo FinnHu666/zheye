@@ -1,3 +1,47 @@
+## 开发流程任务识别与隔离（2026-10-19）
+
+| 用途 | 产物 | 状态与保存 |
+| --- | --- | --- |
+| 开发规划/并行执行判断 | [项目skill](../../../.agents/skills/finns-development/SKILL.md)、[任务识别规则](../../../.agents/skills/finns-development/references/task-planning.md)、[10场景验证](WORKFLOW_TASK_PLANNING_VALIDATION.md) | 本轮已更新；格式/链接通过，同作者静态场景走查；源码与记录持久保存，临时哈希/日志位于可清理的target/skill-task-planning-proof |
+
+仅流程文档交付；没有创建隔离环境、改变业务门禁或实施17/18/19。
+
+## FINNS-19需求评审修订1（2026-10-18）
+
+| 需求/阶段 | 产物与用途 | 路径 | 状态 | 来源/保存方式 |
+| --- | --- | --- | --- | --- |
+| F03/G1 | 专题适配需求、静态评审发现、三项待决及16项验收定义 | [需规修订1](../../requirements/FOUNDATION_COLLECTION_REQUIREMENTS.md) | 待用户确认，G1 pending | 本轮；脱敏本地文档；包含Plane只读范围及限制 |
+| F03/进度 | 本项G1/PLANE/G2具体下一步与核对时间 | [进度](../../delivery-progress.json) | 其余任务不变，后续门禁未通过 | 本轮局部增量；已有登记/归版回执保留历史日期 |
+
+本轮仅需求评审及记录，未写Plane或改业务，16项业务验收未执行。F03原型、概设、契约待制作；F08已有原型及其待评审状态不作为F03完成证据。最终文档检查结果见需规末尾；未运行业务构建、测试或浏览器。已有FINNS-17 R2改动和其他任务证据保留。
+
+## FINNS-18需求评审修订1（2026-10-18）
+
+| 需求/阶段 | 产物与用途 | 状态/来源与保存方式 |
+| --- | --- | --- |
+| FINNS-18 / G1 | [文章与普通话题需规、决定、源码差距及CT-A01–13](../../requirements/FOUNDATION_CONTENT_REQUIREMENTS.md) | 本轮生成；修订1待整项确认，CONTENT-D01/D02已由用户答复；本地持久、脱敏，非远程正文镜像 |
+
+当前G1pending；Plane只读核对FINNS-18/17，无写入，关联成员未核对。需求整项通过后主动处理标题/正文同步检查点；原型和业务未制作，13项业务验收未执行。验证：本轮改动文档的相对链接、验收ID唯一性、状态JSON、仅foundation-content变更和四处版本已检查；最终进度检查本项仍G1，其他任务保持原阶段。未执行业务构建/测试、浏览器、手机或数据库检查。
+
+## FINNS-17：原型 R2 已按阅读与 CRUD 反馈修订，待评审（2026-10-18）
+
+用户 REVIEW-D13 指出审批双栏难读，REVIEW-D14 明确敏感规则缺基础增删改查。已在4175既有Vue原型制作[R2](PROTOTYPE_REVIEW_R2.md)：独立全文审阅、首次无空旧版栏、有旧版单独切换；规则查询/筛选/分页、新增/编辑/启停/删除确认、失败/冲突及审计。50/50模拟、97模块构建、桌面/390/768px与详情导航已验证；截图与22文件快照在忽略目录 `target/prototypes/review-r2-proof/`。R1以下为历史。
+
+当前 G2 pending，等待用户对具体R2及CRUD增量反馈/确认；无须重批已确认的三次命中等规则。需规修订3/P01仅覆盖原范围，R2增量尚未冻结/同步；通过后先协调需规/验收与Plane差异检查点，再设计和业务开发。本轮未访问Plane、操作真实业务/数据库/主站/生产版本或Git；保留FINNS-15/16发布交接。真实13项业务验收和手机未执行。
+
+## FINNS-17产品原型R1（2026-10-18）
+
+| 阶段/用途 | 产物 | 状态与来源 | 保存方式 |
+| --- | --- | --- | --- |
+| G2具体产品原型 | [R1范围、体验步骤、验收映射与验证](PROTOTYPE_REVIEW.md)、[原型运行说明](../../prototypes/site-access/README.md) | 本轮用户REVIEW-D12授权制作；需规修订3不变，待用户确认具体R1，G2pending | 持久本地文档及现有Vue原型源码 |
+| 模拟/构建/浏览器证据 | `target/prototypes/review-r1-proof/` | 最终44/44模拟、93模块构建退出0；桌面/390px/768px和主路径/异常检查；18文件快照、13截图 | Git忽略目录，可清理；不等于真实服务端/数据库/手机或业务验收 |
+
+G1/前置PLANE继续有效；本轮未连接/写Plane或进入业务开发/发布。原型进展未同步，后续授权时另提增量，勿重复P01。共享工作区的FINNS-15/16发布提交及未完成事项不被本项改写。
+
+## FINNS-17需求评审交付（2026-10-18）
+
+[需规修订3/REVIEW-D01–D10及13项候选验收](../../requirements/FOUNDATION_REVIEW_REQUIREMENTS.md)已由用户整项批准，F08 G1通过；[REVIEW-SYNC-P01执行记录](../../requirements/FOUNDATION_REVIEW_PLANE_P01.md)及[脱敏回执](../../requirements/FOUNDATION_REVIEW_PLANE_P01_RECEIPT.json)记录用户单项授权、一次更新和回读通过；19项保护字段保持，G1/PLANE通过、下一阶段G2。[分项索引](../../requirements/FOUNDATION_ARTIFACTS.md)保存来源与范围；相关基础基线、任务/决定和汇总审核条款已协调，其他分项门禁不因F08评审通过改变。本轮仅需求文档及已授权管理同步，未产生原型/业务/数据库/邮件/部署证据。
+
 ## FINNS-16：已按契约B1–B5实施，等待用户验收G7（2026-10-18）
 
 用户要求“完成这个Plane上的任务”，AI据此（USER-ADMIN-D12）完成概设+自评设计评审、契约、后端/前端实施与验证；**未验收、未发布、未提交Git、未写Plane**。入口：[概设](DESIGN_USER_ADMIN.md)、[设计评审](DESIGN_REVIEW_USER_ADMIN.md)、[契约](CONTRACT_USER_ADMIN.md)、[实施与验证记录](IMPLEMENTATION_USER_ADMIN.md)、[用户验收清单V1–V10](ACCEPTANCE_USER_ADMIN.md)。
@@ -152,3 +196,15 @@ G0/G1/PLANE既有通过，G2仍pending，未开始G3后业务。本轮未连接/
 后续若需持久保存忽略目录中的重要证据，先按授权指定受控位置制作脱敏审阅包与 SHA256 清单，再登记实际位置及验证。当前没有声称历史二进制证据已经永久归档。
 
 本轮不生成或归档密钥、密码、OAuth、Cookie、完整模型输入输出、完整 Plane 响应或隐藏推理；仓库内已有历史资料不通过本索引复制到远程。
+
+## FINNS-17 R2确认与设计（2026-10-19）
+
+- [概要设计](DESIGN_CONTENT_REVIEW.md)、[设计评审](DESIGN_REVIEW_CONTENT_REVIEW.md)、[契约草案](CONTRACT_CONTENT_REVIEW.md)；[需规修订4](../../requirements/FOUNDATION_REVIEW_REQUIREMENTS.md)、[REVIEW-D15](../../requirements/FOUNDATION_DECISIONS.md)、[Plane差异P02](../../requirements/FOUNDATION_REVIEW_PLANE_P02.md)。均为本地文档，未实现、未写Plane。
+
+## FINNS-17 实施与验收（2026-10-20）
+
+- [实施与验证记录](IMPLEMENTATION_CONTENT_REVIEW.md)、[用户验收清单](ACCEPTANCE_CONTENT_REVIEW.md)；迁移`src/main/resources/db/migration/V15__content_review.sql`；后端`src/main/java/com/aitome/review/`；前端`frontend/src/pages/admin/AdminReview*.vue`、`AdminRulesPage.vue`、`pages/ReviewStatusPage.vue`。已实施未验收、未发布。
+
+- 检测增强（2026-10-20）：[示例词库与误报样例](SENSITIVE_LEXICON_SAMPLES.md)、[流程优化记录](WORKFLOW_DEFERRED_ITEMS_VALIDATION.md)；迁移`V16__sensitive_rule_match_mode.sql`；`SensitiveMatcher.java`、`SensitiveMatcherTests.java`。
+- 修订6原型（2026-10-20）：[PROTOTYPE_REVIEW_R3.md](PROTOTYPE_REVIEW_R3.md)；源码`docs/prototypes/site-access/`（`mock/review.js`、`components/FlowTimeline.vue`、`pages/AdminReviewsPage.vue`、`ReviewDetailPage.vue`、`ReviewSubmissionsPage.vue`、`SensitiveRulesPage.vue`、`tests/review.test.mjs`）。待评审，非正式功能。
+- 修订6实施（2026-10-20）：[实施记录§7](IMPLEMENTATION_CONTENT_REVIEW.md)、[更新后的验收清单](ACCEPTANCE_CONTENT_REVIEW.md)；迁移`V17__review_levels_flows.sql`；`LexiconImportService.java`、`SensitiveRuleScaleTests.java`、`ReviewText.java`；前端`components/FlowTimeline.vue`、`PageNav.vue`、`ReviewDocument.vue`、`lib/reviewText.js`、`tests/review.test.js`；本地词库`data/lexicons/`（git忽略，不入库）。已实施，G6缺已登录浏览器验证，待用户验收，未发布。
