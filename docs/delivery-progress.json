@@ -1060,7 +1060,7 @@
           "id": "G0",
           "status": "pass",
           "next_action": "按 FOUNDATION_BASELINE.md 逐组评审分项细节",
-          "user_action": "无需重复确认已记录方向及CONTENT-D01/D02；审核规则沿用F08修订3",
+          "user_action": "无需重选既有范围；审核依赖以F08修订6为准",
           "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希；2026-10-18语义复核：F08审核范围由用户整项批准修订3取代，其他分项已确认行为保持，仅刷新共享证据哈希",
           "evidence": [
             {
@@ -1071,78 +1071,154 @@
         },
         {
           "id": "G1",
-          "status": "pending",
-          "next_action": "收集需规修订1整体反馈/确认；沿用已确认的同期话题与手动保存，协调F08检测规则",
-          "user_action": "确认需规修订1整体行为或提出修改，不重复选择CONTENT-D01/D02",
-          "reason": "CONTENT-D01/D02已确认；需规修订1及CT-A01–13已形成，尚未整项批准",
+          "status": "pass",
+          "next_action": "沿用已批准修订2，处理原型前Plane同步检查点",
+          "user_action": "无需重复确认需求或常规流程选择",
+          "reason": "PUBLISH-D01用户明确整项确认文章与专题需规修订2；验收定义通过，业务验收未执行；2026-10-21用户确认修订3增量（PUBLISH-D03：保留删除从未公开的私人草稿，新增CT-A14/A15），原批准范围不变，刷新哈希；2026-10-21用户确认修订4（PUBLISH-D04：整体移除普通话题，既有话题选C彻底移除，新增CT-A16/CT-L05），F02范围改为只含文章，其余已确认规则不变，刷新哈希",
           "evidence": [
             {
               "path": "docs/requirements/FOUNDATION_CONTENT_REQUIREMENTS.md",
-              "sha256": "5bc20dbbfebba96d63a44d7587d60aa5660ac34ed21471f6035dfee2fcc50d5c"
+              "sha256": "a9ba0e642071a24e3ae3d9775950483a74a7226234b672420960f85458586ea2"
+            },
+            {
+              "path": "docs/requirements/PUBLISHING_DECISIONS.md",
+              "sha256": "fe1f1eed880ce48a418da6ee7402c7db1dfc6b71507e81270a80383af8b9281b"
+            },
+            {
+              "path": "docs/iterations/0.7.0/ACCEPTANCE_CONTENT.md",
+              "sha256": "7dbcfdaa134f234ac7d0d51e38554336b68d34fa0dfab446531359da88f9e485"
             }
           ]
         },
         {
           "id": "PLANE",
-          "status": "pending",
-          "next_action": "G1整项通过后展示FINNS-18标题/正文精确差异，单项确认后写入/回读；保留其余字段关联",
-          "user_action": "当前先评审需求；同步差异展示后再单项确认写入",
-          "reason": "本轮只读FINNS-18仍为旧全量审核表述；未核对Cycle/Release成员，未获新写入确认",
+          "status": "pass",
+          "next_action": "FINNS-18 Plane已同步到开发完成（P05）；发布后再同步状态与版本",
+          "user_action": "无需操作",
+          "reason": "2026-10-21用户单项确认CONTENT-SYNC-P01，写前重读一致，仅更新FINNS-18标题/正文一次，回读通过（Backlog、parent、cycle等保护字段保持）；Release成员未核对（此前HTTP 402）；2026-10-21用户逐项确认CONTENT-SYNC-P02（A–D），写前重读一致，仅更新FINNS-18正文一次，回读通过（Backlog/parent/cycle保持），Release成员未核对（HTTP 402）；2026-10-21用户逐项确认CONTENT-SYNC-P03（A–D，修订4），写前重读一致，标题与正文各更新一次，回读通过（Backlog/parent/cycle保持），Release成员未核对（HTTP 402）；2026-10-22用户逐项确认CONTENT-SYNC-P04（A–D），写前重读一致，正文与state（Backlog→In Progress）一次写入，回读通过，Release成员未核对（HTTP 402）；第8项CT-L04过时句待下次同步；2026-10-22 P05：用户取消逐项确认后写入FINNS-18正文，状态保持In Progress，服务器返回已核对",
           "evidence": [
             {
-              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json",
-              "sha256": "8bf6c8d304d5263d46e3ffc823cd0ec0c9a175d21417f98dd18406a3be13ea29"
+              "path": "docs/requirements/FOUNDATION_CONTENT_PLANE_P01.md",
+              "sha256": "59286e2f835a796c1554747fbf86d1a2a25087b5d10ac8334a00623990c36f51"
+            },
+            {
+              "path": "docs/requirements/FOUNDATION_CONTENT_PLANE_P02.md",
+              "sha256": "94b82b139d1db55486fb6d3f1e6896b82f8796a99c4ca4197fc56276d866c877"
+            },
+            {
+              "path": "docs/requirements/FOUNDATION_CONTENT_PLANE_P03.md",
+              "sha256": "e86a34a616069337b7a6292e3c24fa09f5fd60162c2efce21e120bb6fa7e292e"
+            },
+            {
+              "path": "docs/requirements/FOUNDATION_CONTENT_PLANE_P04.md",
+              "sha256": "3ef2bd323e2d7b7613a2e3c6608a151ead33cb6c462998d36799fb5bca180ab2"
             }
           ]
         },
         {
           "id": "G2",
-          "status": "pending",
-          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
-          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
-          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+          "status": "pass",
+          "next_action": "进入G3：完成概设评审条件，等待用户对D1–D5的答复",
+          "user_action": "无需操作",
+          "reason": "2026-10-21用户确认原型R1具体版本与范围、其余四项取舍按推荐（PUBLISH-D05）；68项模拟测试、构建、部分浏览器检查；浏览器未验项随G6补验",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/PROTOTYPE_CONTENT_R1.md",
+              "sha256": "48ea3f55d4b0aad0d834cbab218593fea39436c9743a4db88cef5c0e5bbf7a15"
+            },
+            {
+              "path": "docs/requirements/PUBLISHING_DECISIONS.md",
+              "sha256": "fe1f1eed880ce48a418da6ee7402c7db1dfc6b71507e81270a80383af8b9281b"
+            }
+          ]
         },
         {
           "id": "G3",
-          "status": "pending",
-          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
-          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
-          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+          "status": "pass",
+          "next_action": "进入G4：详设与契约（DTO/版本/错误/权限/幂等并发/迁移V18与V19脚本/需求到测试映射）；需用户授权开始G4的实施范围；C2/C3转入G4/G6，C5/披露转入G8",
+          "user_action": "决定是否进入G4详设与契约，并提供实施授权范围（代码实现、隔离PostgreSQL测试库使用）",
+          "reason": "概设修订4：D1–D7已决定；独立评审退回→修订→复评带条件通过（无阻断），条件已在§14.3关闭；§14.3为作者关闭、未做第三轮；评审记录含同作者自评与两轮独立评审；迁移用时/回退/真人手机未验",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/DESIGN_CONTENT_PUBLISHING.md",
+              "sha256": "bcaf397d387ff00c0448ac8fc77f4919a88ec992221dfaef55ba9708556219a2"
+            },
+            {
+              "path": "docs/iterations/0.7.0/DESIGN_REVIEW_CONTENT_PUBLISHING.md",
+              "sha256": "77dbcd9cb26fdf5d8e64ab0435fa02507986470227d9bc34f28359b561e92180"
+            }
+          ]
         },
         {
           "id": "G4",
-          "status": "pending",
-          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
-          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
-          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+          "status": "pass",
+          "next_action": "进入G5：按契约修订2实施B1–B6（B1/B2起）；B7隔离PostgreSQL演练与B8话题删除另行授权；发布等B7/B8后与话题删除一并（同版交付）",
+          "user_action": "无需操作；B7、B8需要另行授权",
+          "reason": "契约修订2：独立评审带条件通过（无阻断），发现已折入§14；用户授权B1–B6与独立评审（PUBLISH-D08）、撤权作者仍可管理并同版交付（PUBLISH-D09）；PostgreSQL语义均未实测，B6只跑H2；契约评审条件由作者关闭，未做第二轮",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/CONTRACT_CONTENT_PUBLISHING.md",
+              "sha256": "98519d610eaba4f7ffc6f789c1fc4a73fe52d927c1879e00b6b9f54a9da389bb"
+            },
+            {
+              "path": "docs/iterations/0.7.0/CONTRACT_REVIEW_CONTENT_PUBLISHING.md",
+              "sha256": "9b5ce323ef84a2eea2a4e6a6d9a2e4651bf6791743256c675d6320f18d671b76"
+            },
+            {
+              "path": "docs/requirements/PUBLISHING_DECISIONS.md",
+              "sha256": "fe1f1eed880ce48a418da6ee7402c7db1dfc6b71507e81270a80383af8b9281b"
+            }
+          ]
         },
         {
           "id": "G5",
-          "status": "pending",
-          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
-          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
-          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+          "status": "pass",
+          "next_action": "G6/G7已完成；剩余为发布前事项（G8）",
+          "user_action": "无需操作；发布需你授权",
+          "reason": "2026-10-22 B1–B8与话题代码收敛完成：草稿与发布生命周期（后端）、前端（我的内容文章页签/编辑/预览/创作入口/安全Markdown/更新于）、V18迁移脚本、V19草稿（不在迁移目录）。偏差与限制见实施记录",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/IMPLEMENTATION_CONTENT_PUBLISHING.md",
+              "sha256": "fbaec8711d4e21c549af2e502f23b6e53e1daf72d590cec4a7b80a334a8a21f8"
+            }
+          ]
         },
         {
           "id": "G6",
-          "status": "pending",
-          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
-          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
-          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+          "status": "pass",
+          "next_action": "发布前补：真实备份副本演练、真人手机、真实联调、压力",
+          "user_action": "无需操作",
+          "reason": "H2全量184项与隔离PostgreSQL 17全量184项均0失败，之后新增的并发用例在H2与PG通过（未再跑全量）；前端57项、构建通过；浏览器（mock接口）390/768/桌面实测通过；V18/V19在虚构数据上演练。真实数据、真人手机、真实联调、压力未验",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/IMPLEMENTATION_CONTENT_PUBLISHING.md",
+              "sha256": "fbaec8711d4e21c549af2e502f23b6e53e1daf72d590cec4a7b80a334a8a21f8"
+            },
+            {
+              "path": "docs/iterations/0.7.0/ACCEPTANCE_RESULT_CONTENT.md",
+              "sha256": "63c23cbe4c997c3226238f8bd9e1695fba0f5e5fb5d08aa9ba827851a92e82e8"
+            }
+          ]
         },
         {
           "id": "G7",
-          "status": "pending",
-          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
-          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
-          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+          "status": "pass",
+          "next_action": "发布前补验收清单“未验”各项",
+          "user_action": "发布前需你提供真实备份副本、确认不可逆删除、授权发布",
+          "reason": "CT-A01–A16自动化范围通过：A03部分（原生beforeunload未实测）、A11部分（无压力测试）、A16真实数据未执行；真人/外部依赖项单列于验收结果。未把“未验”标为通过",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/ACCEPTANCE_RESULT_CONTENT.md",
+              "sha256": "63c23cbe4c997c3226238f8bd9e1695fba0f5e5fb5d08aa9ba827851a92e82e8"
+            }
+          ]
         },
         {
           "id": "G8",
           "status": "pending",
-          "next_action": "仅在本分项前置门禁满足且获授权后推进，不因需求文档完成而跨阶段",
-          "user_action": "本轮不要求重复确认已定原则；到对应阶段只确认具体范围或必要产品决定",
-          "reason": "尚无本分项的原型、设计、业务实现或验证证据"
+          "next_action": "取得发布授权与真实备份副本后：盘点→V18/V19演练→四处版本→CHANGELOG发布条目→部署→部署后检查",
+          "user_action": "提供发布授权、真实备份副本，并对话题/评论/点赞删除逐类确认",
+          "reason": "未发布；版本文件保持0.7.0未动"
         },
         {
           "id": "G9",
@@ -1179,13 +1255,33 @@
         "V070-P14",
         "V070-P15"
       ],
-      "last_plane_verified": "2026-10-18",
+      "last_plane_verified": "2026-10-22",
       "requirements_path": "docs/requirements/FOUNDATION_CONTENT_REQUIREMENTS.md",
-      "requirement_revision": 1,
-      "requirement_status": "draft_pending_overall_review",
-      "plane_state_name": "Backlog",
-      "plane_scope_sync_status": "pending_requirement_approval_and_per_operation_confirmation",
-      "plane_read_scope": "FINNS-18 and dependency FINNS-17 only; Cycle/Release members not read"
+      "requirement_revision": 2,
+      "requirement_status": "approved_r4_implemented_automation_verified",
+      "plane_state_name": "In Progress",
+      "plane_scope_sync_status": "p05_written_2026-10-22_server_response_checked",
+      "plane_read_scope": "FINNS-18 and dependency FINNS-17 only; Cycle/Release members not read",
+      "workflow_revision": 2,
+      "workflow_review_date": "2026-10-21",
+      "workflow_selection_source": "PF-Q01/A01: user delegated conventional flow choice; AI selected in-request screening with later manual-review results visible in My Content",
+      "approval_record": "docs/requirements/PUBLISHING_DECISIONS.md",
+      "approval_id": "PUBLISH-D01",
+      "acceptance_path": "docs/iterations/0.7.0/ACCEPTANCE_CONTENT.md",
+      "plane_diff_path": "docs/requirements/FOUNDATION_CONTENT_PLANE_P01.md",
+      "prototype_status": "approved",
+      "prototype_path": "docs/iterations/0.7.0/PROTOTYPE_CONTENT_R1.md",
+      "prototype_brief_path": "docs/iterations/0.7.0/PROTOTYPE_PUBLISHING_BRIEF.md",
+      "last_plane_read_scope": "FINNS-18/19 full fields and current state; Cycle/Release members not queried",
+      "plane_diff_path_p02": "docs/requirements/FOUNDATION_CONTENT_PLANE_P02.md",
+      "plane_diff_path_p03": "docs/requirements/FOUNDATION_CONTENT_PLANE_P03.md",
+      "design_record_path": "docs/iterations/0.7.0/DESIGN_CONTENT_PUBLISHING.md",
+      "design_review_path": "docs/iterations/0.7.0/DESIGN_REVIEW_CONTENT_PUBLISHING.md",
+      "contract_record_path": "docs/iterations/0.7.0/CONTRACT_CONTENT_PUBLISHING.md",
+      "contract_review_path": "docs/iterations/0.7.0/CONTRACT_REVIEW_CONTENT_PUBLISHING.md",
+      "implementation_record_path": "docs/iterations/0.7.0/IMPLEMENTATION_CONTENT_PUBLISHING.md",
+      "plane_diff_path_p04": "docs/requirements/FOUNDATION_CONTENT_PLANE_P04.md",
+      "plane_diff_path_p05": "docs/requirements/FOUNDATION_CONTENT_PLANE_P05.md"
     },
     {
       "id": "foundation-collection",
@@ -1200,7 +1296,7 @@
           "id": "G0",
           "status": "pass",
           "next_action": "按 FOUNDATION_BASELINE.md 逐组评审分项细节",
-          "user_action": "无需重复批准已记录的定位与先审后发规则",
+          "user_action": "无需重选既有范围；审核依赖以F08修订6为准",
           "reason": "需求修订1范围不变，仅补FND-P01管理回执和编号，语义复核后更新证据哈希；2026-10-18语义复核：F08审核范围由用户整项批准修订3取代，其他分项已确认行为保持，仅刷新共享证据哈希",
           "evidence": [
             {
@@ -1211,36 +1307,50 @@
         },
         {
           "id": "G1",
-          "status": "pending",
-          "next_action": "收集修订1的三项细化决定，更新需规/验收；确认后处理FINNS-19正文差异检查点",
-          "user_action": "确认或修改修订1，尤其取消送审/撤回区分、副本首次审批、失效引用处置；不重批F08既定规则",
-          "reason": "修订1评审草案已形成；F08修订3直接复用，COL-P01–P03及专题分项范围尚未获用户确认",
+          "status": "pass",
+          "next_action": "沿用已批准修订2，处理原型前Plane同步检查点",
+          "user_action": "无需重复确认需求或常规流程选择",
+          "reason": "PUBLISH-D01用户明确整项确认文章与专题需规修订2；验收定义通过，业务验收未执行",
           "evidence": [
             {
               "path": "docs/requirements/FOUNDATION_COLLECTION_REQUIREMENTS.md",
-              "sha256": "fc6ff0ed384ab6e452e08fec6eefc080d23ad3809943fd62c0bb2c2c02a2ba82"
+              "sha256": "3b2a90813cbf0f42709881493a9d73a0413c478eb2469d2b1ca7a6c09d9beae8"
+            },
+            {
+              "path": "docs/requirements/PUBLISHING_DECISIONS.md",
+              "sha256": "fe1f1eed880ce48a418da6ee7402c7db1dfc6b71507e81270a80383af8b9281b"
+            },
+            {
+              "path": "docs/iterations/0.7.0/ACCEPTANCE_COLLECTION.md",
+              "sha256": "deeb49d23a8def8f21c270b904d678da0e5aa906ab03fc76d3e2b1383ba317c2"
             }
           ]
         },
         {
           "id": "PLANE",
-          "status": "pending",
-          "next_action": "G1通过后主动准备FINNS-19正文完整差异，保留标题/Backlog/父项/负责人/优先级/日期及关联；单项确认后更新回读",
-          "user_action": "先完成本项需求确认；正式差异列出后再单项决定写入或明确延期",
-          "reason": "2026-10-18只读核对：FINNS-19仍Backlog，旧正文未体现F08首次审批/更新检测规则；本项G1未通过，未获写入确认",
+          "status": "pass",
+          "next_action": "PLANE检查点已完成；进入G2，按任务书制作传统专题生命周期原型；原型确认、开始实施、验收等节点再提出新差异",
+          "user_action": "无需重复批准；原型形成后确认具体版本和范围",
+          "reason": "2026-10-21用户单项确认COLLECTION-SYNC-P01，写前重读一致，仅更新FINNS-19标题/正文一次，回读通过（Backlog、parent、cycle等保护字段保持）；Release成员未核对（此前HTTP 402）",
           "evidence": [
             {
-              "path": "docs/iterations/0.7.0/FOUNDATION_PLANE_RECEIPT.json",
-              "sha256": "8bf6c8d304d5263d46e3ffc823cd0ec0c9a175d21417f98dd18406a3be13ea29"
+              "path": "docs/requirements/FOUNDATION_COLLECTION_PLANE_P01.md",
+              "sha256": "8e5f9730dbd3f7ef7ecca4cc9933a2d27a74df1fc8eb5a207b595361f3600260"
             }
           ]
         },
         {
           "id": "G2",
           "status": "pending",
-          "next_action": "G1及Plane检查点满足后，按授权在现有Vue专题编辑/管理流程制作具体原型",
-          "user_action": "到G2时评审具体原型修订与范围；本轮先确认需求",
-          "reason": "F03具体专题原型未制作；F08 R2待评审不能替代本项原型及批准"
+          "next_action": "Plane检查点已完成；按任务书复用Vue环境制作传统专题生命周期原型并验证（FINNS-19尚未制作）",
+          "user_action": "无需操作；原型形成后再评审具体版本；如需现在开始FINNS-19原型请告知",
+          "reason": "PUBLISH-D02已授权检查点后继续；仅原型任务书，具体原型尚未制作",
+          "evidence": [
+            {
+              "path": "docs/iterations/0.7.0/PROTOTYPE_PUBLISHING_BRIEF.md",
+              "sha256": "e7c743e55a118aa8a0dea66df11b30eb5843f2b13f4f46ec30b856ba3485a5c5"
+            }
+          ]
         },
         {
           "id": "G3",
@@ -1319,11 +1429,23 @@
         "V070-P14",
         "V070-P15"
       ],
-      "last_plane_verified": "2026-10-18",
+      "last_plane_verified": "2026-10-21",
       "requirements_path": "docs/requirements/FOUNDATION_COLLECTION_REQUIREMENTS.md",
-      "requirements_revision": 1,
-      "last_plane_read_scope": "FINNS-19正文/状态/父项及评论；依赖FINNS-17限定字段；未核对Cycle/Release成员",
-      "last_plane_observed_updated_at": "2026-10-17T15:06:13.496676Z"
+      "requirements_revision": 2,
+      "last_plane_read_scope": "FINNS-18/19 full fields and current state; Cycle/Release members not queried",
+      "last_plane_observed_updated_at": "2026-10-17T15:06:13.496676Z",
+      "requirement_status": "approved_r2",
+      "workflow_revision": 2,
+      "workflow_review_date": "2026-10-21",
+      "workflow_selection_source": "PF-Q01/A01: user delegated conventional flow choice; AI selected in-request screening with later manual-review results visible in My Content",
+      "plane_scope_sync_status": "p01_written_and_read_back_2026-10-21",
+      "approval_record": "docs/requirements/PUBLISHING_DECISIONS.md",
+      "approval_id": "PUBLISH-D01",
+      "acceptance_path": "docs/iterations/0.7.0/ACCEPTANCE_COLLECTION.md",
+      "plane_diff_path": "docs/requirements/FOUNDATION_COLLECTION_PLANE_P01.md",
+      "plane_state_name": "Backlog",
+      "prototype_status": "brief_only_not_created",
+      "prototype_brief_path": "docs/iterations/0.7.0/PROTOTYPE_PUBLISHING_BRIEF.md"
     },
     {
       "id": "foundation-discovery",

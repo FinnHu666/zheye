@@ -1,3 +1,23 @@
+## FINNS-18/19需求批准及下一步准备（2026-10-21）
+
+| 阶段 | 产物 | 状态/来源/保存 |
+| --- | --- | --- |
+| G1 | [批准与遗留项](PUBLISHING_DECISIONS.md)；[文章需规](FOUNDATION_CONTENT_REQUIREMENTS.md)、[专题需规](FOUNDATION_COLLECTION_REQUIREMENTS.md) | PUBLISH-D01用户整项确认修订2，两项G1通过；本轮脱敏持久资料 |
+| 验收定义 | [CT-A01–16](../iterations/0.7.0/ACCEPTANCE_CONTENT.md)（CT-A14/A15修订3、CT-A16修订4增量）、[COL-A01–16](../iterations/0.7.0/ACCEPTANCE_COLLECTION.md) | 32项全部未执行，不冒称G7通过 |
+| PLANE | [CONTENT-SYNC-P01](FOUNDATION_CONTENT_PLANE_P01.md)及[载荷](FOUNDATION_CONTENT_PLANE_P01.json)；[COLLECTION-SYNC-P01](FOUNDATION_COLLECTION_PLANE_P01.md)及[载荷](FOUNDATION_COLLECTION_PLANE_P01.json) | 各仅标题/正文精确差异，待各项确认；只读对象/状态已核对，关联成员未核对；本地拟稿，不含远程正文镜像 |
+| G2准备 | [原型任务书](../iterations/0.7.0/PROTOTYPE_PUBLISHING_BRIEF.md) | 只有任务书，实际原型未制作；同步检查点后按用户下一步指令继续 |
+
+文档链接、验收编号、JSON/载荷边界、证据哈希及最终进度已检查：两项下一阶段PLANE，G1通过，检查器退出2表示真实待办；四处版本0.7.0，业务/原型/数据库/运行态未验。本轮未写Plane、Git或主站。
+
+## FINNS-18/19发布流程修订2（2026-10-21）
+
+| 需求/阶段 | 产物与用途 | 来源/状态与保存 |
+| --- | --- | --- |
+| FINNS-18 / G1 | [文章与普通话题流程、共同分流及PF-Q01/A01](FOUNDATION_CONTENT_REQUIREMENTS.md) | 修订2讨论稿；用户授权AI选常规发布体验，保留两项既有选择；本地持久脱敏，不含远程正文镜像 |
+| FINNS-19 / G1 | [传统专题创建/保存/发布与引用、复制边界](FOUNDATION_COLLECTION_REQUIREMENTS.md) | 修订2讨论稿；复用F08修订6和现有专题能力；本地持久脱敏，历史修订1保留 |
+
+验证：检查新增当前节的相对链接、需求证据哈希、JSON和差异格式；最终只读检查器退出2，F02/F03仍G1pending，F08仍G8待部署。不将历史F08验收当成本轮验收；业务测试/构建/浏览器/手机/数据库均未执行。未操作Plane、服务、版本或Git。product-discovery来源为通用skills目录的已安装文件，需求文档保存必要问答解释，不新增平行需求系统。
+
 ## FINNS-19分项评审修订1（2026-10-18）
 
 [传统专题需规](FOUNDATION_COLLECTION_REQUIREMENTS.md)：本轮新增，G1草案待确认；复用F08已批准规则，补作者动作/复制/引用边界、COL-P01–P03和16项未执行验收。Plane只读核对范围及源码依据在文内；FINNS-19旧正文差异待G1通过后提出精确写入清单，不是已同步。对应进度/交接/迭代索引只增补本项，未改变其他任务批准。本轮无业务、原型、数据库、服务、Git提交推送或MCP写入；最终文档检查见需规末尾。

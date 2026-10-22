@@ -1,3 +1,5 @@
+FINNS-18 原型 R1（需规修订2，待评审）：[记录与体验步骤](../../iterations/0.7.0/PROTOTYPE_CONTENT_R1.md)。入口 <http://127.0.0.1:4175/me/posts>（真实站点同一入口，旧/me/content重定向），右下“创作演示 · R1”→“载入创作样例（阿远）”；文章（已无话题）保存与发布、三个版本、取消送审与撤回、下架、离开保护、安全Markdown，浏览器虚构数据；`node --test tests/content.test.mjs` 15项；版式已对齐真实个人中心，列表含搜索/筛选/删除草稿。以下FINNS-17及更早内容为历史。
+
 FINNS-17 原型 R3（需规修订6，待评审）：[记录与体验步骤](../../iterations/0.7.0/PROTOTYPE_REVIEW_R3.md)。审批队列 <http://127.0.0.1:4175/admin/reviews>、规则与词库导入预览 <http://127.0.0.1:4175/admin/sensitive-rules>、作者流转 `/me/submissions`；右下“审核演示 · R3”。三级敏感、统一流程、流转时间线（含预留阶段）、重做的审批页；52项模拟测试与构建通过，全部为浏览器虚构数据。以下 R1/R2 内容为历史。
 
 # 当前：FINNS-17 内容审核原型 R2（待评审）

@@ -1,0 +1,42 @@
+/* FINNS-18 R1: article / topic lifecycle. Shares the FINNS cream / forest palette and the review styles. */
+.ct-page{max-width:1240px}
+.ct-tabs{align-items:center;flex-wrap:wrap}.ct-tabs button small{margin-left:5px;color:#8b968a;font-size:11px}.ct-tabs .ct-new{margin-left:auto;font-size:12px;padding:10px 16px;margin-bottom:6px}
+.ct-chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 20px}.ct-chips button{border:1px solid var(--line);background:#fffdf9;border-radius:99px;padding:7px 14px;font:inherit;font-size:12px;color:var(--muted);cursor:pointer;min-height:36px}.ct-chips button.on{background:var(--green);border-color:var(--green);color:#fff}
+.ct-list{list-style:none;margin:0;padding:0}.ct-row{display:flex;gap:18px;align-items:center;justify-content:space-between;padding:22px 0;border-bottom:1px solid var(--line);min-width:0}.ct-row-main{min-width:0;flex:1}.ct-row h2{font-size:18px;font-weight:600;line-height:1.6;margin:10px 0 4px;overflow-wrap:anywhere}.ct-row h2 a{color:inherit;text-decoration:none}.ct-row h2 a:hover{color:var(--green)}.ct-row p{font-size:12px;color:var(--muted);line-height:1.8;margin:0 0 6px;overflow-wrap:anywhere}.ct-row small{font-size:10px;color:#8b968a}.ct-row-actions{display:flex;gap:8px;flex:none}.ct-row-actions .btn{font-size:12px;padding:9px 13px;white-space:nowrap}
+.ct-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;margin:6px 0 18px}.ct-head h1{font:400 clamp(26px,3.6vw,38px)/1.35 Georgia,"Noto Sans SC",serif;letter-spacing:-.8px;margin:10px 0 0;overflow-wrap:anywhere}
+.ct-grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:26px;align-items:start}.ct-form .rv-field{position:relative}.rv-field.bad input,.rv-field.bad textarea{border-color:#c4766a;background:#fffaf8}.ct-count{align-self:flex-end;font-size:10px;color:#8b968a}.ct-count.over{color:#b0554a;font-weight:700}
+.ct-actions .btn{min-height:42px}.ct-hint{font-size:11px;line-height:1.9;color:var(--muted);margin:0}.ct-danger-row{display:flex;gap:22px;flex-wrap:wrap;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}.ct-danger-row .text-link{background:transparent;border:0;cursor:pointer;font:inherit;font-size:12px;color:var(--green);padding:6px 0;min-height:32px}.ct-danger-row .text-link.danger{color:#a75b4f}.ct-danger-row .text-link:disabled{opacity:.4;cursor:not-allowed}
+.ct-side{display:flex;flex-direction:column;gap:18px;position:sticky;top:20px}.ct-versions{background:#f0f4eb;border:1px solid #dbe3d6;border-radius:16px;padding:18px}.ct-versions h2{font-size:15px;font-weight:500;margin:0 0 12px}.ct-version{background:#fffefa;border:1px dashed #d4dccd;border-radius:12px;padding:13px 15px;margin-bottom:10px}.ct-version.on{border-style:solid;border-color:#b8ccb0}.ct-version small{display:block;font-size:10px;color:var(--muted);margin-bottom:5px}.ct-version strong{font-size:13px;font-weight:600}.ct-version p{font-size:12px;color:#5f6d5f;margin:5px 0 0;line-height:1.7;overflow-wrap:anywhere}.ct-version em{display:block;font-style:normal;font-size:11px;color:#8a6c33;line-height:1.8;margin-top:6px}
+.ct-flow{margin:0}.ct-overlay{position:fixed;inset:0;background:#2a3a2670;z-index:80;display:grid;place-items:center;padding:16px}.ct-modal{background:#fffefa;border-radius:16px;max-width:460px;width:100%;padding:26px;box-sizing:border-box;box-shadow:0 20px 50px #2a3a2640}.ct-modal h2{font-size:19px;font-weight:600;margin:0 0 10px}.ct-modal p{font-size:13px;line-height:1.9;color:var(--muted);margin:0 0 20px}.ct-modal-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}.ct-modal-actions .btn{font-size:13px;padding:11px 16px;min-height:42px}
+.ct-preview-bar{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px}.ct-preview-bar button{border:1px solid var(--line);background:#fffdf9;border-radius:99px;padding:9px 16px;font:inherit;font-size:12px;cursor:pointer;color:var(--muted);min-height:40px}.ct-preview-bar button.on{background:var(--green);border-color:var(--green);color:#fff}
+.ct-article{max-width:860px}.ct-title{font:600 clamp(24px,3.4vw,34px)/1.5 "Noto Sans SC",serif;margin:22px 0 10px;overflow-wrap:anywhere}
+.ct-md{font-size:16px;line-height:2;overflow-wrap:anywhere}.ct-md p{margin:0 0 20px;white-space:pre-wrap}.ct-md h2,.ct-md h3,.ct-md h4{line-height:1.6;font-weight:600;margin:30px 0 14px}.ct-md h2{font-size:23px}.ct-md h3{font-size:20px}.ct-md h4{font-size:18px}.ct-md .ct-md-li{padding-left:20px;position:relative;margin-bottom:8px}.ct-md .ct-md-li:before{content:'·';position:absolute;left:3px;color:#6f8a62;font-weight:700}.ct-md blockquote{margin:22px 0;padding:10px 18px;border-left:3px solid #bdcdb3;background:#f2f5ee;color:#66765e}.ct-md pre{font-size:13px;line-height:1.9;white-space:pre-wrap;overflow-wrap:anywhere;border:1px solid var(--line);background:#f3f5ef;border-radius:10px;padding:16px}.ct-md code{background:#eef2e9;border-radius:4px;padding:1px 5px;font-size:.9em}.ct-md a{color:var(--green)}.ct-md-blocked{border-bottom:1px dotted #b0554a;color:#8b5148}.ct-md-image{display:inline-block;border:1px dashed #c5cdbd;border-radius:6px;padding:1px 8px;font-size:12px;color:var(--muted)}.ct-md-empty{color:#9aa58f}.ct-md-notes{font-size:11px}
+.account-prototype-bar .rv-entry-link{margin-left:12px}
+@media(max-width:1000px){.ct-grid{grid-template-columns:1fr}.ct-side{position:static}}
+@media(max-width:600px){.ct-row{flex-direction:column;align-items:stretch;gap:12px}.ct-row-actions{justify-content:flex-end}.ct-tabs .ct-new{flex-basis:100%;text-align:center;margin:0 0 8px}.ct-modal-actions .btn{flex:1}.ct-head h1{font-size:25px}.ct-page{padding-left:16px;padding-right:16px}}
+
+/* FINNS-17 实现后的两级后台导航（与 frontend/src/assets/review.css 一致） */
+.personal-nav.nav-primary{margin-bottom:12px;padding-bottom:10px}
+.personal-nav.nav-sub{margin-top:0;gap:6px;border-bottom:0;padding-bottom:0}
+.personal-nav.nav-sub a{padding:6px 12px;font-size:12px;border:1px solid var(--line);border-radius:999px}
+.personal-nav.nav-sub a.active{border-color:transparent}
+.admin-layout>.personal-nav.nav-primary{margin-bottom:10px;min-height:0}
+.admin-layout>.personal-nav.nav-sub{margin-bottom:22px;min-height:0}
+.personal-container .personal-nav.nav-sub{margin-bottom:24px}
+.personal-container .personal-nav.nav-primary + .personal-head{margin-top:0}
+
+/* 与真实站点“我的内容”一致的列表行（来自 frontend/src/assets/review.css） */
+/* 我的内容：每条内容自带流转 */
+.mc-tabs{margin:0 0 18px}.mc-group{margin:0 0 26px}.mc-group>h2{font-size:15px;margin:0 0 10px;color:var(--muted);font-weight:600}
+.mc-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 16px;align-items:start;padding:18px 20px;margin:0 0 10px;border:1px solid var(--line);border-radius:14px;background:#fffefa}
+.mc-main h3{margin:6px 0 4px;font-size:16px}.mc-main p{margin:0;color:var(--muted);font-size:13px}.mc-main small{color:var(--muted)}
+.mc-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
+.mc-flow{grid-column:1/-1;border-top:1px dashed var(--line);padding-top:12px}.mc-flow-one{margin:0 0 14px}.mc-flow-one>strong{display:block;font-size:13px;margin-bottom:6px}
+@media(max-width:600px){.mc-row{grid-template-columns:1fr;padding:14px}.mc-actions{justify-content:flex-start}}
+.personal-container.ct-wide{max-width:1120px}
+.ct-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 14px}.ct-search{flex:1;min-width:200px}.ct-search input{width:100%;box-sizing:border-box;border:1px solid #d8e0d5;border-radius:10px;padding:11px 14px;background:#fff;font:inherit;min-height:44px;color:var(--ink)}.ct-search input:focus{outline:none;border-color:#769d83;box-shadow:0 0 0 3px #769d8318}.ct-toolbar .btn{min-height:44px}
+.ct-filters{display:flex;flex-direction:column;gap:10px;margin:0 0 18px}.ct-chips button small{margin-left:6px;opacity:.7}
+.mc-main h3 a{color:inherit;text-decoration:none}.mc-main h3 a:hover{color:var(--green)}.mc-actions .btn{min-height:40px}.btn.ct-danger{color:#a75b4f}
+@media(max-width:600px){.mc-actions .btn{flex:1 1 auto}}
+
+.ct-create-choices{display:grid;gap:12px;margin-top:18px}.ct-create-choice{display:flex;flex-direction:column;gap:5px;text-align:left;padding:16px 18px;border:1px solid var(--line);border-radius:14px;background:#fffefa;cursor:pointer;font:inherit;color:var(--ink);min-height:64px}.ct-create-choice:hover,.ct-create-choice:focus-visible{border-color:#8fb08a;background:#f6f9f1;outline:none}.ct-create-choice strong{font-size:15px}.ct-create-choice small{color:var(--muted);font-size:12px}

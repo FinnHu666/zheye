@@ -6,15 +6,15 @@ import { longReviewSample } from './review-samples'
 
 export const REVIEW_PERMISSION = 'content.review'
 export const LEVELS = { NONE: 0, LOW: 1, MEDIUM: 2, HIGH: 3 }
-const copy = value => JSON.parse(JSON.stringify(value))
-const stamp = (ago = 0, plus = 0) => new Date(now() - ago * 60000 + plus * 1000).toISOString()
-const problem = (status, message) => { throw Object.assign(new Error(message), { status }) }
+export const copy = value => JSON.parse(JSON.stringify(value))
+export const stamp = (ago = 0, plus = 0) => new Date(now() - ago * 60000 + plus * 1000).toISOString()
+export const problem = (status, message) => { throw Object.assign(new Error(message), { status }) }
 // Same normalization as the production detector: width/case folded; whitespace, punctuation, symbols and zero-width characters removed.
 export const normalize = value => String(value || '').normalize('NFKC').toLowerCase().replace(/[\s\p{P}\p{S}\p{Z}\p{C}]/gu, '')
 const permitted = user => !!user && user.accountStatus !== 'DISABLED' && (getDb().permissions[user.role] || []).includes(REVIEW_PERMISSION)
-const authorName = id => getDb().users.find(u => u.id === id)?.displayName || '作者'
+export const authorName = id => getDb().users.find(u => u.id === id)?.displayName || '作者'
 
-function document(id, type, authorId, title, body, published = false, legacy = false) {
+export function document(id, type, authorId, title, body, published = false, legacy = false) {
   const draft = { title, summary: type === 'COMMENT' ? '' : '把经验整理成能复用的知识。', body, visibility: 'PUBLIC', version: 1 }
   return { id, type, authorId, draft, published: published ? copy(draft) : null, approvedOnce: published, legacy, generation: 1, down: false, withdrawn: false, deleted: false, receipts: {}, history: [], flows: [] }
 }
@@ -27,7 +27,7 @@ function addEvent(flow, stage, title, note, { detail = '', actor = '', ago = 0, 
 }
 const levelText = { LOW: '低', MEDIUM: '中', HIGH: '高' }
 
-function detect(snapshot) {
+export function detect(snapshot) {
   const state = ensureReview()
   const active = state.rules.filter(r => !r.deleted && r.enabled && normalize(r.phrase))
   if (state.settings.detectFailure || !active.length) problem(503, '敏感检测暂不可用，本次未发布。草稿和旧发布版已保留。')
@@ -37,7 +37,7 @@ function detect(snapshot) {
   return { hits, level }
 }
 
-function invalidate(doc, reason) {
+export function invalidate(doc, reason) {
   doc.generation += 1
   for (const task of ensureReview().tasks.filter(t => t.docId === doc.id && t.status === 'PENDING')) {
     task.status = 'INVALID'; task.result = reason; task.closedAt = stamp()
@@ -45,7 +45,7 @@ function invalidate(doc, reason) {
     if (flow && ['IN_REVIEW', 'AUTO_REJECTED'].includes(flow.status)) { flow.status = 'INVALID'; addEvent(flow, 'RESULT', '提交已失效', reason) }
   }
 }
-function publish(doc, snapshot) { doc.published = copy(snapshot); doc.approvedOnce = true; doc.withdrawn = false }
+export function publish(doc, snapshot) { doc.published = copy(snapshot); doc.approvedOnce = true; doc.withdrawn = false }
 function newTask(doc, flow, kind, level, matches, ago = 0) {
   const task = { id: nextId(), docId: doc.id, flowId: flow.id, authorId: doc.authorId, type: doc.type, kind, level, snapshot: copy(doc.draft), generation: doc.generation, triggers: [kind === 'RECHECK' ? 'HIGH' : 'SENSITIVE'], matches, status: 'PENDING', createdAt: stamp(ago, 40), result: '' }
   ensureReview().tasks.unshift(task)
@@ -53,7 +53,7 @@ function newTask(doc, flow, kind, level, matches, ago = 0) {
 }
 
 // One pipeline for every content type: submit → detect → route → (manual handling) → result.
-function pipeline(doc, { ago = 0 } = {}) {
+export function pipeline(doc, { ago = 0 } = {}) {
   const snapshot = copy(doc.draft), { hits, level } = detect(snapshot)
   invalidate(doc, '作者已重新提交，旧提交失效。')
   const flow = { id: nextId(), docId: doc.id, version: snapshot.version, level, status: 'IN_REVIEW', startedAt: stamp(ago), events: [] }
@@ -121,7 +121,7 @@ export function ensureReview(d = getDb()) {
   return d.review
 }
 
-function actor(permission = false, owner = false) {
+export function actor(permission = false, owner = false) {
   ensureReview()
   const user = currentPrototypeUser()
   if (!user) problem(401, '登录已失效，请重新登录。内容输入已保留。')
@@ -135,14 +135,14 @@ function owned(id) {
   if (doc.deleted) problem(409, '这条内容已删除。')
   return doc
 }
-function findDoc(id) { const doc = ensureReview().documents.find(x => x.id === Number(id)); if (!doc) problem(404, '内容不存在。'); return doc }
-function guardWrite() {
+export function findDoc(id) { const doc = ensureReview().documents.find(x => x.id === Number(id)); if (!doc) problem(404, '内容不存在。'); return doc }
+export function guardWrite() {
   const settings = ensureReview().settings
   if (settings.failWriteOnce) { settings.failWriteOnce = false; problem(503, '暂时无法保存，输入与旧发布版已保留，请重试。') }
   if (settings.conflictOnce) { settings.conflictOnce = false; problem(409, '内容已在别处处理，请关闭后重新读取最新状态。') }
 }
-function log(doc, action, note, user = currentPrototypeUser()) { doc.history.unshift({ id: nextId(), action, note, operator: user?.displayName || '系统', version: doc.published?.version || doc.draft.version, at: stamp() }) }
-function sweep() {
+export function log(doc, action, note, user = currentPrototypeUser()) { doc.history.unshift({ id: nextId(), action, note, operator: user?.displayName || '系统', version: doc.published?.version || doc.draft.version, at: stamp() }) }
+export function sweep() {
   for (const task of ensureReview().tasks.filter(t => t.status === 'PENDING')) {
     const doc = findDoc(task.docId), author = getDb().users.find(u => u.id === doc.authorId)
     if (author?.accountStatus === 'DISABLED' || doc.deleted || doc.down || task.generation !== doc.generation) {
@@ -156,7 +156,7 @@ function sweep() {
 const reviewerEvents = flow => flow.events.map(e => ({ ...copy(e) }))
 // Author side: reviewer names become “审核员”; matched words are never shown for high sensitivity (detail removed entirely for HIGH).
 const authorEvents = flow => flow.events.map(e => ({ id: e.id, stage: e.stage, title: e.title, note: e.note, at: e.at, actor: e.actor ? '审核员' : '', detail: flow.level === 'HIGH' ? '' : e.detail }))
-const authorFlow = flow => ({ id: flow.id, version: flow.version, level: flow.level, status: flow.status, startedAt: flow.startedAt, events: authorEvents(flow) })
+export const authorFlow = flow => ({ id: flow.id, version: flow.version, level: flow.level, status: flow.status, startedAt: flow.startedAt, events: authorEvents(flow) })
 function taskView(task) {
   const doc = findDoc(task.docId), user = currentPrototypeUser(), flow = doc.flows.find(f => f.id === task.flowId)
   const other = getDb().users.some(u => u.id !== doc.authorId && permitted(u))

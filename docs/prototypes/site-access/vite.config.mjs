@@ -13,6 +13,7 @@ const overlays = {
   'pages/DiscoverPage.vue': here('./src/overlays/DiscoverPage.vue'),
   'components/PersonalNav.vue': here('./src/overlays/PersonalNav.vue'),
   'pages/CollectionEditorPage.vue': here('./src/overlays/CollectionEditorPage.vue'),
+  'pages/MyContentPage.vue': here('./src/overlays/MyContentPage.vue'),
 }
 
 const overlayPlugin = {

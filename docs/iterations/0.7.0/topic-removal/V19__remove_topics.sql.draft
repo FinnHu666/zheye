@@ -1,0 +1,48 @@
+-- FINNS-18 B8：V19 删除历史话题（草稿，**不在 src/main/resources/db/migration 下，Flyway 不会执行**）。
+-- 状态：只在隔离测试库演练过；未对任何真实/主库执行。执行前提（缺一不可）：
+--   1) 用户逐类确认 INVENTORY_TOPICS.sql 的结果（话题数/评论数/作者/专题引用/快照提及），并明确同意不可逆删除；
+--   2) 对生产库做过备份，且备份已在隔离库恢复演练通过；
+--   3) 用户为包含 V19 的版本给出发布授权（V18 与话题删除同版交付，PUBLISH-D09）。
+-- 转为正式迁移时：把下面三个 __EXPECTED_*__ 换成【已确认清单里的数字】；任何一个不符，DO 块抛错，整个事务回滚、什么都不删。
+-- 占位符未替换时 DO 块在第一步报错（演练实测：字段 "__expected_topics__" 不存在），事务不会提交，因此不会误删。**回退 = 恢复备份，脚本无法撤销。**
+begin;
+
+do $$
+declare topics bigint; comments bigint; states bigint;
+begin
+    select count(*) into topics from content_posts where type = 'TOPIC';
+    select count(*) into comments from comments c join content_posts p on p.id = c.post_id where p.type = 'TOPIC';
+    select count(*) into states from review_content_state s where s.content_type = 'COMMENT' and (
+        s.target_id in (select c.id from comments c join content_posts p on p.id = c.post_id where p.type = 'TOPIC')
+        or exists (select 1 from content_posts p where p.type = 'TOPIC' and s.content_key like 'COMMENT:' || p.id || ':%'));
+    if topics <> __EXPECTED_TOPICS__ or comments <> __EXPECTED_COMMENTS__ or states <> __EXPECTED_COMMENT_STATES__ then
+        raise exception 'V19 中止：实际 话题=% 评论=% 评论状态=%，与已确认清单不符', topics, comments, states;
+    end if;
+    if exists (select 1 from article_drafts d join content_posts p on p.id = d.post_id where p.type = 'TOPIC') then
+        raise exception 'V19 中止：有文章草稿指向话题行';
+    end if;
+end $$;
+
+-- 1 评论审核留痕（必须在评论被级联删除之前；先收集评论ID，键有80字符截断故同时按 target_id 与 key 前缀匹配）
+delete from review_noted where content_type = 'COMMENT' and content_id in
+    (select c.id from comments c join content_posts p on p.id = c.post_id where p.type = 'TOPIC');
+delete from review_content_state s where s.content_type = 'COMMENT' and (
+    s.target_id in (select c.id from comments c join content_posts p on p.id = c.post_id where p.type = 'TOPIC')
+    or exists (select 1 from content_posts p where p.type = 'TOPIC' and s.content_key like 'COMMENT:' || p.id || ':%'));
+-- 提交/流转/事件/回执靠外键级联；review_audit_log 只留元数据，不删。
+
+-- 2 话题本体（comments、旧 collection_posts 级联删除；collection_entries.post_id 置空，条目保留）
+delete from content_posts where type = 'TOPIC';
+
+-- 3 事后断言（失败则整体回滚）
+do $$
+begin
+    if exists (select 1 from content_posts where type = 'TOPIC') then raise exception 'V19 事后检查失败：仍有话题'; end if;
+    if exists (select 1 from comments c where not exists (select 1 from content_posts p where p.id = c.post_id)) then raise exception 'V19 事后检查失败：孤儿评论'; end if;
+end $$;
+
+commit;
+
+-- 同版代码需要随之收敛（见设计 §14.3#3，逐项配测试）：ContentPost.Type 去掉 TOPIC、ContentController 列表/?type=、requirePost 链路、
+-- 专题文章列表 jdbc、SiteStatsController 的 content_count、PersonalController 的 addPost/postCount、专题编辑校验、submitComment 路径、
+-- DemoData 话题样例、DiscoverPage 话题标签。本草稿只含数据迁移。

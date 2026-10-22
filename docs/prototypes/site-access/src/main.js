@@ -10,9 +10,7 @@ import VpsPage from '@finns/pages/VpsPage.vue'
 import LocalToolsPage from '@finns/pages/LocalToolsPage.vue'
 import PersonalPage from './pages/ProfilePage.vue'
 import AiSettingsPage from '@finns/pages/AiSettingsPage.vue'
-import MyPostsPage from '@finns/pages/MyPostsPage.vue'
-import MyCollectionsPage from '@finns/pages/MyCollectionsPage.vue'
-import SelectedCollectionsPage from '@finns/pages/SelectedCollectionsPage.vue'
+import MyContentPage from '@finns/pages/MyContentPage.vue'
 import CollectionDetailPage from '@finns/pages/CollectionDetailPage.vue'
 import CollectionImportPage from '@finns/pages/CollectionImportPage.vue'
 import CollectionNewPage from '@finns/pages/CollectionNewPage.vue'
@@ -29,6 +27,8 @@ import ReviewDetailPage from './pages/ReviewDetailPage.vue'
 import SensitiveRulesPage from './pages/SensitiveRulesPage.vue'
 import ReviewSubmissionsPage from './pages/ReviewSubmissionsPage.vue'
 import ReviewReadingPage from './pages/ReviewReadingPage.vue'
+import ContentEditorPage from './pages/ContentEditorPage.vue'
+import ContentPreviewPage from './pages/ContentPreviewPage.vue'
 import { api } from '@finns/lib/api'
 import { sessionUser } from './proto/session'
 import '@finns/assets/styles.css'
@@ -36,6 +36,7 @@ import './proto.css'
 import './account.css'
 import './user-admin.css'
 import './review.css'
+import './content.css'
 
 installMockServer()
 
@@ -50,6 +51,12 @@ const router = createRouter({
     { path: '/me/security/draft', component: AccountDraftPage, meta: { requiresAuth: true } },
     { path: '/me/submissions', component: ReviewSubmissionsPage, meta: { requiresAuth: true } },
     { path: '/review/reading', component: ReviewReadingPage },
+    // 0.7.0 FINNS-18：与真实站点同一入口 /me/posts（文章 / 我创建的专题 / 自选专题页签）；编辑与私人预览独立可直达、刷新
+    { path: '/me/posts/new', component: ContentEditorPage, meta: { requiresAuth: true, perm: 'post.create' } },
+    { path: '/me/posts/:id(\\d+)/edit', component: ContentEditorPage, meta: { requiresAuth: true, perm: 'post.create' } },
+    { path: '/me/posts/:id(\\d+)/preview', component: ContentPreviewPage, meta: { requiresAuth: true, perm: 'post.create' } },
+    { path: '/me/content/:rest(.*)*', redirect: to => ({ path: '/me/posts' + (to.params.rest?.length ? '/' + [].concat(to.params.rest).join('/') : ''), query: to.query }) },
+    { path: '/me/content', redirect: '/me/posts' },
     { path: '/collections', component: CollectionsPage },
     { path: '/collections/:id(\\d+)', component: CollectionDetailPage },
     { path: '/vps', component: VpsPage },
@@ -57,8 +64,8 @@ const router = createRouter({
     { path: '/me', component: PersonalPage, meta: { requiresAuth: true } },
     { path: '/me/profile/edit', component: PersonalPage, meta: { requiresAuth: true, profileEdit: true } },
     { path: '/me/ai-settings', component: AiSettingsPage, meta: { requiresAuth: true, perm: 'ai.use' } },
-    { path: '/me/posts', component: MyPostsPage, meta: { requiresAuth: true } },
-    { path: '/me/collections', component: MyCollectionsPage, meta: own },
+    { path: '/me/posts', component: MyContentPage, meta: { requiresAuth: true } },
+    { path: '/me/collections', redirect: { path: '/me/posts', query: { type: 'COLLECTION' } } },
     { path: '/me/collections/ai/new', component: TopicBuilderPage, meta: { ...own, perm: 'ai.use' } },
     { path: '/me/collections/:id(\\d+)/builder', component: TopicBuilderPage, meta: own },
     { path: '/me/collections/:id(\\d+)/builder/preview', component: TopicBuilderPage, meta: { ...own, builderPreview: true } },
@@ -66,7 +73,7 @@ const router = createRouter({
     { path: '/me/collections/:id(\\d+)/preview', component: CollectionDetailPage, meta: { ...own, privatePreview: true } },
     { path: '/me/collections/new', component: CollectionNewPage, meta: own },
     { path: '/me/collections/:id(\\d+)/edit', component: CollectionEditorPage, meta: own },
-    { path: '/my/collections', component: SelectedCollectionsPage, meta: { requiresAuth: true } },
+    { path: '/my/collections', redirect: { path: '/me/posts', query: { type: 'SELECTED' } } },
     // 0.7.0 FINNS-11：管理页面（独立路由，可直达/刷新；后端 SpaController 需同步增加 /admin/** 回退）
     { path: '/admin', redirect: '/admin/users' },
     { path: '/admin/users', component: AdminUsersPage, meta: admin },

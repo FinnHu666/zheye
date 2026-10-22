@@ -1,0 +1,46 @@
+{
+  "operation_id": "COLLECTION-SYNC-P01",
+  "diff_revision": 1,
+  "approval": "confirmed 2026-10-21 (user single-item confirmation in chat)",
+  "execution": {
+    "executed_at": "2026-10-21",
+    "pre_write_reread": "matched baseline (updated_at 2026-10-17T15:06:13.496676Z)",
+    "result_updated_at": "2026-10-21T05:27:33.570243Z",
+    "readback": "name/state(Backlog)/parent/priority/assignees/labels/dates/sort_order/is_draft preserved; cycle_id e6eb9092-424a-4c10-a472-bd29f4a2b063 preserved per retrieve (update response showed null, serialization only); body matches draft",
+    "not_checked": ["Release membership (previous HTTP 402)"]
+  },
+  "baseline": {
+    "updated_at": "2026-10-17T15:06:13.496676Z",
+    "name": "FINNS 0.7.0｜F03 传统专题接入审核",
+    "protected": {
+      "project": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+      "workspace": "9626c056-e247-4a76-97f1-96802796a4da",
+      "parent": "26ba60d7-9746-44e6-b135-9dc60100ea54",
+      "state": "5b7d9df4-8ce4-40be-b110-83515a957a2a",
+      "priority": "none",
+      "assignees": [],
+      "labels": [],
+      "type_id": null,
+      "point": null,
+      "estimate_point": null,
+      "start_date": null,
+      "target_date": null,
+      "sort_order": 125535,
+      "is_draft": false,
+      "external_source": null,
+      "external_id": null,
+      "created_at": "2026-10-17T15:06:13.496663Z",
+      "archived_at": null,
+      "deleted_at": null,
+      "completed_at": null,
+      "cycle_id": null
+    }
+  },
+  "payload": {
+    "action": "update",
+    "project_id": "587f13f8-9bd0-4ab2-933c-e3ace27f647f",
+    "workitem_id": "923e172c-6b67-4def-bfe5-745e68441ded",
+    "name": "FINNS 0.7.0｜F03 传统专题创作与发布",
+    "description_stripped": "内部需求：FINNS-REQ-020/COLLECTION；父项FINNS-14。当前源码及目标产品版本均为0.7.0，本项完整创作生命周期未验收，不表示主站已部署。\n2026-10-21用户在文章与专题生命周期修订2说明后明确“确认需规，完毕以后，进行下一步”（PUBLISH-D01）。G1通过；本次管理同步后进入G2原型，具体原型尚待制作/评审；保持Backlog，不标Done。\n确认范围：\n1. 复用传统OUTLINE专题的直接编写/模板、文件导入及复制本人专题入口；新建形成私人稿，追加导入作用于已有稿。保留章节、条目、笔记、外链显示文字和本人站内内容引用，不扩大收录归属。\n2. 沿用已有自动保存（约1.2秒）与手动保存入口；不完整私人稿可保存。私人预览/发布前先确认保存成功；保存不公开、不送审。工作稿修改可见范围不立即改变旧公开版。\n3. 明确发布/更新时校验结构、有效条目、引用、角色及可见范围，保存并冻结本次快照，在本次请求中完成与文章相同的三级检测：无命中直接发布、低敏感发布留痕、中敏感人工审核、高敏感自动不通过并人工复核，多条取最高。取消首次必审和次数阈值。\n4. 待审/驳回/高敏感复核或检测失败期间旧有效发布版和范围保持；审批只处理固定提交快照。继续编辑不替换被审稿，明确重提使旧任务失效。独立权限、禁止自审、停用失权最终校验及下架独立恢复复用F08。\n5. 取消本次送审仅取消任务，私人稿与旧公开版保留；撤回已发布专题停止公开、私人保留，并使未处理提交失效；重新发布重新检测。副本为新ID私人稿，不继承提交/审核/发布/处置资格，公开时走普通三级检测，不额外首次审批。\n6. 草稿允许保留失效引用；发布提交时不可用引用阻断并定位，须移除/替换后重试；处理提交前引用再失效时需修正重提。已发布专题只将失效条目统一占位，不整篇连带下架；公开响应不得返回受保护原文标题/摘要/作者/正文或携带原文信息的字段，旧冻结卡片同样生效。\n7. 受限阅读权限与内容处理分别生效，公开/受限范围绑定发布快照；我的内容合并页复用“我创建的专题”页签和现有审核流转，补真实创建/保存/更新/撤回阶段，不新增独立审核中心。\n8. 失败保留输入，保存失败不提交，检测不可用不发布；会话过期/换号、多窗口版本冲突、重复提交与审批，以及撤回/下架/停用/撤权与审批并发必须验证。\n验收：COL-A01–16，见ACCEPTANCE_COLLECTION.md修订2；全部未执行。覆盖创建/导入/复制兼容、首次/更新三级分流、固定快照和旧版、取消与撤回、下架恢复、失效引用、公开/受限与跨账号、幂等并发、保存/失败输入保护以及桌面390/768px与导航。F08已有验收不替代本项全部验收。\n已实现基础：传统专题已接三级审核并有工作稿/发布快照，自动保存、送审/自动不通过提示、合并我的内容和审核流转已存在；本项复用并补齐创作/撤回/复制/引用的完整验收，不从零重做。\n非目标：AI BUILDER公开发布/转换、跨作者复制或任意作者引用、媒体上传/新外链抓取、外部审查服务、通知/申诉中心、永久删除/历史回滚/多人协作、评价/租房。AI稿继续私人，自选专题不等同创作发布。版本与部署、Git操作另行授权。\n依赖F08审核契约及F02有效文章读取，与F04/F05及相关互动读取联调；不要求依赖整项先发布。下一步同步回读后按任务书制作具体产品原型，确认后概设/设计评审和契约；G2/G3/G4交付动作与失效引用样例、容量/字段及并发契约。\n本地权威路径（文件路径，不是公网链接）：docs/requirements/FOUNDATION_COLLECTION_REQUIREMENTS.md修订2；docs/iterations/0.7.0/ACCEPTANCE_COLLECTION.md；docs/iterations/0.7.0/PROTOTYPE_PUBLISHING_BRIEF.md；docs/delivery-progress.json。"
+  }
+}

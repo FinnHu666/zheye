@@ -1,3 +1,21 @@
+## FINNS-18/19：需规修订2已确认，下一步管理同步与原型（2026-10-21）
+
+用户明确“确认需规，完毕以后，进行下一步”，已记录[PUBLISH-D01/D02](requirements/PUBLISHING_DECISIONS.md)，文章与专题修订2的G1通过，勿重复索要需求批准。已归档[文章CT-A01–13](iterations/0.7.0/ACCEPTANCE_CONTENT.md)、[专题COL-A01–16](iterations/0.7.0/ACCEPTANCE_COLLECTION.md)，业务验收均未执行；遗留项CT-L01–03/COL-L01–03待G2/G3/G4交付。
+
+本轮只读重读FINNS-18/19，仍Backlog和旧G1待审正文。两个精确操作：[CONTENT-SYNC-P01](requirements/FOUNDATION_CONTENT_PLANE_P01.md)、[COLLECTION-SYNC-P01](requirements/FOUNDATION_COLLECTION_PLANE_P01.md)，各仅更新标题/正文，保留21项保护字段；待各项明确确认，尚未写入，Cycle/Release成员未查询。获确认后须写前重读并写后回读，不覆盖同期新内容；关联写操作不在本轮范围。
+
+[原型任务书](iterations/0.7.0/PROTOTYPE_PUBLISHING_BRIEF.md)已准备，实际原型尚未制作。用户下一步指令覆盖同步检查点后的继续制作，不再重问是否开始；只有对应同步完成/核对无需改动或明确延期才进入实际原型。具体原型完成后仍需评审，不开始真实业务开发。保留AI稿私人边界和F08独立发布事实。
+
+本轮为需求批准归档、验收/任务书与同步差异准备；未改业务/原型、真实库、服务端口或四处版本，未构建/测试/浏览器手机验收，未提交推送发布；保留.claude/及本会话既有未提交资料。分支release/0.7.0，HEAD c0119db；复用现有目录仅文档增量，尚未建立原型运行环境。下方旧G1pending是历史。
+
+## FINNS-18/19：发布流程更新为修订2，待具体评审（2026-10-21）
+
+按用户“以最新内容更新，讨论文章和专题创建流程”，已使用product-discovery读取现有草案并完成PF-Q01/A01；用户授权AI选择常规发布体验。已更新[文章/普通话题修订2](requirements/FOUNDATION_CONTENT_REQUIREMENTS.md)和[传统专题修订2](requirements/FOUNDATION_COLLECTION_REQUIREMENTS.md)：文章手动保存，传统专题复用自动保存与目录条目；明确发布后在本次请求完成检测，人工结果之后在“我的内容”查看，不新建后台队列或消息中心。三级分流复用F08修订6，旧次数阈值/专题首次必审取消；AI BUILDER仍私人，不扩大公开发布。
+
+核对源码基线`release/0.7.0@c0119db`：文章已接三级审核、普通话题仍直接发布；传统专题已接审核；“我的内容”合并页及流转已存在，创建/草稿和更新/撤回仍占位，文章私人草稿/改稿/撤回生命周期尚缺。不能把FINNS-17已验收/推送写成F02/F03整项已完成或主站已部署。F02/F03仍G1pending；本轮给出可审阅方案，不要求重选CONTENT-D01/D02或三级政策。
+
+下一步：收具体流程反馈并检查保存/发布/送审/撤回是否可区分；G1通过后主动提出FINNS-18/19管理差异并逐项确认，再按授权进入原型。仅本地文档/进度/索引/Unreleased更新，无Plane读写、业务/原型修改、测试构建、浏览器手机、数据库、端口服务或四处版本变更，无Git提交推送。工作区复用单一目录，未建立新运行环境，其他客户端未来写入状态未知；保留.claude/。下方各日期记录为历史，不覆盖本节。
+
 ## 开发流程更新：先识别任务及并行方式（2026-10-19）
 
 [开发skill任务识别与隔离](../.agents/skills/finns-development/references/task-planning.md)已补齐，[验证记录](iterations/0.7.0/WORKFLOW_TASK_PLANNING_VALIDATION.md)包含10场景边界走查。后续规划/继续/原型/实施先核对任务、版本、授权、阶段、依赖与共享资源；按实际风险复用、串行或独立工作树执行。这里只完成流程优化，17/18/19现有任务未迁移、阶段未改变；不将规划中的环境写成已隔离。

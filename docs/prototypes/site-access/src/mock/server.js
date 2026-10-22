@@ -4,6 +4,7 @@ import { getDb, reloadDb, saveDb, now, nextId, MINUTE, DAY } from './db'
 import { CATALOG, permLabel, isLocked, MAX_ROLES } from './roles'
 import { handleAccount, ensureAccount } from './account'
 import { handleReview, ensureReview } from './review'
+import { handleContent } from './publishing'
 import { ensureUserAdmin, currentPrototypeUser, normalManagerCount, changeAccountStatus, isSiteOwner, protectedRole, managementRestriction, ownershipOptions, transferOwnership } from './user-admin'
 
 // 角色清单保存在服务端（R3 起可新增、改名、删除）。
@@ -391,7 +392,9 @@ async function handle(url, init) {
     if (notSimulated.test(path)) fail(501, '原型未模拟此功能（不在 0.7.0 浏览量/角色范围内）')
     const account = handleAccount(method, path, body, parsed.searchParams)
     const review = account.handled ? { handled: false } : handleReview(method, path, body, parsed.searchParams)
+    const content = account.handled || review.handled ? { handled: false } : handleContent(method, path, body, parsed.searchParams)
     if (account.handled) data = account.data
+    else if (content.handled) data = content.data
     else if (review.handled) data = review.data && typeof review.data.then === 'function' ? await review.data : review.data
     else {
       const route = routes.find((r) => r.method === method && r.pattern.test(path))

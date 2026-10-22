@@ -1,3 +1,96 @@
+## FINNS-18：开发与自动化验证完成，待发布前事项（2026-10-22）
+
+**一句话**：FINNS-18（F02 文章草稿及发布 + 话题整体移除）开发完成并自动化验证；未发布、未部署、未提交 Git、未改版本号；主库与 `data/postgres` 未触碰。
+- 结果：H2 全量 184、隔离 PostgreSQL 17 全量 184、前端 57，均 0 失败（之后新增的删除/发布并发用例在 H2 与 PG 通过，未再跑全量）。浏览器（mock 接口）390/768/桌面实测。逐项验收见[验收结果](iterations/0.7.0/ACCEPTANCE_RESULT_CONTENT.md)，实施记录见[IMPLEMENTATION](iterations/0.7.0/IMPLEMENTATION_CONTENT_PUBLISHING.md)。
+- 话题：代码已收敛（`ContentPost.Type` 仅 `ARTICLE`）；V19 删除脚本是草稿（`iterations/0.7.0/topic-removal/`，不在 Flyway 目录），仅在隔离库虚构数据上演练；被删文章在公开专题读取时遮成“原文已不可用”，无需改写快照。
+- Plane：FINNS-18 正文已同步（[P05](requirements/FOUNDATION_CONTENT_PLANE_P05.md)），状态保持 In Progress，不标 Done。
+- **发布前必做（需用户授权/提供，AI 未做）**：真实备份副本上的话题盘点（`INVENTORY_TOPICS.sql`）与 V18/V19 演练，并由用户逐类确认不可逆删除；真人手机、浏览器原生 beforeunload、前后端真实联调；高并发/连接池评估；四处版本号（VERSION、pom.xml、frontend/package.json、package-lock）、CHANGELOG 发布条目、部署与部署后检查。含历史话题的 H2 开发库不支持 V19（迁到 PostgreSQL 或重建）。
+- 下一步任务项：FINNS-19（传统专题）原型曾被用户暂缓，未开始。
+
+## 本地站点：FINNS 工作树已接入 Project Runner（2026-10-22）
+
+用户确认目标为当前项目 `E:\code\FINNS\AI-tome`。本机 Project Runner `http://127.0.0.1:17890` 已新增并启动两项：后端 `FINNS 后端（内存 H2）`（ID `804f738906c04da682d9029e4b334c45`，8080）和前端 `FINNS 个人网站（开发前端）`（ID `f9b03bd4ad7e41399f5256c523711980`，5173）。前端使用 Vite 开发服务器并代理 `/api` 到后端；后端从当前工作树以 JDK 17/Maven 启动，使用 `default` profile、内存 H2 `finns_runner`，并显式禁用 SMTP。
+
+本轮验证：Project Runner 两项均显示“就绪检查通过”；首页 `http://127.0.0.1:5173/`、后端 `/api/stats` 与前端代理 `/api/stats` 均返回 HTTP 200。首次启动因继承宿主 `FINNS_MAIL_MODE=smtp` 失败；改为 `disabled` 后启动成功，未发送邮件。内存 H2 在停止进程后不保留数据。未启动或连接 `data/postgres` / `finns` 主库，未运行 `scripts/run.ps1`，未改业务源码、需求阶段或版本；Maven 运行时只编译当前工作树到忽略的 `target/`，未运行测试。工作目录为既有 `release/0.7.0`，保留原有未提交 FINNS 改动。
+
+下一步：通过 Project Runner 启停以上两项；需要现有主库内容时，先另行确认主库迁移范围与授权。
+
+## FINNS-18：G5进行中，B1–B8完成（2026-10-22）
+
+B8（只准备）：[topic-removal/](iterations/0.7.0/topic-removal/)下的只读盘点`INVENTORY_TOPICS.sql`、删除草稿`V19__remove_topics.sql.draft`（带“数量必须与已确认清单一致否则整体回滚”的保护）、演练种子；在隔离库`finns_test_v19`演练通过（错误数字中止无变化；确认数字后只删话题及其评论/留痕，文章与评论不受影响）。**未对主库或真实数据执行；V19不在Flyway目录；代码收敛（去掉TOPIC枚举等）未做。** 待你决定：已发布专题冻结快照里的话题引用怎么处理（保持/改写占位/重新捕获，见实施记录B8）。发布前还需：真实备份副本上的盘点与演练、你对不可逆删除的逐类确认、发布授权。临时PostgreSQL实例已停止。
+
+## FINNS-18：G5进行中，B1–B7完成（2026-10-22）
+
+B7：在临时目录另起的隔离PostgreSQL 17（端口54329，已停止）上演练：V1–V17→灌虚构数据→备份→Flyway应用V18（0.26s，Hibernate validate通过）→回填核对→dump/restore校验和一致。PG全量181项（干净库）与H2全量181项均0失败；首次PG跑出的25个错误是测试夹具外键顺序，已改测试。证据与脚本见[实施记录B7](iterations/0.7.0/IMPLEMENTATION_CONTENT_PUBLISHING.md)、[rehearsal/](iterations/0.7.0/rehearsal/)。**未验**：真实数据量/耗时/锁、旧键残留（上线前盘点应为0）、并发行锁。主库与`data/postgres`未触碰（其中`postmaster.pid`为10-21旧文件）。下一步B8：只准备话题删除V19与清单查询，**不对主库执行**；发布前需用真实备份副本再演练（需你授权）。
+
+## FINNS-18：G5进行中，B1–B6完成（2026-10-22）
+
+B6：后端全量H2 181项通过（0失败）；前端57项通过。**浏览器实测已做**（用户放行后，mock接口，390/768/桌面；修复1处`text-link`按钮样式缺陷，详见实施记录B6补记）。未验：前后端联调、公开阅读页“更新于”、beforeunload原生提示、键盘/读屏。下一步B7（隔离PostgreSQL演练，仅`finns_test_*`）与B8（只准备话题删除脚本）。
+
+## FINNS-18：G5进行中，B1–B5完成（2026-10-22）
+
+B5已实施（[实施记录](iterations/0.7.0/IMPLEMENTATION_CONTENT_PUBLISHING.md)）：前端“我的内容”文章页签（读`/api/me/articles`，状态/搜索/页码在地址）、编辑页与预览页、创作入口选择（`ComposerForm`已删）、`lib/articles.js`、安全Markdown（`lib/safeMarkdown.js`+`SafeMarkdown.vue`）、详情“更新于”。前端`node --test`55项通过，`vite build`通过。**未做**：浏览器实测（B6）、后端全量复跑（自B4修复后未跑）、PostgreSQL/V18（B7）、话题删除V19（B8，不对主库执行）。已知差距：`DiscoverPage`仍保留“话题”筛选标签（既有话题可读，阶段2才删）；专题编辑页的可见性校验属FINNS-19。注意：`vite build`默认写入被跟踪的`src/main/resources/static`，验证时请用`--outDir`指向临时目录。
+
+## FINNS-18：G5进行中，B1–B4完成（2026-10-22）
+
+B4已实施（[实施记录](iterations/0.7.0/IMPLEMENTATION_CONTENT_PUBLISHING.md)）：`POST /api/posts`停用（410）并关闭话题创建、作者列表/资料计数只含可见、专题`addPost`与`capture`可见性、旧测试经`TestArticles`迁移。全量H2 181项首次179通过，2项为迁移后适配问题已修，**修复后只重跑相关4类，未重跑全量**。偏差：专题编辑页保存校验未加可见性（会阻止保存带失效引用的草稿，属FINNS-19）。**用户回复（PUBLISH-D10）**：同步Plane（差异[CONTENT-SYNC-P04](requirements/FOUNDATION_CONTENT_PLANE_P04.md)A–D已逐项确认并写入回读：FINNS-18正文更新、state Backlog→In Progress，Cycle/parent保持，Release成员未核对；正文第8项CT-L04过时句待下次同步）；B7按“直接操作”授权但只用`finns_test_*`库；B8仅准备脚本不对主库执行（AI的保守解释，可纠正）；FINNS-19原型暂缓。前端仍调旧接口（B5）。
+
+## FINNS-18：G5进行中，B1–B3完成（2026-10-22）
+
+B3已实施（[实施记录](iterations/0.7.0/IMPLEMENTATION_CONTENT_PUBLISHING.md)）：发布/取消送审/撤回/删除接口与服务，`ArticleDraftWriter`（独立事务保存）、`publishArticle`条件更新同一公开行、`decide`/`manage`/`publications`补强、点赞原子更新。全量H2套件178项：177通过，1项`TopicBuilderTests`因本机桩服务1秒超时在全量负载下抖动（单独重跑2次通过），**本次全量不是全绿**。测试中补强了契约：同`requestId`不同内容重放→409`REQUEST_REUSED`。跑测试仍须先清除`FINNS_MAIL_*`。B4–B6未开始；B7/B8、主库、发布、Git、Plane未授权。
+
+## FINNS-18：G5进行中，B1–B2完成（2026-10-22）
+
+B2已实施（[实施记录](iterations/0.7.0/IMPLEMENTATION_CONTENT_PUBLISHING.md)）：`/api/me/articles`创建/读取/保存/列表（`ArticleController`、`ArticleDraftService`），权限读取`profile.manage`、创建保存`post.create`，码点上限、乐观版本、状态推导；H2测试59项通过。**实测发现**H2 `varchar(n)`按UTF-16单元计，已把JPA列放宽（ArticleDraft、ContentPost、flows/submissions/noted的title），PostgreSQL按字符计未实测。跑测试仍须先清除`FINNS_MAIL_*`。B3–B6未开始；B7/B8、主库、发布、Git、Plane未授权。
+
+## FINNS-18：G5进行中，B1完成（2026-10-21）
+
+B1已实施并记录于[实施记录](iterations/0.7.0/IMPLEMENTATION_CONTENT_PUBLISHING.md)：`ArticleDraft`实体与仓库、`ContentPost.updatedAt`、`TextLimits`（码点）与`ReviewText.cut`码点化、`V18__article_drafts.sql`（未在PostgreSQL实测）。验证：新增10项+回归37项（`ContentReviewTests`等）在H2上通过。**注意**：本shell带真实SMTP环境变量，跑Maven测试前须在进程内清除`FINNS_MAIL_*`（否则测试上下文起不来；测试用记录型发信端，不会发信）。B2–B6未开始；B7/B8、主库、发布、Git、Plane未授权。命令示例（PowerShell）：`$env:JAVA_HOME='D:\java\jdk\jdk-17.0.12'; Get-ChildItem Env:FINNS_MAIL_* | % { Remove-Item "Env:$($_.Name)" }; mvn -s .mvn/settings.xml -q test -Dtest=...`。
+
+## FINNS-18：G4通过，进入G5实施B1–B6（2026-10-21）
+
+独立契约评审（只读子代理）结论带条件通过、无阻断；9条重要发现与若干建议已折入[契约修订2§14](iterations/0.7.0/CONTRACT_CONTENT_PUBLISHING.md)，评审记录见[CONTRACT_REVIEW_CONTENT_PUBLISHING.md](iterations/0.7.0/CONTRACT_REVIEW_CONTENT_PUBLISHING.md)。用户决定（PUBLISH-D09）：撤权作者仍可查看/取消送审/撤回/删除（`PROFILE_MANAGE`），创建/保存/发布用`POST_CREATE`；仍同版交付（发布等B7演练+B8话题删除授权后一并）。关键修订：回填C用`coalesce`、断言改写；发布幂等用内容哈希+`REQUEST_REUSED`；提交事务重新锁草稿并核对版本；旧`POST /api/posts`约16处测试用`TestArticles`迁移（B4）；B6只跑H2、PG用例标未验；新增`cancelArticleSubmission`不改评论/专题行为；列表筛选语义；审计`content_type='DRAFT'`。**G4通过**（契约评审条件由作者关闭，未做第二轮；PostgreSQL语义未实测）。授权B1–B6；B7/B8、主库、发布、Git、Plane未授权。
+
+## FINNS-18：G4契约已写，等待实施授权（2026-10-21）
+
+用户要求进入G4并先不写业务代码。已写[详设与契约](iterations/0.7.0/CONTRACT_CONTENT_PUBLISHING.md)：V18（草稿表、`updated_at`、`WITHDRAWN`、审计类型、三类回填含在途提交补建草稿）与阶段2 V19（话题删除，仅授权版本加入）的SQL方案及五项回填断言；服务规则与统一锁序（草稿→状态→公开行）、发布两事务拆分与同`requestId`幂等、取消/撤回/删除规则、`publishOrUpdate`条件UPDATE、点赞原子更新；接口/DTO/错误码、并发矩阵、前端契约、CT-A01–16到测试映射与批次B1–B8。对概设的细化：状态键改为`ARTICLE#<draftId>`、新接口一律HTTP 200、草稿外键不级联。**G4未通过**：需用户授权实施范围（B1–B6；B7隔离PostgreSQL演练、B8话题删除另行授权）并决定契约是否独立评审。未写业务代码、未启动数据库、未改Plane（G2/G3/G4状态文案与话题处置待另提差异）、未提交Git。约束名`content_posts_moderation_state_check`依赖V15默认命名，演练时核对（未核实）。
+
+## FINNS-18：G3通过，下一步G4详设与契约待用户授权（2026-10-21）
+
+用户已决定D1–D5与两项作者可见选择（PUBLISH-D06/D07）。[概要设计修订4](iterations/0.7.0/DESIGN_CONTENT_PUBLISHING.md)经[设计评审](iterations/0.7.0/DESIGN_REVIEW_CONTENT_PUBLISHING.md)：第一轮同作者自评→独立评审（只读子代理）**退回**→修订3→复评**带条件通过**（无阻断）→条件在§14.3关闭（§14.3由作者关闭，未做第三轮）。**G3通过。**关键设计：`article_drafts`新表（JPA实体+V18 SQL）、`content_posts`更新同一行并加`WITHDRAWN`/`updated_at`、点赞与更新用原子/定向SQL、删除草稿显式按序删除（H2无级联）、V18回填含在途提交补建草稿、话题移除两阶段（阶段1仅关创建，阶段2授权后`V19`删除并清理评论审核留痕）。未验：迁移用时、回退、真人手机、原型浏览器横幅；PostgreSQL专有约束只能在隔离库验。**下一步G4**（详设/DTO/迁移脚本/测试映射），需用户授权范围；Plane的G2/G3状态与话题处置文案尚未同步（需另提差异逐项确认）。未写实现、未改数据库、未提交Git。
+
+## FINNS-18：G2通过，概要设计已起草待用户决定（2026-10-21）
+
+用户确认原型R1及其余四项取舍按推荐（PUBLISH-D05），G2通过。已写[概要设计](iterations/0.7.0/DESIGN_CONTENT_PUBLISHING.md)（新增`article_drafts`作为稳定草稿实体、`content_posts`只存公开版并改为“更新同一行”、新增`WITHDRAWN`状态、话题彻底移除的三案比较、V18迁移骨架、能力边界表）和[设计评审](iterations/0.7.0/DESIGN_REVIEW_CONTENT_PUBLISHING.md)（**同作者自评，独立性有限**；带条件通过）。评审抽查源码发现两处现状与假设不符并已在概设更正：`withdrawTask`无类型保护且不写作者事件；`manage`对`WITHDRAWN`执行`TAKE_DOWN`会通过校验。**G3未通过**：等待用户决定D1历史话题处置、D2旧文正文显示、D3字数计量、D4删除留存、D5历史文章改稿，以及是否授权独立评审、是否拆分方案C的范围；未验项：迁移用时/回退/真人手机/原型浏览器横幅。未写实现代码、未改数据库、未写Plane（G2状态文案“未通过→通过”需另提差异）、未提交Git。
+
+## FINNS-18：原型R1已制作，待用户评审（2026-10-21）
+
+**修订4已确认（PUBLISH-D04：整体移除普通话题，既有话题选C彻底移除）**：[需规§8](requirements/FOUNDATION_CONTENT_REQUIREMENTS.md)已定稿，验收CT-A01改为只含文章、新增CT-A16，遗留项CT-L05（历史话题下线/转换/删除方式**尚未选定**，G3需备选比较+设计评审+备份恢复演练）。**范围提示**：C涉及真实数据迁移与全站读取链路，明显大于仅文章生命周期，是否拆分/调整排期待G3上报。Plane[CONTENT-SYNC-P03](requirements/FOUNDATION_CONTENT_PLANE_P03.md)A–D四项已逐项确认并写入回读（FINNS-18标题改为“F02 文章草稿及发布”，正文去话题、加第9项、验收CT-A01–16、遗留项CT-L05；Backlog/parent/cycle保持，Release成员未核对）。
+
+**整体修复（用户要求）**：原型删除话题；我的内容统一为真实入口`/me/posts`（文章/我创建的专题/自选专题同页，旧`/me/content*`重定向，`ContentListPage`已删、改为`overlays/MyContentPage.vue`），顶部自选专题与个人中心对齐，创作入口改为选择；自查清单（含“普通话题仍在需规/验收/Plane、管理入口规则、后台页未逐页对齐、列表缺分页与流转”等）见[PROTOTYPE_CONTENT_R1.md](iterations/0.7.0/PROTOTYPE_CONTENT_R1.md)“整体修复与自我审查”。**需规/验收/Plane中的“普通话题”未改，待用户决定是否做需规修订4。**
+
+按PUBLISH-D02在Plane检查点后制作原型：[PROTOTYPE_CONTENT_R1.md](iterations/0.7.0/PROTOTYPE_CONTENT_R1.md)（体验步骤、行为、验收映射、验证与未验项）。入口4175 `/me/content`（预览服务由AI启动，可停止）；源码在`docs/prototypes/site-access/`新增`mock/publishing.js`、`pages/Content*Page.vue`、`lib/safe-markdown.js`等，既有审核原型行为不变，并修复原型构建因引用已合并页面失败的问题。模拟测试67/67、构建通过、部分浏览器检查；**未验**：会话过期/换号/冲突/检测不可用/高敏感页面的浏览器横幅（权限分类器拒绝了那次检查，未重试）、离开弹窗另两个选项、截图归档、真人手机。**同日反馈修订**：用户指出版式撕裂、列表缺增删改查，已把导航/页头/列表行对齐真实站点（含个人中心与后台两级导航，原型此前未回写FINNS-17实施的改动），列表补搜索/筛选/删除草稿，模拟测试68/68；第5项“删除私人草稿”**用户已确认保留（PUBLISH-D03）**，已回写[需规修订3§7](requirements/FOUNDATION_CONTENT_REQUIREMENTS.md)、新增CT-A14/A15与遗留项CT-L04（存储语义，G3/G4），非目标“永久删除”收窄为不含从未公开的私人草稿；传统专题草稿删除不含在内。**FINNS-18 Plane正文已按[CONTENT-SYNC-P02](requirements/FOUNDATION_CONTENT_PLANE_P02.md)（A非目标/B第8项/C验收CT-A01–15/D状态文案，逐项确认）写入并回读（Backlog/parent/cycle保持，Release成员未核对）。** **G2未通过**，待用户确认具体版本和其余4项产品取舍；FINNS-19原型尚未制作，Plane仅标题/正文已同步。未提交Git、四处版本未改、主站未部署。
+
+## FINNS-18/19：需规修订2已确认，下一步管理同步与原型（2026-10-21）
+
+**更新（同日）：FINNS-18 的 CONTENT-SYNC-P01 已获用户单项确认并执行**——写前重读与基线一致，仅更新标题/正文一次，回读通过（Backlog、parent、cycle=0.7.0周期等保护字段保持；update返回体cycle_id显示null，以retrieve回读为准）；Release成员未核对（此前HTTP 402）。回执见[CONTENT-SYNC-P01](requirements/FOUNDATION_CONTENT_PLANE_P01.md)，FINNS-18 的 PLANE 门禁已记 pass，下一步进入G2原型。**FINNS-19 的 COLLECTION-SYNC-P01 随后也获用户单项确认并执行**：写前重读一致，仅更新标题/正文一次，回读通过（Backlog、parent、cycle保持，update返回体cycle_id显示null以retrieve为准），回执见[COLLECTION-SYNC-P01](requirements/FOUNDATION_COLLECTION_PLANE_P01.md)，PLANE门禁记pass，下一步进入G2原型。两项Release成员均未核对（此前HTTP 402）。下文“尚未写入”描述为历史，已被本段取代。
+
+用户明确“确认需规，完毕以后，进行下一步”，已记录[PUBLISH-D01/D02](requirements/PUBLISHING_DECISIONS.md)，文章与专题修订2的G1通过，勿重复索要需求批准。已归档[文章CT-A01–13](iterations/0.7.0/ACCEPTANCE_CONTENT.md)、[专题COL-A01–16](iterations/0.7.0/ACCEPTANCE_COLLECTION.md)，业务验收均未执行；遗留项CT-L01–03/COL-L01–03待G2/G3/G4交付。
+
+本轮只读重读FINNS-18/19，仍Backlog和旧G1待审正文。两个精确操作：[CONTENT-SYNC-P01](requirements/FOUNDATION_CONTENT_PLANE_P01.md)、[COLLECTION-SYNC-P01](requirements/FOUNDATION_COLLECTION_PLANE_P01.md)，各仅更新标题/正文，保留21项保护字段；待各项明确确认，尚未写入，Cycle/Release成员未查询。获确认后须写前重读并写后回读，不覆盖同期新内容；关联写操作不在本轮范围。
+
+[原型任务书](iterations/0.7.0/PROTOTYPE_PUBLISHING_BRIEF.md)已准备，实际原型尚未制作。用户下一步指令覆盖同步检查点后的继续制作，不再重问是否开始；只有对应同步完成/核对无需改动或明确延期才进入实际原型。具体原型完成后仍需评审，不开始真实业务开发。保留AI稿私人边界和F08独立发布事实。
+
+本轮为需求批准归档、验收/任务书与同步差异准备；未改业务/原型、真实库、服务端口或四处版本，未构建/测试/浏览器手机验收，未提交推送发布；保留.claude/及本会话既有未提交资料。分支release/0.7.0，HEAD c0119db；复用现有目录仅文档增量，尚未建立原型运行环境。下方旧G1pending是历史。
+
+## FINNS-18/19：发布流程更新为修订2，待具体评审（2026-10-21）
+
+按用户“以最新内容更新，讨论文章和专题创建流程”，已使用product-discovery读取现有草案并完成PF-Q01/A01；用户授权AI选择常规发布体验。已更新[文章/普通话题修订2](requirements/FOUNDATION_CONTENT_REQUIREMENTS.md)和[传统专题修订2](requirements/FOUNDATION_COLLECTION_REQUIREMENTS.md)：文章手动保存，传统专题复用自动保存与目录条目；明确发布后在本次请求完成检测，人工结果之后在“我的内容”查看，不新建后台队列或消息中心。三级分流复用F08修订6，旧次数阈值/专题首次必审取消；AI BUILDER仍私人，不扩大公开发布。
+
+核对源码基线`release/0.7.0@c0119db`：文章已接三级审核、普通话题仍直接发布；传统专题已接审核；“我的内容”合并页及流转已存在，创建/草稿和更新/撤回仍占位，文章私人草稿/改稿/撤回生命周期尚缺。不能把FINNS-17已验收/推送写成F02/F03整项已完成或主站已部署。F02/F03仍G1pending；本轮给出可审阅方案，不要求重选CONTENT-D01/D02或三级政策。
+
+下一步：收具体流程反馈并检查保存/发布/送审/撤回是否可区分；G1通过后主动提出FINNS-18/19管理差异并逐项确认，再按授权进入原型。仅本地文档/进度/索引/Unreleased更新，无Plane读写、业务/原型修改、测试构建、浏览器手机、数据库、端口服务或四处版本变更，无Git提交推送。工作区复用单一目录，未建立新运行环境，其他客户端未来写入状态未知；保留.claude/。下方各日期记录为历史，不覆盖本节。
+
 ## FINNS-17：用户验收通过，代码提交（2026-10-21）
 
 用户回复“验收通过”并要求提交；G6、G7 已记 pass（依据与限制见[验收清单结论](iterations/0.7.0/ACCEPTANCE_CONTENT_REVIEW.md)）。代码按三组提交到 release/0.7.0（流程 skill、FINNS-17 实现与测试、文档与原型），**已于 2026-10-21 按用户指示推送到 origin/release/0.7.0（未合并到 main）**。**未发布**：版本号仍 0.7.0，改动在 CHANGELOG Unreleased；发布(G8)需用户指定环境并授权，上线前须备份主库并做恢复演练，V15–V17 不支持回退旧包（REVIEW-D16-U3）；启用规则前所有发布会被 503 阻止，需先在“敏感规则”页启用规则或导入词库。**Plane REVIEW-SYNC-P03 未写**，待用户单项确认。后续：评论互动与“消息与回复”（点赞、评论被回复）另立需求；FINNS-18/19 沿用本任务的流转与管线。本机 PostgreSQL 与 8091 预览由 AI 启动，可按本文上一条的命令停止。
