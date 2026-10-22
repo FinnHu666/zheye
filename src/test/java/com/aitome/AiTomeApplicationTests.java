@@ -42,39 +42,39 @@ class AiTomeApplicationTests {
 
     @Test void publicPostsArePagedFilteredAndStableForMatchingTimestamps() throws Exception {
         long authorId = createTestUser("post-pages");
-        long baselineTopics = jdbc.queryForObject("select count(*) from content_posts where type='TOPIC'", Long.class);
+        long baselineTopics = jdbc.queryForObject("select count(*) from content_posts where type='ARTICLE' and moderation_state='VISIBLE'", Long.class);
         String prefix = "page-topic-" + UUID.randomUUID().toString().replace("-", "");
         List<ContentPost> saved = contentPostRepository.saveAll(java.util.stream.IntStream.range(0, 55)
-                .mapToObj(i -> new ContentPost(ContentPost.Type.TOPIC, prefix + "-" + i, "分页测试摘要", "分页测试正文", authorId, "分页测试用户"))
+                .mapToObj(i -> new ContentPost(ContentPost.Type.ARTICLE, prefix + "-" + i, "分页测试摘要", "分页测试正文", authorId, "分页测试用户"))
                 .toList());
         jdbc.update("update content_posts set created_at=? where title like ?",
-                java.sql.Timestamp.from(java.time.Instant.now().plusSeconds(300)), prefix + "%");
+                java.sql.Timestamp.from(java.time.Instant.now().plusSeconds(3600L * 24 * 3650)), prefix + "%"); // 排在其他测试遗留文章之前（类型已只剩文章）
         List<Long> expectedIds = saved.stream().map(ContentPost::getId).sorted(java.util.Comparator.reverseOrder()).toList();
         long expectedTotal = baselineTopics + saved.size();
 
         List<Long> actualIds = new java.util.ArrayList<>();
         int pageCount = (int) ((expectedTotal + 49) / 50);
         for (int page = 0; page < pageCount; page++) {
-            String response = mvc.perform(get("/api/posts").param("type", "TOPIC").param("page", String.valueOf(page)).param("size", "50"))
+            String response = mvc.perform(get("/api/posts").param("type", "ARTICLE").param("page", String.valueOf(page)).param("size", "50"))
                     .andExpect(status().isOk()).andExpect(jsonPath("$.page").value(page)).andExpect(jsonPath("$.size").value(50))
                     .andExpect(jsonPath("$.total").value(expectedTotal))
                     .andExpect(jsonPath("$.items.length()").value(Math.min(50, expectedTotal - (long) page * 50)))
                     .andReturn().getResponse().getContentAsString();
-            if (page == 0) org.junit.jupiter.api.Assertions.assertEquals("TOPIC", json.readTree(response).path("items").get(0).path("type").asText());
+            if (page == 0) org.junit.jupiter.api.Assertions.assertEquals("ARTICLE", json.readTree(response).path("items").get(0).path("type").asText());
             actualIds.addAll(itemIds(response));
         }
         org.junit.jupiter.api.Assertions.assertEquals(expectedTotal, actualIds.size(), "post pages must cover the reported total");
         org.junit.jupiter.api.Assertions.assertEquals(actualIds.size(), new java.util.HashSet<>(actualIds).size(), "post pages must not overlap");
         org.junit.jupiter.api.Assertions.assertEquals(expectedIds, actualIds.subList(0, expectedIds.size()), "matching timestamps must use ID as a stable tie-breaker");
 
-        String cappedPage = mvc.perform(get("/api/posts").param("type", "TOPIC").param("page", "0").param("size", "100"))
+        String cappedPage = mvc.perform(get("/api/posts").param("type", "ARTICLE").param("page", "0").param("size", "100"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.size").value(50)).andExpect(jsonPath("$.items.length()").value(50))
                 .andReturn().getResponse().getContentAsString();
         org.junit.jupiter.api.Assertions.assertEquals(expectedIds.subList(0, 50), itemIds(cappedPage));
-        mvc.perform(get("/api/posts").param("type", "TOPIC").param("page", "-1").param("size", "0"))
+        mvc.perform(get("/api/posts").param("type", "ARTICLE").param("page", "-1").param("size", "0"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.page").value(0)).andExpect(jsonPath("$.size").value(1))
                 .andExpect(jsonPath("$.items.length()").value(1));
-        mvc.perform(get("/api/posts").param("type", "TOPIC").param("page", "10001").param("size", "50"))
+        mvc.perform(get("/api/posts").param("type", "ARTICLE").param("page", "10001").param("size", "50"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.page").value(10000)).andExpect(jsonPath("$.items.length()").value(0))
                 .andExpect(jsonPath("$.total").value(expectedTotal));
         mvc.perform(get("/api/posts").param("type", "ARTICLE")).andExpect(status().isOk())
@@ -114,7 +114,7 @@ class AiTomeApplicationTests {
         String prefix = "collection-pages-" + UUID.randomUUID().toString().replace("-", "");
         String longBody = "正文".repeat(10_000);
         List<ContentPost> saved = contentPostRepository.saveAll(java.util.stream.IntStream.range(0, 55)
-                .mapToObj(i -> new ContentPost(ContentPost.Type.TOPIC, prefix + "-" + i, "专题分页摘要",
+                .mapToObj(i -> new ContentPost(ContentPost.Type.ARTICLE, prefix + "-" + i, "专题分页摘要",
                         i == 54 ? longBody : "短正文", authorId, "列表摘要用户"))
                 .toList());
         java.sql.Timestamp sharedCreatedAt = java.sql.Timestamp.from(java.time.Instant.parse("2020-01-01T00:00:00Z"));
@@ -218,10 +218,8 @@ class AiTomeApplicationTests {
         TestUsers.registerAndLogin(mvc, jdbc, session, email, "password123", "新用户")
                 .andExpect(status().isOk()).andExpect(jsonPath("$.displayName").value("新用户"));
         csrf = csrfCookie();
-        String response=mvc.perform(post("/api/posts").session(session).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue()).contentType(MediaType.APPLICATION_JSON)
-                .content(json.writeValueAsString(Map.of("type","ARTICLE","title","测试文章","summary","这是测试摘要","body","正文内容"))))
-                .andExpect(status().isCreated()).andExpect(jsonPath("$.authorName").value("新用户")).andReturn().getResponse().getContentAsString();
-        long id=json.readTree(response).get("id").asLong();
+        long id=TestArticles.publish(mvc, json, jdbc, session, "测试文章", "这是测试摘要", "正文内容");
+        mvc.perform(get("/api/posts/"+id)).andExpect(status().isOk()).andExpect(jsonPath("$.authorName").value("新用户"));
         csrf = csrfCookie();
         mvc.perform(post("/api/posts/"+id+"/comments").session(session).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue()).contentType(MediaType.APPLICATION_JSON).content("{\"body\":\"第一条讨论\"}"))
                 .andExpect(status().isCreated()).andExpect(jsonPath("$.body").value("第一条讨论"));
@@ -245,10 +243,7 @@ class AiTomeApplicationTests {
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         long userId = json.readTree(userResponse).get("id").asLong();
         csrf = csrfCookie();
-        String postResponse = mvc.perform(post("/api/posts").session(session).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue()).contentType(MediaType.APPLICATION_JSON)
-                        .content(json.writeValueAsString(Map.of("type", "TOPIC", "title", "大量讨论分页", "summary", "验证批量评论分页", "body", "正文"))))
-                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
-        long postId = json.readTree(postResponse).get("id").asLong();
+        long postId = TestArticles.publish(mvc, json, jdbc, session, "大量讨论分页", "验证批量评论分页", "正文");
         List<Comment> rows = java.util.stream.IntStream.range(0, 55)
                 .mapToObj(i -> new Comment(postId, userId, "分页用户", "分页评论 " + i)).toList();
         rows = commentRepository.saveAll(rows);
@@ -274,11 +269,11 @@ class AiTomeApplicationTests {
         mvc.perform(get("/api/me/profile")).andExpect(status().isUnauthorized());
         mvc.perform(get("/api/me/collections")).andExpect(status().isUnauthorized());
         mvc.perform(post("/api/posts").contentType(MediaType.APPLICATION_JSON)
-                .content("{\"type\":\"TOPIC\",\"title\":\"标题\",\"summary\":\"摘要\",\"body\":\"正文\"}"))
+                .content("{\"type\":\"ARTICLE\",\"title\":\"标题\",\"summary\":\"摘要\",\"body\":\"正文\"}"))
                 .andExpect(status().isForbidden());
         Cookie csrf = csrfCookie();
         mvc.perform(post("/api/posts").cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue()).contentType(MediaType.APPLICATION_JSON)
-                .content("{\"type\":\"TOPIC\",\"title\":\"标题\",\"summary\":\"摘要\",\"body\":\"正文\"}"))
+                .content("{\"type\":\"ARTICLE\",\"title\":\"标题\",\"summary\":\"摘要\",\"body\":\"正文\"}"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -301,10 +296,7 @@ class AiTomeApplicationTests {
         long collectionId = json.readTree(collectionJson).get("id").asLong();
 
         csrf = csrfCookie();
-        String postJson = mvc.perform(post("/api/posts").session(session).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue()).contentType(MediaType.APPLICATION_JSON)
-                .content(json.writeValueAsString(Map.of("type", "ARTICLE", "title", "自己的专题内容", "summary", "用于验证专题关联", "body", "专题正文"))))
-                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
-        long postId = json.readTree(postJson).get("id").asLong();
+        long postId = TestArticles.publish(mvc, json, jdbc, session, "自己的专题内容", "用于验证专题关联", "专题正文");
 
         csrf = csrfCookie();
         mvc.perform(put("/api/me/collections/" + collectionId + "/posts/" + postId).param("revision", "0").session(session).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue()))
@@ -344,10 +336,7 @@ class AiTomeApplicationTests {
         long secondCollectionId = json.readTree(secondCollectionJson).get("id").asLong();
 
         csrf = csrfCookie();
-        String postJson = mvc.perform(post("/api/posts").session(ownerSession).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue()).contentType(MediaType.APPLICATION_JSON)
-                        .content(json.writeValueAsString(Map.of("type", "ARTICLE", "title", "甲的私有文章", "summary", "用户隔离验收", "body", "隔离测试正文"))))
-                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
-        long ownerPostId = json.readTree(postJson).get("id").asLong();
+        long ownerPostId = TestArticles.publish(mvc, json, jdbc, ownerSession, "甲的私有文章", "用户隔离验收", "隔离测试正文");
 
         csrf = csrfCookie();
         mvc.perform(put("/api/me/collections/" + firstCollectionId + "/posts/" + ownerPostId).param("revision", "0").session(ownerSession).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue()))
@@ -414,11 +403,7 @@ class AiTomeApplicationTests {
                 .andExpect(status().isOk());
 
         csrf = csrfCookie();
-        String postJson = mvc.perform(post("/api/posts").session(owner).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.writeValueAsString(Map.of("type", "ARTICLE", "title", "签约检查清单", "summary", "签约前逐项确认", "body", "核对合同与房屋状态"))))
-                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
-        long postId = json.readTree(postJson).get("id").asLong();
+        long postId = TestArticles.publish(mvc, json, jdbc, owner, "签约检查清单", "签约前逐项确认", "核对合同与房屋状态");
 
         csrf = csrfCookie();
         String draftJson = mvc.perform(post("/api/me/collections/drafts").session(owner).cookie(csrf).header("X-XSRF-TOKEN", csrf.getValue())

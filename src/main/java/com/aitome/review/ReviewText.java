@@ -47,10 +47,8 @@ final class ReviewText {
         };
     }
 
-    static String cut(String value, int max) {
-        if (value == null) return null;
-        return value.length() <= max ? value : value.substring(0, max);
-    }
+    /** 按 Unicode 码点截断（FINNS-18 D3），不会截断代理对。 */
+    static String cut(String value, int max) { return com.aitome.common.TextLimits.cut(value, max); }
 
     static String escapeLike(String value) {
         return value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");

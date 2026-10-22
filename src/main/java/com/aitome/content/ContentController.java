@@ -58,14 +58,12 @@ public class ContentController {
 
     @GetMapping("/posts/{id}") @PublicEndpoint("公开内容") public ContentPost post(@PathVariable Long id) { return requirePost(id); }
 
+    /**
+     * FINNS-18：文章改走 /api/me/articles（草稿→发布），话题创建已关闭（需规修订4）。权限检查仍先于此处执行，因此无权限者仍得到 401/403。
+     */
     @PostMapping("/posts") @RequirePermission(Permission.POST_CREATE)
-    public ResponseEntity<Object> create(@Valid @RequestBody PostRequest request, HttpSession session) {
-        UserAccount user = AuthController.requireUser(session, users);
-        // 普通话题是否纳入审核由 F02 另行评审，保持直接发布；文章经敏感检测（FINNS-17）
-        if (request.type() == ContentPost.Type.TOPIC)
-            return ResponseEntity.status(HttpStatus.CREATED).body(posts.save(new ContentPost(request.type(), request.title(), request.summary(), request.body(), user.getId(), user.getDisplayName())));
-        SubmitResult result = review.submitArticle(user.getId(), user.getDisplayName(), request.draftKey(), request.requestId(), request.title(), request.summary(), request.body());
-        return respond(result, () -> posts.findById(result.targetId()).orElseThrow(() -> new ApiProblem(HttpStatus.NOT_FOUND, "内容不存在")), HttpStatus.CREATED);
+    public ResponseEntity<Object> create() {
+        throw new ApiProblem(HttpStatus.GONE, "该接口已停用：文章请通过“我的内容”创建草稿并发布，话题创建已关闭。", "GONE", null);
     }
 
     /** 把提交结果转成响应：已发布 → 原有成功响应；送审/自动不通过 → 202（outcome 区分）。不抛异常，避免回滚流转记录。 */
@@ -80,7 +78,11 @@ public class ContentController {
     }
 
     @PostMapping("/posts/{id}/like") @Transactional @RequirePermission(Permission.POST_INTERACT)
-    public ContentPost like(@PathVariable Long id) { ContentPost post = requirePost(id); post.like(); return post; }
+    public ContentPost like(@PathVariable Long id) {
+        // 原子累加且只作用于可见内容：不加载实体整行回写，避免覆盖并发的撤回/下架/改稿（FINNS-18 契约 §3.10）
+        if (jdbc.update("update content_posts set likes=likes+1 where id=? and moderation_state='VISIBLE'", id) == 0) throw new ApiProblem(HttpStatus.NOT_FOUND, "内容不存在");
+        return requirePost(id);
+    }
 
     @GetMapping("/posts/{id}/comments") @PublicEndpoint("公开内容")
     public CommentPage comments(@PathVariable Long id,
@@ -151,7 +153,6 @@ public class ContentController {
 
     private ContentPost requirePost(Long id) { return posts.findById(id).filter(p -> "VISIBLE".equals(p.getModerationState())).orElseThrow(() -> new ApiProblem(HttpStatus.NOT_FOUND, "内容不存在")); }
 
-    public record PostRequest(ContentPost.Type type, @NotBlank @Size(max = 120) String title, @NotBlank @Size(max = 280) String summary, @NotBlank @Size(max = 20000) String body, @Size(max = 64) String requestId, @Size(max = 64) String draftKey) {}
     public record CommentRequest(@NotBlank @Size(max = 1000) String body, @Size(max = 64) String requestId, @Size(max = 64) String draftKey) {}
     public record CommentPage(List<Comment> items, int page, int size, long total) {}
     public record PostPage(List<ContentPostSummary> items, int page, int size, long total) {}

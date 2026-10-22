@@ -15,7 +15,7 @@ public interface ContentPostRepository extends JpaRepository<ContentPost,Long>{
     Page<ContentPostSummary> findSummariesByType(@Param("type") ContentPost.Type type, Pageable pageable);
 
     @Query("select new com.aitome.content.ContentPostSummary(p.id, p.type, p.title, p.summary, p.authorName, p.createdAt, p.likes) " +
-            "from ContentPost p where p.authorId = :authorId order by p.createdAt desc, p.id desc")
+            "from ContentPost p where p.authorId = :authorId and p.moderationState = 'VISIBLE' order by p.createdAt desc, p.id desc")
     Page<ContentPostSummary> findSummariesByAuthorId(@Param("authorId") Long authorId, Pageable pageable);
 
     Page<ContentPost> findAllByOrderByCreatedAtDescIdDesc(Pageable pageable);
@@ -23,4 +23,5 @@ public interface ContentPostRepository extends JpaRepository<ContentPost,Long>{
     List<ContentPost> findByAuthorIdOrderByCreatedAtDesc(Long authorId, Pageable pageable);
     List<ContentPost> findByAuthorIdOrderByCreatedAtDescIdDesc(Long authorId, Pageable pageable);
     long countByAuthorId(Long authorId);
+    long countByAuthorIdAndModerationState(Long authorId, String moderationState);
 }

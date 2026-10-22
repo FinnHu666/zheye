@@ -121,7 +121,7 @@ class UserStatusTests {
 
         for (MockHttpSession s : List.of(m.session(), second)) {
             mvc.perform(get("/api/auth/me").session(s)).andExpect(status().isUnauthorized());
-            mvc.perform(t.write(post("/api/posts"), s, Map.of("type", "TOPIC", "title", "t", "summary", "s", "body", "b"))).andExpect(status().isUnauthorized());
+            mvc.perform(t.write(post("/api/me/articles"), s, Map.of("title", "t", "summary", "s", "body", "b"))).andExpect(status().isUnauthorized());
             mvc.perform(get("/api/account/security").session(s)).andExpect(status().isUnauthorized());
         }
         String blocked = TestUsers.login(mvc, new MockHttpSession(), m.email(), PW).andExpect(status().isForbidden())
@@ -158,7 +158,7 @@ class UserStatusTests {
 
     @Test @Order(5) void publishedWorksKeepTheirVisibilityWhileTheAuthorIsDisabled() throws Exception {
         Account author = t.register("author");
-        long post = body(mvc.perform(t.write(post("/api/posts"), author.session(), Map.of("type", "TOPIC", "title", "停用后仍可见", "summary", "s", "body", "b"))).andExpect(status().isCreated())).path("id").asLong();
+        long post = TestArticles.publish(mvc, json, jdbc, author.session(), "停用后仍可见", "s", "b");
         mvc.perform(get("/api/posts/" + post)).andExpect(status().isOk()).andExpect(jsonPath("$.title").value("停用后仍可见"));
         disable(owner, author.id(), "账号核查").andExpect(status().isOk());
         mvc.perform(get("/api/posts/" + post)).andExpect(status().isOk()).andExpect(jsonPath("$.title").value("停用后仍可见"));
@@ -276,7 +276,7 @@ class UserStatusTests {
         jdbc.update("update user_accounts set account_status='DISABLED' where id=?", m.id());
         assertEquals(epoch, epochOf(m.id()));
         mvc.perform(get("/api/auth/me").session(m.session())).andExpect(status().isUnauthorized());
-        mvc.perform(t.write(post("/api/posts"), m.session(), Map.of("type", "TOPIC", "title", "t", "summary", "s", "body", "b"))).andExpect(status().isUnauthorized());
+        mvc.perform(t.write(post("/api/me/articles"), m.session(), Map.of("title", "t", "summary", "s", "body", "b"))).andExpect(status().isUnauthorized());
         TestUsers.login(mvc, new MockHttpSession(), m.email(), PW).andExpect(status().isForbidden());
         jdbc.update("update user_accounts set account_status='ACTIVE' where id=?", m.id());
         mvc.perform(get("/api/auth/me").session(m.session())).andExpect(status().isOk());

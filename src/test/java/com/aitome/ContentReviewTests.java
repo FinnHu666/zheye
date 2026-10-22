@@ -37,6 +37,7 @@ class ContentReviewTests {
     /** 共享库（尤其是复制的旧 PostgreSQL 库）里可能残留历史运行发布的同名文章，先清理，避免按标题计数的断言被污染。 */
     void cleanPosts() {
         jdbc.update("delete from comments where post_id in (select id from content_posts where title like '标题k-%')");
+        jdbc.update("delete from article_drafts where post_id in (select id from content_posts where title like '标题k-%')");
         jdbc.update("delete from content_posts where title like '标题k-%'");
     }
 
@@ -77,8 +78,28 @@ class ContentReviewTests {
     JsonNode jget(MockHttpSession s, String path, int expected) throws Exception { return body(mvc.perform(t.read(get(path), s)).andExpect(status().is(expected))); }
     int statusOf(MockHttpSession s, String path, Object payload) throws Exception { return mvc.perform(t.write(post(path), s, payload)).andReturn().getResponse().getStatus(); }
 
+    final Map<String, Long> articleDrafts = new java.util.HashMap<>();
+
+    /**
+     * FINNS-18 B4：旧接口 POST /api/posts 已停用，文章改走“草稿 → 发布”。key 对应一份草稿（同一会话内同 key 复用同一草稿）；
+     * expected 沿用旧语义：201=已发布，202=送审/自动不通过（新接口一律 200，由 outcome 区分），其余状态码原样断言。
+     */
     JsonNode article(MockHttpSession s, String key, String requestId, String text, int expected) throws Exception {
-        return jpost(s, "/api/posts", articleBody(key, requestId, text), expected);
+        String k = System.identityHashCode(s) + ":" + key;
+        Long id = articleDrafts.get(k);
+        if (id == null) {
+            id = jpost(s, "/api/me/articles", Map.of("title", "标题" + key, "summary", "摘要", "body", text), 201).path("id").asLong();
+            articleDrafts.put(k, id);
+        }
+        long version = jget(s, "/api/me/articles/" + id, 200).path("version").asLong();
+        boolean accepted = expected == 201 || expected == 202;
+        JsonNode out = jpost(s, "/api/me/articles/" + id + "/publish", Map.of("title", "标题" + key, "summary", "摘要", "body", text, "expectedVersion", version, "requestId", requestId), accepted ? 200 : expected);
+        if (!accepted) return out;
+        String outcome = out.path("outcome").asText();
+        assertEquals(expected == 201, "PUBLISHED".equals(outcome), "旧语义 201=已发布、202=送审或自动不通过，实际 outcome=" + outcome);
+        com.fasterxml.jackson.databind.node.ObjectNode adapted = ((com.fasterxml.jackson.databind.node.ObjectNode) out).deepCopy();
+        if ("PUBLISHED".equals(outcome)) { adapted.put("id", out.path("article").path("postId").asLong()); adapted.put("title", out.path("article").path("published").path("title").asText()); }
+        return adapted;
     }
 
     Map<String, Object> articleBody(String key, String requestId, String text) {
@@ -156,7 +177,7 @@ class ContentReviewTests {
     @Test void highSensitivityIsAutomaticallyRejectedWithARecheckTaskAndTheAuthorNeverSeesTheWords() throws Exception {
         JsonNode result = article(author.session(), "k-high", "h1", "这是 highword 内容", 202);
         assertEquals("AUTO_REJECTED", result.path("outcome").asText());
-        assertFalse(result.toString().contains("highword"), "作者响应不含命中词");
+        assertFalse(result.path("article").path("flows").toString().contains("命中") || result.has("matches"), "作者响应的流转与字段不含命中词（响应里作者自己的正文当然含该词）");
         assertEquals(0, publicPostCount("标题k-high"));
         long flowId = result.path("flowId").asLong();
         assertEquals("AUTO_REJECTED", flowStatus(flowId));
@@ -385,7 +406,7 @@ class ContentReviewTests {
         JsonNode down = article(author.session(), "q3", "q3", "任何内容", 503);
         assertEquals("DETECTION_UNAVAILABLE", down.path("code").asText());
         assertEquals(0, jdbc.queryForObject("select count(*) from review_flows", Integer.class), "检测不可用不建流转");
-        assertEquals(0, jdbc.queryForObject("select count(*) from review_content_state where content_key='ARTICLE:q3'", Integer.class));
+        assertEquals(0, jdbc.queryForObject("select count(*) from review_content_state where content_type='ARTICLE' and content_key like 'ARTICLE#%'", Integer.class));
     }
 
     @Test void lexiconImportPreviewAndCommitGroupByTagWithSuspectsExcludedByDefault() throws Exception {

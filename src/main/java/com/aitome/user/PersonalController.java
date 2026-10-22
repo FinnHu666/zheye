@@ -137,6 +137,7 @@ public class PersonalController {
         entityManager.refresh(collection);
         ContentPost post = posts.findById(postId).orElseThrow(() -> new ApiProblem(HttpStatus.NOT_FOUND, "内容不存在"));
         if (!Objects.equals(post.getAuthorId(), user.getId())) throw new ApiProblem(HttpStatus.FORBIDDEN, "只能将自己发布的内容加入专题");
+        if (!"VISIBLE".equals(post.getModerationState())) throw new ApiProblem(HttpStatus.BAD_REQUEST, "该文章未公开（已撤回、下架或尚未发布），不能收录。");
         Integer count = jdbc.queryForObject("select count(*) from collection_entries where collection_id=? and post_id=?", Integer.class, collectionId, postId);
         if (count == null || count == 0) {
             Integer totalEntries = jdbc.queryForObject("select count(*) from collection_entries where collection_id=?", Integer.class, collectionId);
@@ -221,7 +222,7 @@ public class PersonalController {
     private ProfileView profileOf(UserAccount user) {
         Integer selectedCount = jdbc.queryForObject("select count(*) from user_collection_selections where user_id=?", Integer.class, user.getId());
         return new ProfileView(user.getId(), user.getEmail(), user.getDisplayName(), user.getBio(), user.getCreatedAt(),
-                posts.countByAuthorId(user.getId()), collections.countByOwnerId(user.getId()), selectedCount == null ? 0 : selectedCount);
+                posts.countByAuthorIdAndModerationState(user.getId(), "VISIBLE"), collections.countByOwnerId(user.getId()), selectedCount == null ? 0 : selectedCount);
     }
     private <T> PageView<T> page(List<T> rows, int page, int size) {
         boolean more = rows.size() > size;

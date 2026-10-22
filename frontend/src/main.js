@@ -10,6 +10,8 @@ import AccountFlowPage from './pages/AccountFlowPage.vue'
 import AccountSecurityPage from './pages/AccountSecurityPage.vue'
 import AiSettingsPage from './pages/AiSettingsPage.vue'
 import MyContentPage from './pages/MyContentPage.vue'
+import ArticleEditorPage from './pages/ArticleEditorPage.vue'
+import ArticlePreviewPage from './pages/ArticlePreviewPage.vue'
 import CollectionDetailPage from './pages/CollectionDetailPage.vue'
 import CollectionImportPage from './pages/CollectionImportPage.vue'
 import CollectionNewPage from './pages/CollectionNewPage.vue'
@@ -26,6 +28,7 @@ import './assets/styles.css'
 import './assets/account.css'
 import './assets/admin.css'
 import './assets/review.css'
+import './assets/content.css'
 
 // meta.perm：页面所需权限（FINNS-11）。无权限时 App 保留地址显示 403；接口另由服务端检查。
 const own = { requiresAuth: true, perm: 'collection.manage' }
@@ -43,6 +46,9 @@ const router = createRouter({
     { path: '/me/security', component: AccountSecurityPage, meta: { requiresAuth: true } },
     { path: '/me/ai-settings', component: AiSettingsPage, meta: { requiresAuth: true, perm: 'ai.use' } },
     { path: '/me/posts', component: MyContentPage, meta: { requiresAuth: true } },
+    { path: '/me/posts/new', component: ArticleEditorPage, meta: { requiresAuth: true, perm: 'post.create' } },
+    { path: '/me/posts/:id(\\d+)/edit', component: ArticleEditorPage, meta: { requiresAuth: true, perm: 'post.create' } },
+    { path: '/me/posts/:id(\\d+)/preview', component: ArticlePreviewPage, meta: { requiresAuth: true } },
     { path: '/me/collections', redirect: { path: '/me/posts', query: { type: 'COLLECTION' } } },
     { path: '/me/collections/ai/new', component: TopicBuilderPage, meta: { ...own, perm: 'ai.use' } },
     { path: '/me/collections/:id(\\d+)/builder', component: TopicBuilderPage, meta: { ...own, perm: 'ai.use' } },

@@ -68,7 +68,7 @@ class AccessEnforcementTests {
         mvc.perform(get("/api/me/profile").session(s)).andExpect(status().isOk());
         mvc.perform(get("/api/me/posts").session(s)).andExpect(status().isOk());
         mvc.perform(get("/api/me/collections/selected").session(s)).andExpect(status().isOk());
-        mvc.perform(t.write(post("/api/posts"), s, Map.of("type", "TOPIC", "title", "t", "summary", "s", "body", "b")))
+        mvc.perform(t.write(post("/api/me/articles"), s, Map.of("title", "t", "summary", "s", "body", "b")))
                 .andExpect(status().isForbidden()).andExpect(jsonPath("$.message").value("当前角色没有此操作权限"));
         mvc.perform(t.write(post("/api/posts/" + anyPostId() + "/comments"), s, Map.of("body", "hi"))).andExpect(status().isForbidden());
         mvc.perform(t.write(post("/api/posts/" + anyPostId() + "/like"), s, null)).andExpect(status().isForbidden());
@@ -81,7 +81,7 @@ class AccessEnforcementTests {
     @Test void memberKeepsAllPreviousAbilitiesButNotAdministration() throws Exception {
         var user = t.withRole("member", "MEMBER");
         MockHttpSession s = user.session();
-        mvc.perform(t.write(post("/api/posts"), s, Map.of("type", "TOPIC", "title", "成员发帖", "summary", "s", "body", "b"))).andExpect(status().isCreated());
+        mvc.perform(t.write(post("/api/me/articles"), s, Map.of("title", "成员发帖", "summary", "s", "body", "b"))).andExpect(status().isCreated());
         mvc.perform(t.write(post("/api/posts/" + anyPostId() + "/like"), s, null)).andExpect(status().isOk());
         mvc.perform(get("/api/me/collections").session(s)).andExpect(status().isOk());
         mvc.perform(get("/api/me/ai-settings/deepseek").session(s)).andExpect(status().isOk());
@@ -146,8 +146,6 @@ class AccessEnforcementTests {
         Long id = jdbc.queryForObject("select min(id) from content_posts", Long.class);
         if (id != null) return id;
         var author = t.withRole("seed-author", "MEMBER");
-        String created = mvc.perform(t.write(post("/api/posts"), author.session(), Map.of("type", "TOPIC", "title", "种子内容", "summary", "s", "body", "b")))
-                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
-        return json.readTree(created).path("id").asLong();
+        return TestArticles.publish(mvc, json, jdbc, author.session(), "种子内容", "s", "b");
     }
 }

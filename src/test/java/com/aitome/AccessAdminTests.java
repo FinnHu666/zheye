@@ -75,14 +75,14 @@ class AccessAdminTests {
 
     @Test @Order(3) void permissionChangesApplyImmediatelyAndRespectLocksAndVersion() throws Exception {
         var restricted = t.withRole("perm", "RESTRICTED");
-        mvc.perform(t.write(post("/api/posts"), restricted.session(), Map.of("type", "TOPIC", "title", "t", "summary", "s", "body", "b"))).andExpect(status().isForbidden());
+        mvc.perform(t.write(post("/api/me/articles"), restricted.session(), Map.of("title", "t", "summary", "s", "body", "b"))).andExpect(status().isForbidden());
         JsonNode roles = roles();
         long version = roles.path("version").asLong();
         List<String> restrictedPerms = new ArrayList<>(permissionsOf(roles, "RESTRICTED"));
         restrictedPerms.add("post.create");
         JsonNode saved = body(call(put("/api/admin/roles"), Map.of("version", version, "permissions", Map.of("RESTRICTED", restrictedPerms), "note", "允许发布")).andExpect(status().isOk()));
         assertEquals(version + 1, saved.path("version").asLong());
-        mvc.perform(t.write(post("/api/posts"), restricted.session(), Map.of("type", "TOPIC", "title", "t", "summary", "s", "body", "b"))).andExpect(status().isCreated());
+        mvc.perform(t.write(post("/api/me/articles"), restricted.session(), Map.of("title", "t", "summary", "s", "body", "b"))).andExpect(status().isCreated());
 
         call(put("/api/admin/roles"), Map.of("version", version, "permissions", Map.of("RESTRICTED", restrictedPerms))).andExpect(status().isConflict());
         long v2 = saved.path("version").asLong();

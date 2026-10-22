@@ -24,7 +24,7 @@ public class CollectionPublicationService {
                 rs.getTimestamp("updated_at").toInstant(), rs.getTimestamp("published_at") == null ? null : rs.getTimestamp("published_at").toInstant()), id);
         List<PublicSection> sections = jdbc.query("select * from collection_sections where collection_id=? order by sort_order,id", (rs, n) -> {
             long sectionId = rs.getLong("id");
-            List<PublicEntry> entries = jdbc.query("select e.*,p.title as post_title,p.summary as post_summary,p.author_name from collection_entries e left join content_posts p on p.id=e.post_id where e.collection_id=? and e.section_id=? order by e.sort_order,e.id",
+            List<PublicEntry> entries = jdbc.query("select e.*,p.title as post_title,p.summary as post_summary,p.author_name from collection_entries e left join content_posts p on p.id=e.post_id and p.moderation_state='VISIBLE' where e.collection_id=? and e.section_id=? order by e.sort_order,e.id",
                 (entry, i) -> new PublicEntry(entry.getLong("id"), CollectionEntry.Kind.valueOf(entry.getString("kind")), entry.getInt("sort_order"),
                     entry.getString("title"), entry.getString("annotation"), entry.getString("body"), (Long)entry.getObject("post_id"),
                     entry.getString("post_title"), entry.getString("post_summary"), entry.getString("author_name"), entry.getString("external_url")), id, sectionId);

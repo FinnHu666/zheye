@@ -35,7 +35,9 @@ const logout = async () => {
   finally { logoutBusy.value = false }
 }
 onMounted(() => { reportSiteEntry(); refreshSession() })
-watch(() => route.query.create, (value) => { if (value === 'post' || value === 'topic') composerOpen.value = true }, { immediate: true })
+// 旧入口 /?create=post|topic 统一进入创作选择（普通话题已下线）
+watch(() => route.query.create, (value) => { if (value === 'post' || value === 'topic') { composerOpen.value = true; router.replace({ path: route.path, query: { ...route.query, create: undefined } }) } }, { immediate: true })
+const choose = (path) => { composerOpen.value = false; router.push(path) }
 </script>
 
 <template>
@@ -64,12 +66,7 @@ watch(() => route.query.create, (value) => { if (value === 'post' || value === '
 
     <footer><RouterLink class="brand" to="/" aria-label="FINNS 首页"><span class="brand-mark">F</span><span>FINNS</span></RouterLink><p>为独立思考与开放创造而生。</p><div class="footer-links"><RouterLink to="/collections">专题广场</RouterLink><RouterLink to="/vps">VPS 指南</RouterLink><RouterLink to="/me">个人中心</RouterLink><RouterLink v-if="can('admin.users')" to="/admin/users">管理</RouterLink></div><span>© 2026 FINNS</span></footer>
 
-    <div v-if="composerOpen" class="overlay" @click.self="composerOpen = false"><section class="modal modal-wide" role="dialog" aria-modal="true"><button class="modal-close" aria-label="关闭" @click="composerOpen = false">×</button><span class="kicker">CREATE</span><h2>分享新的内容</h2><ComposerForm @ai-collection="composerOpen = false; router.push('/me/collections/ai/new')" @collection="composerOpen = false; router.push('/me/collections/new')" @done="composerOpen = false; showToast('内容已发布')" @notice="showToast($event)" @error="showToast" /></section></div>
+    <div v-if="composerOpen" class="overlay" @click.self="composerOpen = false"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="create-title"><button class="modal-close" aria-label="关闭" @click="composerOpen = false">×</button><span class="kicker">CREATE</span><h2 id="create-title">开始创作</h2><div class="ct-create-choices"><button v-if="can('post.create')" type="button" class="ct-create-choice" @click="choose('/me/posts/new')"><strong>写文章</strong><small>先存为私人草稿，准备好再发布。</small></button><button v-if="can('collection.manage')" type="button" class="ct-create-choice" @click="choose('/me/collections/new')"><strong>创建专题</strong><small>用模板或现成内容整理专题。</small></button><button v-if="can('ai.use')" type="button" class="ct-create-choice" @click="choose('/me/collections/ai/new')"><strong>AI 创建专题</strong><small>让 AI 协助起草专题结构。</small></button></div></section></div>
     <div v-if="toastMessage" class="toast show" role="status">{{ toastMessage }}</div>
   </div>
 </template>
-
-<script>
-import ComposerForm from './components/ComposerForm.vue'
-export default { components: { ComposerForm } }
-</script>

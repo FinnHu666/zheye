@@ -19,7 +19,7 @@ public class DemoData {
             byte[] random=new byte[24]; new java.security.SecureRandom().nextBytes(random);
             UserAccount user=users.save(UserAccount.verified("demo@aitome.dev",encoder.encode(java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(random)),"纸飞机",java.time.Instant.now()));
             posts.save(new ContentPost(ContentPost.Type.ARTICLE,"把 AI 变成可靠的结对开发者","从上下文、任务拆分到验收闭环，一套能复用的 AI 协作方法。","# 从规格开始\n\n真正高效的 AI 开发，不是一次生成更多代码，而是让每一步都有清晰输入与可验证输出。\n\n## 三个原则\n\n1. 小步垂直切片\n2. 契约先行\n3. 每次改动都能测试",user.getId(),user.getDisplayName()));
-            posts.save(new ContentPost(ContentPost.Type.TOPIC,"你在生产环境中如何选择 Java LTS？","17、21 还是更激进的新版本？欢迎分享迁移成本与收益。","聊聊你所在团队的版本选择，以及最让你意外的兼容性问题。",user.getId(),user.getDisplayName()));
+            posts.save(new ContentPost(ContentPost.Type.ARTICLE,"你在生产环境中如何选择 Java LTS？","17、21 还是更激进的新版本？欢迎分享迁移成本与收益。","聊聊你所在团队的版本选择，以及最让你意外的兼容性问题。",user.getId(),user.getDisplayName()));
             posts.save(new ContentPost(ContentPost.Type.ARTICLE,"轻量社区的缓存设计笔记","从读多写少出发，避免缓存成为第二套数据库。","热门内容采用短 TTL，计数聚合走异步，数据库仍是事实来源。",user.getId(),user.getDisplayName()));
             collections.save(new CommunityCollection("AI 工程实践","把提示词、评测、代理工作流与真实工程经验放在一起。",user.getDisplayName(),12,user.getId()));
             collections.save(new CommunityCollection("独立开发手册","从第一个提交到部署、运营和成本优化。",user.getDisplayName(),8,user.getId()));

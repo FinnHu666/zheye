@@ -70,18 +70,6 @@ public class ReviewService {
     // ------------------------------------------------------------------ 提交
 
     @Transactional
-    public SubmitResult submitArticle(long authorId, String authorName, String contentKey, String requestId, String title, String summary, String body) {
-        Map<String, Object> snapshot = new LinkedHashMap<>();
-        snapshot.put("type", ARTICLE); snapshot.put("title", title); snapshot.put("summary", summary); snapshot.put("body", body);
-        return process(authorId, authorName, ARTICLE, "ARTICLE:" + cleanKey(contentKey), requestId, List.of(title, summary, body), ReviewText.cut(title, 120), snapshot, 1, false, null,
-                submissionId -> {
-                    ContentPost saved = posts.saveAndFlush(new ContentPost(ContentPost.Type.ARTICLE, title, summary, body, authorId, authorName));
-                    if (submissionId != null) jdbc.update("update content_posts set review_submission_id=? where id=?", submissionId, saved.getId());
-                    return saved.getId();
-                });
-    }
-
-    @Transactional
     public SubmitResult submitComment(long authorId, String authorName, long postId, String contentKey, String requestId, String postTitle, String body) {
         Map<String, Object> snapshot = new LinkedHashMap<>();
         snapshot.put("type", COMMENT); snapshot.put("postId", postId); snapshot.put("postTitle", postTitle); snapshot.put("body", body);
@@ -112,7 +100,7 @@ public class ReviewService {
         String rid = requestId == null || requestId.isBlank() ? UUID.randomUUID().toString() : ReviewText.cut(requestId.trim(), 64);
         List<String> receipt = jdbc.queryForList("select response_json from review_receipts where state_id=? and request_id=?", String.class, state.id(), rid);
         if (!receipt.isEmpty()) return fromJson(receipt.get(0)).asReplay();
-        if (!COLLECTION.equals(type) && state.targetId() != null) throw new ApiProblem(HttpStatus.CONFLICT, "该内容已发布，请不要重复提交。", "ALREADY_PUBLISHED", null);
+        if (!COLLECTION.equals(type) && draftIdOf(key) == null && state.targetId() != null) throw new ApiProblem(HttpStatus.CONFLICT, "该内容已发布，请不要重复提交。", "ALREADY_PUBLISHED", null);
         String level = detection.level(), snapshotJson = toJson(snapshot), words = ReviewText.cut(String.join("、", detection.phrases()), 400);
         long generation = state.generation() + 1;
         invalidatePending(state.id(), null, "作者已重新提交，旧提交失效。");
@@ -152,6 +140,132 @@ public class ReviewService {
         return result;
     }
 
+    // ------------------------------------------------------------------ 文章草稿生命周期（FINNS-18 B3，契约修订2 §3.3–§3.9）
+
+    public static String articleKey(long draftId) { return "ARTICLE#" + draftId; }
+
+    /** 状态键 ARTICLE#<draftId> 的草稿 ID；旧键（客户端 draftKey）返回 null。 */
+    static Long draftIdOf(String key) {
+        if (key == null || !key.startsWith("ARTICLE#")) return null;
+        try { return Long.parseLong(key.substring("ARTICLE#".length())); } catch (NumberFormatException e) { return null; }
+    }
+
+    private String stateKey(long stateId) {
+        List<String> keys = jdbc.queryForList("select content_key from review_content_state where id=?", String.class, stateId);
+        return keys.isEmpty() ? null : keys.get(0);
+    }
+
+    private static ApiProblem notPublic() { return new ApiProblem(HttpStatus.CONFLICT, "这条内容当前没有公开版或已被撤回，不能执行此操作。", "NOT_PUBLIC", null); }
+    private static ApiProblem notDeletable(String reason) {
+        return new ApiProblem(HttpStatus.CONFLICT, "PENDING_SUBMISSION".equals(reason) ? "有待处理的提交，请先取消送审或等待处理结果后再删除。" : "这篇文章公开过，不能删除；可以撤回公开后保留私人稿。", "NOT_DELETABLE", Map.of("reason", reason));
+    }
+
+    /** 同一 requestId 的回执回放（契约 §3.3 步骤2）。只存结果；article 由调用方现取现算。 */
+    @Transactional(readOnly = true)
+    public java.util.Optional<SubmitResult> articleReceipt(long authorId, long draftId, String requestId) {
+        List<String> rows = jdbc.queryForList("select r.response_json from review_receipts r join review_content_state s on s.id=r.state_id where s.author_id=? and s.content_type='ARTICLE' and s.content_key=? and r.request_id=?", String.class, authorId, articleKey(draftId), cut(requestId.trim(), 64));
+        return rows.isEmpty() ? java.util.Optional.empty() : java.util.Optional.of(fromJson(rows.get(0)).asReplay());
+    }
+
+    private record DraftRow(long authorId, Long postId, long version, String title, String summary, String body) {}
+
+    /** 提交事务：重新锁草稿并核对版本，快照取自锁住的草稿行（契约 §3.3 步骤4、§14 R3）。检测异常（503）发生在建立任何状态之前。 */
+    @Transactional
+    public SubmitResult submitArticleDraft(long authorId, String authorName, long draftId, String requestId, long expectedVersion) {
+        List<DraftRow> rows = jdbc.query("select author_id,post_id,version,title,summary,body from article_drafts where id=? for update",
+                (rs, n) -> new DraftRow(rs.getLong(1), (Long) rs.getObject(2), rs.getLong(3), rs.getString(4), rs.getString(5), rs.getString(6)), draftId);
+        if (rows.isEmpty() || rows.get(0).authorId() != authorId) throw new ApiProblem(HttpStatus.NOT_FOUND, "未找到属于当前账号的文章。");
+        DraftRow draft = rows.get(0);
+        if (draft.version() != expectedVersion)
+            throw new ApiProblem(HttpStatus.CONFLICT, "这份草稿已在别处更新到 v" + draft.version() + "。你的输入已保留，请核对后再发布。", "VERSION_CONFLICT", Map.of("currentVersion", draft.version()));
+        Long postId = draft.postId();
+        if (postId != null) {
+            List<String> moderation = jdbc.queryForList("select moderation_state from content_posts where id=?", String.class, postId);
+            if (!moderation.isEmpty() && "TAKEN_DOWN".equals(moderation.get(0))) throw takenDown();
+        }
+        Map<String, Object> snapshot = new LinkedHashMap<>();
+        snapshot.put("type", ARTICLE); snapshot.put("title", draft.title()); snapshot.put("summary", draft.summary()); snapshot.put("body", draft.body());
+        return process(authorId, authorName, ARTICLE, articleKey(draftId), requestId, List.of(draft.title(), draft.summary(), draft.body()), cut(draft.title(), 120), snapshot, draft.version(), postId != null, postId,
+                submissionId -> publishArticle(postId, draftId, authorId, authorName, draft.title(), draft.summary(), draft.body(), submissionId));
+    }
+
+    /** 发布与审批通过共用（契约 §3.6）：无公开行则新建并写回草稿；有公开行则条件 UPDATE（只作用于 VISIBLE/WITHDRAWN），不 save 整个实体。 */
+    private long publishArticle(Long postId, long draftId, long authorId, String authorName, String title, String summary, String body, Long submissionId) {
+        if (postId == null) {
+            ContentPost saved = posts.saveAndFlush(new ContentPost(ContentPost.Type.ARTICLE, title, summary, body, authorId, authorName));
+            if (submissionId != null) jdbc.update("update content_posts set review_submission_id=? where id=?", submissionId, saved.getId());
+            jdbc.update("update article_drafts set post_id=? where id=? and post_id is null", saved.getId(), draftId);
+            return saved.getId();
+        }
+        Timestamp now = Timestamp.from(Instant.now());
+        int changed = submissionId == null
+                ? jdbc.update("update content_posts set title=?,summary=?,body=?,updated_at=?,moderation_state='VISIBLE' where id=? and moderation_state in ('VISIBLE','WITHDRAWN')", title, summary, body, now, postId)
+                : jdbc.update("update content_posts set title=?,summary=?,body=?,updated_at=?,moderation_state='VISIBLE',review_submission_id=? where id=? and moderation_state in ('VISIBLE','WITHDRAWN')", title, summary, body, now, submissionId, postId);
+        if (changed == 0) throw takenDown();
+        return postId;
+    }
+
+    /** 取消送审（契约 §3.4）：只对 REVIEW 类待办任务；复核任务不可取消；写作者可见事件；工作稿与公开行不变。调用方已先锁草稿行。 */
+    @Transactional
+    public void cancelArticleSubmission(long authorId, String authorName, long draftId) {
+        List<Long> stateIds = jdbc.queryForList("select id from review_content_state where author_id=? and content_type='ARTICLE' and content_key=?", Long.class, authorId, articleKey(draftId));
+        if (stateIds.isEmpty()) throw new ApiProblem(HttpStatus.CONFLICT, "当前没有待处理的提交，可能已被处理。", "NOTHING_TO_CANCEL", null);
+        State state = lockStateById(stateIds.get(0));
+        List<Map<String, Object>> tasks = jdbc.queryForList("select id,kind,flow_id from review_submissions where state_id=? and status='PENDING' order by id desc", state.id());
+        if (tasks.isEmpty()) throw new ApiProblem(HttpStatus.CONFLICT, "当前没有待处理的提交，可能已被处理。", "NOTHING_TO_CANCEL", null);
+        Map<String, Object> task = new HashMap<>();
+        tasks.get(0).forEach((k, v) -> task.put(k.toLowerCase(Locale.ROOT), v));
+        if ("RECHECK".equals(String.valueOf(task.get("kind"))))
+            throw new ApiProblem(HttpStatus.CONFLICT, "高敏感内容已自动不通过并转人工复核，不能取消；可以修改后重新提交。", "RECHECK_NOT_CANCELLABLE", null);
+        long taskId = ((Number) task.get("id")).longValue();
+        jdbc.update("update review_submissions set status='INVALID',result_note=?,closed_at=? where id=?", "作者取消送审", Timestamp.from(Instant.now()), taskId);
+        if (task.get("flow_id") != null) {
+            long flowId = ((Number) task.get("flow_id")).longValue();
+            setFlowStatus(flowId, "INVALID");
+            event(flowId, "RESULT", "已取消送审", "只取消这次提交；工作稿与旧公开版保留。", "", authorId, authorName);
+        }
+        saveState(state, state.generation() + 1, state.targetId(), state.approvedOnce());
+        audit.write(ReviewAudit.Row.of("WITHDRAW", authorId, authorName).content(authorId, ARTICLE, state.targetId(), taskId, null, null).note("", "作者取消送审"));
+    }
+
+    /** 撤回公开（契约 §3.5）：只作用于 VISIBLE；使待审提交失效；事件追加到最近一条 PUBLISHED 流转（没有则建合成流转）。调用方已先锁草稿行并核对二次确认。 */
+    @Transactional
+    public void withdrawArticle(long authorId, String authorName, long draftId, Long postId, String title, long version) {
+        if (postId == null) throw notPublic();
+        State state = lockState(authorId, ARTICLE, articleKey(draftId), true, postId);
+        List<String> moderation = jdbc.queryForList("select moderation_state from content_posts where id=?", String.class, postId);
+        if (moderation.isEmpty()) throw notPublic();
+        if ("TAKEN_DOWN".equals(moderation.get(0))) throw takenDown();
+        if (!"VISIBLE".equals(moderation.get(0))) throw notPublic();
+        invalidatePending(state.id(), null, "作者撤回，旧提交失效。");
+        if (jdbc.update("update content_posts set moderation_state='WITHDRAWN' where id=? and moderation_state='VISIBLE'", postId) == 0) throw takenDown();
+        List<Long> published = jdbc.queryForList("select id from review_flows where state_id=? and status='PUBLISHED' order by id desc limit 1", Long.class, state.id());
+        long flowId;
+        if (published.isEmpty()) { flowId = insertFlow(state, authorId, ARTICLE, cut(title, 120), version, "NONE"); setFlowStatus(flowId, "PUBLISHED"); }
+        else flowId = published.get(0);
+        event(flowId, "RESULT", "作者撤回", "私人原稿保留", "", authorId, authorName);
+        saveState(state, state.generation() + 1, postId, state.approvedOnce());
+        audit.write(ReviewAudit.Row.of("WITHDRAW", authorId, authorName).content(authorId, ARTICLE, postId, null, version, null).note("", "作者撤回公开内容"));
+    }
+
+    /** 删除从未公开的私人草稿的审核痕迹（契约 §3.9）：显式按序删除（H2 无级联），审计只留不含正文的元数据。调用方已先锁草稿行并确认 post_id 为空。 */
+    @Transactional
+    public void deleteArticleTraces(long authorId, String authorName, long draftId) {
+        List<Long> stateIds = jdbc.queryForList("select id from review_content_state where author_id=? and content_type='ARTICLE' and content_key=?", Long.class, authorId, articleKey(draftId));
+        if (!stateIds.isEmpty()) {
+            long stateId = stateIds.get(0);
+            jdbc.queryForList("select id from review_content_state where id=? for update", Long.class, stateId);
+            Integer pending = jdbc.queryForObject("select count(*) from review_submissions where state_id=? and status='PENDING'", Integer.class, stateId);
+            if (pending != null && pending > 0) throw notDeletable("PENDING_SUBMISSION");
+            jdbc.update("delete from review_flow_events where flow_id in (select id from review_flows where state_id=?)", stateId);
+            jdbc.update("delete from review_flows where state_id=?", stateId);
+            jdbc.update("delete from review_submissions where state_id=?", stateId);
+            jdbc.update("delete from review_receipts where state_id=?", stateId);
+            jdbc.update("delete from review_content_state where id=?", stateId);
+        }
+        audit.write(ReviewAudit.Row.of("DELETE_DRAFT", authorId, authorName).content(authorId, "DRAFT", draftId, null, null, null).note("", "删除私人草稿"));
+    }
+
     // ------------------------------------------------------------------ 审批决定
 
     /** REVIEW 任务：APPROVE / REJECT；RECHECK 任务：UPHOLD（维持不通过）/ OVERTURN（判定误判并放行，发布提交快照）。 */
@@ -161,6 +275,8 @@ public class ReviewService {
         Map<String, Object> task = loadTask(taskId);
         State peek = stateById(((Number) task.get("state_id")).longValue());
         if (COLLECTION.equals(peek.type()) && peek.targetId() != null) jdbc.queryForObject("select id from community_collections where id=? for update", Long.class, peek.targetId());
+        Long peekDraft = ARTICLE.equals(peek.type()) ? draftIdOf(stateKey(peek.id())) : null;
+        if (peekDraft != null) jdbc.queryForList("select id from article_drafts where id=? for update", Long.class, peekDraft); // 锁序：草稿 → 状态
         State state = lockStateById(peek.id());
         String kind = String.valueOf(task.get("kind"));
         if (state.authorId() == operator.userId()) {
@@ -189,9 +305,22 @@ public class ReviewService {
             Long target = state.targetId();
             switch (state.type()) {
                 case ARTICLE -> {
-                    ContentPost saved = posts.saveAndFlush(new ContentPost(ContentPost.Type.ARTICLE, snapshot.path("title").asText(), snapshot.path("summary").asText(), snapshot.path("body").asText(), state.authorId(), authorName(state.authorId())));
-                    jdbc.update("update content_posts set review_submission_id=? where id=?", taskId, saved.getId());
-                    target = saved.getId();
+                    Long draftId = draftIdOf(stateKey(state.id()));
+                    if (draftId != null) {
+                        if (target != null) {
+                            List<String> moderation = jdbc.queryForList("select moderation_state from content_posts where id=?", String.class, target);
+                            if (!moderation.isEmpty() && "TAKEN_DOWN".equals(moderation.get(0))) { // 下架优先：中止并使该提交失效，不覆盖下架
+                                invalidatePending(state.id(), null, "内容已被人工下架，该提交已失效。");
+                                saveState(state, state.generation() + 1, target, state.approvedOnce());
+                                return Map.of("message", "内容已被人工下架，该提交已失效，未发布。");
+                            }
+                        }
+                        target = publishArticle(target, draftId, state.authorId(), authorName(state.authorId()), snapshot.path("title").asText(), snapshot.path("summary").asText(), snapshot.path("body").asText(), taskId);
+                    } else { // 旧键（客户端 draftKey，开发库遗留）：沿用原行为
+                        ContentPost saved = posts.saveAndFlush(new ContentPost(ContentPost.Type.ARTICLE, snapshot.path("title").asText(), snapshot.path("summary").asText(), snapshot.path("body").asText(), state.authorId(), authorName(state.authorId())));
+                        jdbc.update("update content_posts set review_submission_id=? where id=?", taskId, saved.getId());
+                        target = saved.getId();
+                    }
                 }
                 case COMMENT -> {
                     long postId = snapshot.path("postId").asLong();
@@ -249,6 +378,7 @@ public class ReviewService {
         if (cleaned.length() > 200) throw new ApiProblem(HttpStatus.BAD_REQUEST, "处理原因最多200字。");
         if (COLLECTION.equals(type)) jdbc.queryForList("select id from community_collections where id=? for update", targetId);
         Published published = publishedOf(type, targetId);
+        if ("WITHDRAWN".equals(published.moderation())) throw new ApiProblem(HttpStatus.CONFLICT, "内容已被作者撤回，不能下架或恢复。", "NOT_PUBLIC", null);
         State state = lockStateForTarget(type, targetId, published.authorId());
         if ("RESTORE".equals(action) && published.authorId() == operator.userId()) {
             audit.writeIndependent(ReviewAudit.Row.of("RESTORE", operator.userId(), operator.displayName()).content(published.authorId(), type, targetId, null, null, null).outcome("REJECTED").note(cleaned, "禁止批准恢复本人作品"));
@@ -295,6 +425,8 @@ public class ReviewService {
         State state = lockStateById(((Number) task.get("state_id")).longValue());
         task = loadTask(taskId);
         if (!"PENDING".equals(task.get("status"))) throw new ApiProblem(HttpStatus.CONFLICT, "该提交已处理或失效。", "STALE", null);
+        if (ARTICLE.equals(state.type()) && "RECHECK".equals(String.valueOf(task.get("kind"))))
+            throw new ApiProblem(HttpStatus.CONFLICT, "高敏感内容已自动不通过并转人工复核，不能取消；可以修改后重新提交。", "RECHECK_NOT_CANCELLABLE", null);
         invalidatePending(state.id(), null, "作者已撤回，私人原稿保留。");
         saveState(state, state.generation() + 1, state.targetId(), state.approvedOnce());
         audit.write(ReviewAudit.Row.of("WITHDRAW", authorId, authorName).content(authorId, state.type(), state.targetId(), taskId, null, null).note("", "作者撤回待审提交"));
@@ -364,10 +496,10 @@ public class ReviewService {
     public Map<String, Object> publications(long operatorId, String type, String moderation, String q, int page, int size) {
         requireReviewer(operatorId);
         int safePage = Math.max(0, Math.min(page, 100_000)), safeSize = Math.max(1, Math.min(size, 50));
-        String union = "select 'ARTICLE' as t, id, cast(title as varchar(120)) as title, author_id, author_name, created_at as ts, moderation_state from content_posts where type='ARTICLE' "
-                + "union all select 'COMMENT', id, cast(substring(body,1,40) as varchar(120)), author_id, author_name, created_at, moderation_state from comments "
-                + "union all select 'COLLECTION', c.id, cast(c.name as varchar(120)), c.owner_id, c.owner_name, p.updated_at, c.moderation_state from community_collections c join collection_publications p on p.collection_id=c.id where c.status='PUBLISHED'";
-        StringBuilder where = new StringBuilder(" where 1=1");
+        String union = "select 'ARTICLE' as t, id, cast(title as varchar(240)) as title, author_id, author_name, created_at as ts, moderation_state from content_posts where type='ARTICLE' "
+                + "union all select 'COMMENT', id, cast(substring(body,1,40) as varchar(240)), author_id, author_name, created_at, moderation_state from comments "
+                + "union all select 'COLLECTION', c.id, cast(c.name as varchar(240)), c.owner_id, c.owner_name, p.updated_at, c.moderation_state from community_collections c join collection_publications p on p.collection_id=c.id where c.status='PUBLISHED'";
+        StringBuilder where = new StringBuilder(" where moderation_state<>'WITHDRAWN'");
         List<Object> args = new ArrayList<>();
         if (type != null && !type.isBlank()) { where.append(" and t=?"); args.add(type); }
         if (moderation != null && !moderation.isBlank()) { where.append(" and moderation_state=?"); args.add(moderation); }
@@ -391,6 +523,7 @@ public class ReviewService {
     public Map<String, Object> publicationDetail(long operatorId, String type, long targetId) {
         requireReviewer(operatorId);
         Published published = publishedOf(type, targetId);
+        if ("WITHDRAWN".equals(published.moderation())) throw new ApiProblem(HttpStatus.NOT_FOUND, "未找到可处置的发布版。");
         Map<String, Object> view = new LinkedHashMap<>();
         view.put("type", type); view.put("id", targetId); view.put("authorId", published.authorId()); view.put("authorName", authorName(published.authorId()));
         view.put("moderation", published.moderation()); view.put("down", "TAKEN_DOWN".equals(published.moderation())); view.put("self", published.authorId() == operatorId);
@@ -450,6 +583,15 @@ public class ReviewService {
         List<Map<String, Object>> items = new ArrayList<>();
         for (Long id : ids) items.add(authorFlow(id));
         return Map.of("items", items);
+    }
+
+    /** 文章草稿视图用：某审核状态下最近的流转（按最近事件时间倒序，保证撤回等追加事件的流转不被挤出），作者视角。 */
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> articleFlows(long stateId, int limit) {
+        List<Long> ids = jdbc.queryForList("select f.id from review_flows f where f.state_id=? order by coalesce((select max(e.occurred_at) from review_flow_events e where e.flow_id=f.id), f.started_at) desc, f.id desc limit ?", Long.class, stateId, Math.max(1, Math.min(limit, 20)));
+        List<Map<String, Object>> items = new ArrayList<>();
+        for (Long id : ids) items.add(authorFlow(id));
+        return items;
     }
 
     private Map<String, Object> authorFlow(long id) {

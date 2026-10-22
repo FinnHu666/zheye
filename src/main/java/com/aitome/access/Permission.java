@@ -11,7 +11,7 @@ public enum Permission {
     CONTENT_PUBLIC("content.public", "页面", "浏览公开内容", "发现、专题广场、公开专题、VPS 指南", true, false, true),
     PROFILE_MANAGE("profile.manage", "页面", "个人资料与我的内容", "登录、退出、个人资料始终可用", true, false, false),
     SELECTION_MANAGE("selection.manage", "操作", "自选专题", "加入、移除、排序自选", false, false, false),
-    POST_CREATE("post.create", "操作", "发布文章/话题", "“开始创作”入口与发布接口", false, false, false),
+    POST_CREATE("post.create", "操作", "发布文章", "“开始创作”入口与发布接口", false, false, false),
     POST_INTERACT("post.interact", "操作", "点赞、讨论、收录", "内容详情中的互动", false, false, false),
     COLLECTION_MANAGE("collection.manage", "页面", "创建和编辑专题", "我创建的专题、专题编辑、导入", false, false, false),
     AI_USE("ai.use", "页面", "使用 AI", "AI 配置、AI 创建专题", false, false, false),

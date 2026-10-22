@@ -134,8 +134,8 @@ class CollectionImportTests {
 
     @Test void legacyWritesUseRevisionsAndNeverChangePublication() throws Exception {
         MockHttpSession session=user();ObjectNode doc=draft(session);long id=doc.get("id").asLong();publish(session,doc);
-        JsonNode article=write(post("/api/posts"),session,Map.of("type","ARTICLE","title","文章","summary","摘要","body","正文"),201);
-        ObjectNode before=current(session,id);String url="/api/me/collections/"+id+"/posts/"+article.get("id").asLong();
+        long articleId=TestArticles.publish(mvc,json,jdbc,session,"文章","摘要","正文");
+        ObjectNode before=current(session,id);String url="/api/me/collections/"+id+"/posts/"+articleId;
         write(put(url).param("revision",before.get("revision").asText()),session,null,200);
         write(put("/api/me/collections/"+id+"/draft"),session,before,409);
         mvc.perform(get("/api/collections/"+id+"/posts")).andExpect(jsonPath("$.total").value(0));
