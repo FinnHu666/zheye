@@ -4,6 +4,8 @@
 import { defineConfig } from '../../../frontend/node_modules/vite/dist/node/index.js'
 import vue from '../../../frontend/node_modules/@vitejs/plugin-vue/dist/index.mjs'
 import { fileURLToPath } from 'node:url'
+import { createReadStream, existsSync, statSync } from 'node:fs'
+import { extname, join, normalize } from 'node:path'
 
 const here = (path) => fileURLToPath(new URL(path, import.meta.url))
 const repo = here('../../../')
@@ -13,6 +15,9 @@ const overlays = {
   'pages/DiscoverPage.vue': here('./src/overlays/DiscoverPage.vue'),
   'components/PersonalNav.vue': here('./src/overlays/PersonalNav.vue'),
   'pages/CollectionEditorPage.vue': here('./src/overlays/CollectionEditorPage.vue'),
+  'components/CollectionOutlineEditor.vue': here('./src/overlays/CollectionOutlineEditor.vue'),
+  'pages/CollectionDetailPage.vue': here('./src/overlays/CollectionDetailPage.vue'),
+  'pages/CollectionNewPage.vue': here('./src/overlays/CollectionNewPage.vue'),
   'pages/MyContentPage.vue': here('./src/overlays/MyContentPage.vue'),
 }
 
@@ -29,9 +34,23 @@ const overlayPlugin = {
   },
 }
 
+// 原型专用：把本地 node_modules/vditor 以 /vendor/vditor 提供，Vditor 不再访问外部 CDN。
+const vditorRoot = here('./node_modules/vditor')
+const types = { '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff': 'font/woff', '.woff2': 'font/woff2', '.ttf': 'font/ttf', '.wasm': 'application/wasm' }
+const vditorAssets = {
+  name: 'finns-vditor-assets',
+  configureServer(server) {
+    server.middlewares.use('/vendor/vditor', (req, res, next) => {
+      const file = normalize(join(vditorRoot, decodeURIComponent(req.url.split('?')[0])))
+      if (!file.startsWith(vditorRoot) || !existsSync(file) || !statSync(file).isFile()) return next()
+      res.setHeader('Content-Type', types[extname(file)] || 'application/octet-stream'); createReadStream(file).pipe(res)
+    })
+  },
+}
+
 export default defineConfig({
   root: here('.'),
-  plugins: [overlayPlugin, vue()],
+  plugins: [overlayPlugin, vditorAssets, vue()],
   resolve: {
     alias: {
       '@finns': here('../../../frontend/src'),

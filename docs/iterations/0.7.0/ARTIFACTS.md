@@ -1,3 +1,15 @@
+## FINNS-19 最终交付索引（2026-10-24）
+
+| 阶段 | 产物 | 状态 |
+| --- | --- | --- |
+| G3/G4 | [概设](DESIGN_COLLECTION.md)、[设计自评](DESIGN_REVIEW_COLLECTION.md)、[契约](CONTRACT_COLLECTION.md) | PUBLISH-D21授权，独立性限制有记录 |
+| G5/G6 | [实施及真实验证](IMPLEMENTATION_COLLECTION.md)、[最终哈希](COLLECTION_VALIDATION_SHA256.json) | H2/PG各202、前端86、最终PG13及打包通过 |
+| G7 | [COL-A01–26结果](ACCEPTANCE_RESULT_COLLECTION.md)、[验收定义](ACCEPTANCE_COLLECTION.md) | 本轮通过；真机等发布前置单列 |
+| G8 | 发布 | 未执行，默认关闭开关，未部署/未改版本 |
+| G9/Plane | [最终回执](../../requirements/FOUNDATION_COLLECTION_PLANE_P05.md) | 以回执实际读回结果为准 |
+
+原始日志/截图/夹具在已忽略target/finns-19-implementation/；持久结论与哈希在上述文件，不含凭据。下方旧进度是历史。
+
 ## FINNS-18/19需求批准及下一步准备（2026-10-21）
 
 | 阶段 | 产物 | 状态/来源/保存 |

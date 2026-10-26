@@ -114,7 +114,8 @@ export function handleContent(method, path, body = {}, params = new URLSearchPar
     const all = state.documents.filter(d => d.authorId === user.id && !d.deleted && TYPES.includes(d.type)).map(row)
     const match = r => ({ ALL: true, DRAFT: ['PRIVATE', 'SAVED'].includes(r.status.work) && !r.hasPublished, REVIEW: ['REVIEWING', 'RECHECK', 'REJECTED'].includes(r.status.work), LIVE: r.publicVisible, OFF: ['WITHDRAWN', 'DOWN'].includes(r.status.publicState) }[filter])
     const inType = all.filter(r => (!q || `${r.title} ${r.summary}`.toLowerCase().includes(q)))
-    data = { items: inType.filter(match), counts: { ARTICLE: all.length } }
+    const title = (params.get('title') || '').trim().toLowerCase(), pub = params.get('pub') || '', work = params.get('work') || ''
+    data = { items: inType.filter(match).filter(r => (!title || r.title.toLowerCase().includes(title)) && (!pub || r.status.publicState === pub) && (!work || r.status.work === work)), counts: { ARTICLE: all.length } }
   } else if (method === 'POST' && path === '/api/content/mine') {
     const user = authorGuard(); const type = 'ARTICLE', draft = clean(body)
     if (fields.every(k => blank(draft[k]))) problem(400, '标题、摘要和正文都为空，不会创建草稿。')

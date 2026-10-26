@@ -1,3 +1,7 @@
+## FINNS-19 当前交付（2026-10-24）
+
+F03原型接入、实施及本轮验收完成，目标0.7.0；[验收结果](iterations/0.7.0/ACCEPTANCE_RESULT_COLLECTION.md)与[实施记录](iterations/0.7.0/IMPLEMENTATION_COLLECTION.md)为当前入口。后续是获发布环境授权后的G8：实体手机/触摸、生产备份恢复、开关与部署验证；本轮没有发布、版本升级或Git提交推送。其他分项状态不变，下方旧F03待实施记录保留为历史。
+
 ## FINNS-18/19：需规修订2已确认，下一步管理同步与原型（2026-10-21）
 
 用户明确“确认需规，完毕以后，进行下一步”，已记录[PUBLISH-D01/D02](requirements/PUBLISHING_DECISIONS.md)，文章与专题修订2的G1通过，勿重复索要需求批准。已归档[文章CT-A01–13](iterations/0.7.0/ACCEPTANCE_CONTENT.md)、[专题COL-A01–16](iterations/0.7.0/ACCEPTANCE_COLLECTION.md)，业务验收均未执行；遗留项CT-L01–03/COL-L01–03待G2/G3/G4交付。

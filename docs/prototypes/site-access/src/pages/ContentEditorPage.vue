@@ -7,10 +7,13 @@ import { api } from '@finns/lib/api'
 import { sessionUser } from '../proto/session'
 import FlowTimeline from '../components/FlowTimeline.vue'
 import ContentShell from '../components/ContentShell.vue'
+import VditorEditor from '../components/VditorEditor.vue'
 const LIMITS = { title: 120, summary: 280, body: 20000 }
 const FIELDS = ['title', 'summary', 'body']
 const FIELD_TEXT = { title: '标题', summary: '摘要', body: '正文' }
 const route = useRoute(), router = useRouter()
+const editMode = computed(() => route.query.mode === 'source' ? 'source' : 'read')
+const setMode = m => { bypass = true; router.replace({ query: { ...route.query, mode: m === 'source' ? 'source' : undefined } }).finally(() => { bypass = false }) }
 const isNew = computed(() => !route.params.id)
 const type = ref('ARTICLE'), doc = ref(null), form = ref({ title: '', summary: '', body: '' }), base = ref({ title: '', summary: '', body: '' })
 const loading = ref(true), busy = ref(''), error = ref(''), notice = ref(''), noticeTone = ref('success'), missing = ref([]), conflict = ref(null), reader = ref(null), readerNote = ref(''), loadFailed = ref(false)
@@ -176,8 +179,8 @@ const older = computed(() => doc.value?.flows?.slice(1) || [])
           <div class="rv-editor-top"><span class="rv-badge">{{ typeText }}</span><span>{{ doc ? `工作稿 v${doc.draft.version}` : '新稿' }} · {{ dirty ? '有未保存的修改' : doc ? '已保存' : '未保存' }}</span></div>
           <label class="rv-field" :class="{ bad: missing.includes('title') || over.includes('title') }">标题<input ref="titleInput" v-model="form.title" data-field="title" :aria-invalid="missing.includes('title') || over.includes('title')" autocomplete="off" /><span class="ct-count" :class="{ over: over.includes('title') }">{{ count(form.title) }}/{{ LIMITS.title }}</span></label>
           <label class="rv-field" :class="{ bad: missing.includes('summary') || over.includes('summary') }">摘要<textarea v-model="form.summary" data-field="summary" rows="3" :aria-invalid="missing.includes('summary') || over.includes('summary')" /><span class="ct-count" :class="{ over: over.includes('summary') }">{{ count(form.summary) }}/{{ LIMITS.summary }}</span></label>
-          <label class="rv-field" :class="{ bad: missing.includes('body') || over.includes('body') }">正文<textarea v-model="form.body" data-field="body" rows="14" :aria-invalid="missing.includes('body') || over.includes('body')" /><span class="ct-count" :class="{ over: over.includes('body') }">{{ count(form.body) }}/{{ LIMITS.body }}</span></label>
-          <p class="rv-footnote">支持安全 Markdown：<code># 标题</code>、<code>- 列表</code>、<code>**粗体**</code>、<code>`代码`</code>、<code>[链接](https://…)</code>。HTML、脚本和图片不会生效。草稿可以缺字段；发布时标题、摘要、正文都必填。上限按字符数计算，具体计量规则在设计阶段确认。</p>
+          <div class="rv-field" :class="{ bad: missing.includes('body') || over.includes('body') }"><div class="ct-body-head"><span>正文</span><div class="fc-seg" role="group" aria-label="编辑模式"><button type="button" :class="{ on: editMode === 'read' }" :aria-pressed="editMode === 'read'" @click="setMode('read')">阅读模式</button><button type="button" :class="{ on: editMode === 'source' }" :aria-pressed="editMode === 'source'" @click="setMode('source')">源码</button></div></div><div data-field="body" tabindex="-1"><VditorEditor v-model="form.body" :mode="editMode === 'source' ? 'source' : 'read'" :disabled="locked" /></div><span class="ct-count" :class="{ over: over.includes('body') }">{{ count(form.body) }}/{{ LIMITS.body }}</span></div>
+          
           <div class="rv-editor-actions ct-actions">
             <button type="button" class="btn btn-ghost" :disabled="locked || (empty && !doc)" @click="save()">{{ busy === 'save' ? '保存中…' : '保存草稿' }}</button>
             <button type="button" class="btn btn-ghost" :disabled="locked || (empty && !doc)" @click="preview">私人预览</button>

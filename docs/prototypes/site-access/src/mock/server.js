@@ -5,6 +5,7 @@ import { CATALOG, permLabel, isLocked, MAX_ROLES } from './roles'
 import { handleAccount, ensureAccount } from './account'
 import { handleReview, ensureReview } from './review'
 import { handleContent } from './publishing'
+import { handleCollection } from './collections'
 import { ensureUserAdmin, currentPrototypeUser, normalManagerCount, changeAccountStatus, isSiteOwner, protectedRole, managementRestriction, ownershipOptions, transferOwnership } from './user-admin'
 
 // 角色清单保存在服务端（R3 起可新增、改名、删除）。
@@ -146,9 +147,10 @@ on('PUT', /^\/api\/me\/collections\/(\d+)\/posts\/(\d+)$/, ({ match }) => {
   if (!c.postIds.includes(Number(match[2]))) c.postIds.push(Number(match[2]))
   return collectionView(c)
 })
+// 撤回/下架期间自选记录保留但隐藏（c.status 非 PUBLISHED 时不展示）
 const selectionView = (user) => {
   const ids = getDb().selections[user.id] || []
-  const items = ids.map((id, i) => { const c = getDb().collections.find((x) => x.id === id); return c && canReadCollection(user, c) ? { ...collectionView(c), sortOrder: i } : null }).filter(Boolean)
+  const items = ids.map((id, i) => { const c = getDb().collections.find((x) => x.id === id); return c && c.status === 'PUBLISHED' && canReadCollection(user, c) ? { ...collectionView(c), sortOrder: i } : null }).filter(Boolean)
   return { version: ids.length, items }
 }
 on('GET', /^\/api\/me\/collections\/selected$/, () => selectionView(requirePerm('selection.manage')))
@@ -363,7 +365,7 @@ on('GET', /^\/api\/me\/collections\/(\d+)\/preview$/, ({ match }) => {
 })
 
 // 不在 0.7.0 原型范围内的既有接口：如实返回“原型未模拟”，不假装成功。
-const notSimulated = /^\/api\/(me\/(collection-templates|collections\/drafts|collections\/\d+\/(duplicate|builder-document)|collection-imports|topic-builder)|private\/tools)/
+const notSimulated = /^\/api\/(me\/(collections\/\d+\/builder-document|topic-builder)|private\/tools)/
 
 const json = (status, data) => new Response(status === 204 ? null : JSON.stringify(data ?? {}), { status, headers: { 'Content-Type': 'application/json' } })
 const emit = () => window.dispatchEvent(new CustomEvent('finns-proto-change'))
@@ -389,11 +391,13 @@ async function handle(url, init) {
       if (d.settings.dropCsrfOnce) { d.settings.dropCsrfOnce = false; fail(403, 'CSRF 校验失败：请求缺少有效令牌（模拟）。页面输入已保留，请重试') }
       if (header !== d.csrf) fail(403, 'CSRF 校验失败')
     }
-    if (notSimulated.test(path)) fail(501, '原型未模拟此功能（不在 0.7.0 浏览量/角色范围内）')
+    const collection = handleCollection(method, path, body, parsed.searchParams)
+    if (notSimulated.test(path) && !collection.handled) fail(501, '原型未模拟此功能（不在 0.7.0 浏览量/角色范围内）')
     const account = handleAccount(method, path, body, parsed.searchParams)
     const review = account.handled ? { handled: false } : handleReview(method, path, body, parsed.searchParams)
-    const content = account.handled || review.handled ? { handled: false } : handleContent(method, path, body, parsed.searchParams)
+    const content = account.handled || review.handled || collection.handled ? { handled: false } : handleContent(method, path, body, parsed.searchParams)
     if (account.handled) data = account.data
+    else if (collection.handled) data = collection.data
     else if (content.handled) data = content.data
     else if (review.handled) data = review.data && typeof review.data.then === 'function' ? await review.data : review.data
     else {

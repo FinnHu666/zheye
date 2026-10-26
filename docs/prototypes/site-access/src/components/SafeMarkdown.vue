@@ -11,7 +11,7 @@ defineExpose({ notes })
   <div class="ct-md">
     <p v-if="notes.length" class="rv-notice amber ct-md-notes" role="status">安全处理：{{ notes.join('；') }}。</p>
     <template v-for="(block, index) in parsed.blocks" :key="index">
-      <component :is="'h' + (block.level + 1)" v-if="block.k === 'h'"><template v-for="(t, i) in block.inline" :key="i"><SafeInline :token="t" /></template></component>
+      <component :is="'h' + Math.min(6, block.level + 1)" v-if="block.k === 'h'"><template v-for="(t, i) in block.inline" :key="i"><SafeInline :token="t" /></template></component>
       <p v-else-if="block.k === 'p'"><template v-for="(t, i) in block.inline" :key="i"><SafeInline :token="t" /></template></p>
       <p v-else-if="block.k === 'li'" class="ct-md-li"><template v-for="(t, i) in block.inline" :key="i"><SafeInline :token="t" /></template></p>
       <blockquote v-else-if="block.k === 'quote'"><template v-for="(t, i) in block.inline" :key="i"><SafeInline :token="t" /></template></blockquote>

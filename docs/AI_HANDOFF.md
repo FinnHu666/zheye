@@ -1,3 +1,206 @@
+## 0.7.0 封板与部署：备份与演练完成，发现两个阻断，已停在切换主站之前（2026-10-26）
+
+用户要求封板并完成部署，并决定：封板范围＝FINNS-10/11/15/16 + 17/18/19，20/21/22 移出；话题数据本次不碰；授权本地提交（不推送）；授权 P0 与备份（决定 D22–D25，见 [DECISIONS](iterations/0.7.0/DECISIONS.md)）。**主站 8080 未切换，Git 未提交，Plane 未写。**
+
+已做并验证：
+- 构建与测试：`scripts/package.ps1` 第一次后端 202 项有 1 项失败（`TopicBuilderTests.generatesSnapshotAndChatPreservesAnswers` 返回 504，与交接里已记录的本机桩服务 1 秒超时抖动同类），单独重跑 2 次各 8 项通过，**完整重跑 202/202 通过**，生成 `target/finns-0.7.0.jar`（SHA256 `8BE9C363…4999`）。
+- P0：冷拷贝 `data/postgres`（13537 个文件，逐文件 SHA256 比对 0 差异）到 `E:\tools\finns-runtime\backups\20261026-pre-0.7.0-seal\cold-copy\postgres`（清单 `cold-copy.sha256`；位置在仓库与 `data/` 之外、不在 E 盘根）；启动前 `LC_ALL=C pg_controldata`=`in production`（陈旧 `postmaster.pid`=PID 29264，2026-10-21）；直接 `pg_ctl` 启动，自动恢复 redo 约 200 字节，数据库可用，**主集群现在运行在 5432，已保持运行**。
+- 备份与恢复演练：发布目录 `data/deployments/20261026-seal-content-collection-0.7.0/`（JAR、VERSION、JAR 与 dump 的 SHA256、`rowcounts-main-vs-restore.txt`）；`pg_dump -Fc`（80,601 字节）、`pg_restore -l` 177 项、恢复到 `finns_restore_check_070_seal_20261026`，24 张表逐表行数 **0 差异**。
+- 8094 演练：新 JAR 连恢复库启动，Flyway 在 V14 之上应用 V15–V20 共 6 个迁移全部成功，启动 11.7 秒；`/`、`/admin/users`、`/auth/login`、`/api/stats`、`/api/collections`、`/me/posts`、`/collections` 为 200，游客 `/api/admin/users`、`/api/auth/me` 为 401，无 CSRF 登录为 403。演练进程已停止。
+
+**两个阻断（均须用户决定，AI 未处理）**：
+1. **主库有 1 条历史话题（`content_posts.type=TOPIC`，状态 VISIBLE）**。新代码已无话题类型，`GET /api/posts` 在演练中返回 **500**（`No enum constant ContentPost.Type.TOPIC`）。用户“本次不碰话题”的前提（读取不受影响）不成立。需求依据：FINNS-18 的 PUBLISH-D04 选择了“既有话题彻底移除”，删除不可逆且需逐类确认。主库只有 4 条帖子（3 篇文章、1 条话题）、2 个用户。
+2. **前端有 1 个测试失败，且 6 个文件在 FINNS-19 验证清单之后被改过**。前端 `node --test` 85/86：`collection-wizard-ui.test.js` “append import saves current edits before leaving the unified wizard” 找不到“导入补充资料”按钮（`StepContent.vue` 现已没有该文案，仅有导入 HTML 模块）。`COLLECTION_VALIDATION_SHA256.json`（2026-10-24 11:43）对 260 个文件的核对：`collection-wizard.css`、`styles.css`、`StepContent.vue`、`StepPublish.vue`、`MyContentPage.vue`、`static/index.html` 已变化（修改时间 10-24 13:05–13:28，`target/collection-page-adjustments`、`collection-list-page` 有 `.before` 备份和截图，但交接文档与 CHANGELOG 没有记录这批调整）。“追加导入”入口是否被有意移除未知；验证记录说它已验证过。
+
+未验/限制：真机与浏览器验收对这批后期调整未复验；`FINNS_BOOTSTRAP_ADMIN_EMAIL` 在用户级环境变量中未设置（主站已有站长，不影响）；Plane 未同步；前端 `static/` 构建产物已重新生成（8 个文件变化，尚未提交）。
+
+下一步需用户：①话题处理方式（见最近的回复）；②前端后期调整与失败测试怎么办；③确认后继续：本地分组提交 → 再次构建核对 → 切换主站（最后一次确认）。
+## FINNS-24：范围澄清——Project Runner 不属本任务（2026-10-26）
+
+用户指出 FINNS-24 与 Project Runner 没有关系，最多是技术对接。记 [ENG-D15](requirements/REPO_BASELINE_DECISIONS.md)：此前由我（并经评审者放大）写进需求 R02、验收 A15、风险 §5、§7 和设计 L7、T9 的 Project Runner 条目核对，**属于我把外部工具扩进了任务范围**，已全部移除，只在迁移说明里保留“外部工具路径需自行更新”的提示。L7、T9 已撤销。
+- 影响：需求 G1 结论不变（只收窄 R02/A15 措辞）；设计 G3 的必答项只剩 **T8**（U9/U1 细节与提交分组），不再有 T9。其余设计决定 T1–T7、T10–T13 仍待用户答复。设计修订 3 仍未复核。
+- 进度文件相关证据哈希已刷新，检查器仍只有既有的 `AI_HANDOFF.md` 失配。
+- 没有改动：业务源码、`scripts/`、`data/`、运行实例、Git、Plane。
+
+## FINNS-24 G3：两轮设计评审完成（均退回），设计修订 3 待用户决定（2026-10-25）
+
+用户授权两轮只读子代理设计评审（第一轮现状与实测真实性，第二轮数据迁移与失败模式，轮间修订）。已做：[设计修订 3](iterations/0.8.0/DESIGN_REPO_STRUCTURE.md)、[设计评审记录](iterations/0.8.0/DESIGN_REVIEW_REPO_STRUCTURE.md)。评审者独立性有限；我核对了关键条目后才采纳。
+
+- 结果：第一轮退回（遗留项 L1/L7/L8/L9 未交付等），第二轮退回（3 条阻断：W1 与 W2 自相矛盾，因为备份需要运行中的实例；首次启动崩溃遗留集群前没有冷拷贝；窗口无状态表、脚本先于数据生效且无放弃套件）。设计修订 3 已吸收，**修订 3 未复核**（授权的两轮已用完）。**G3 未通过**。
+- 重跑实验并留证：`target/repo-structure-g3-evidence/`（脚本、原始输出、`MANIFEST.sha256`；在已忽略的 `target/` 下，可能被清理）。新发现：`pg_controldata` 在本机默认输出 GBK 中文，须 `LC_ALL=C` 才能解析（崩溃遗留目录为 `in production`，干净停止为 `shut down`）；`pg_ctl status` 对残留 pid 返回退出码 3；`pg_ctl start | tail` 管道会挂起；E5 在 clone 后 docs 在所有无差异方案下都是 LF，`docs/** -text` 会让 CRLF 文档产生整文件 diff。
+- 设计要点（修订 3）：P0 先冷拷贝崩溃遗留的 `data/` 再启动恢复；窗口 W1–W7 状态表（先停主站后停 PG；非 5432 端口启动做备份与基线；复制到 `data.incoming`；先改名旧目录、后改名新目录，其间无入口可启动的数据；先 54398 端口核对 system identifier 与基线再正式启动）；窗口标记与放弃套件；DS6 守卫加强；`start-local-main.ps1` 限定发布目录并检查库非空。
+- **需用户决定（设计 §9，T1–T13）**，其中答复前 G3 不得通过的是 **T8（U9/U1 细节与提交分组）与 T9（L7 延期）**；评审建议 **T4 保持 A13 原文**（与我先前推荐相反）；T7（备份落点与四份副本的保留期）无默认值；T11（P0 授权与主站离线时长）、T12（热修复路径）、T13（根目录占位文件）是新增项。
+- 没有改动：业务源码、`pom.xml`、`scripts/`、`data/`（评审者与我都未读取真实 `data/`）、运行实例、Git 提交与推送、Plane。实验用 PostgreSQL 进程已停止，仅剩一个无命令行、无端口的已终止进程句柄。
+- 下一步需用户：①回答 T8、T9（必须）；②决定 T1–T7、T10–T13；③是否授权对设计修订 3 的被改动部分再复核；④FINNS-23“整体修复”范围仍待说明；FINNS-25 由另一会话处理。
+
+## FINNS-26：一轮独立需求评审完成，修订1待用户确认（2026-10-25）
+
+用户要求评审 FINNS-26，随后明确允许 1 轮独立评审。已形成[需求修订1](iterations/0.8.0/REQUIREMENTS_CODE_REVIEW_BASELINE.md)、[评审记录](iterations/0.8.0/REQUIREMENT_REVIEW_CODE_REVIEW_BASELINE.md)及[D1不变输入](iterations/0.8.0/REQUIREMENTS_CODE_REVIEW_BASELINE_D1.md)，索引与验证见[本项产物](iterations/0.8.0/ARTIFACTS_CODE_REVIEW_BASELINE.md)。
+
+- 独立评审对象为 D1，结论**带条件通过，无退回重写阻断项**。三项重要条件：A08允许清单与U2-B入口脚本相容；审查SHA与最终复现输入分别冻结；U4明确选择或延期到G2/G3前。作者已在修订1落实，**修订1未再次独立复核**，不冒称已评审通过。子代理未继承作者对话且只读，未追加第二轮。
+- **G1仍pending**：待用户决定U1（建议固定提交区间＋权限/会话）、U2（建议包含必要构建/测试/隔离启动入口整改，不含业务修复）、U3（建议规则与样例，不搬历史）并确认具体修订1；U4建议本项G2不适用，需本项确认或明确延期，未沿用FINNS-24豁免。
+- 目标0.8.0沿用已有决定，不重复分版。Plane本轮只读核对：FINNS-26为Backlog/medium/base，已关联0.8.0周期、日期为空，正文仍为原草稿，updated_at=`2026-10-25T11:03:16.171807Z`。G1通过后才列本项正文具体差异，逐项确认写入并回读；未替FINNS-23/24/25写入。
+- 执行依赖：人工审查绑定FINNS-25实际规则版本，路径与复现绑定FINNS-24验收结果及0.7.0封板外部前置，不要求两项整项发布。当前0.8.0 PLAN/REQUIREMENTS及路线图仍含旧历史入口，本轮不替其他会话重编迭代；本项权威入口为上述独立需求文件。
+- 修改范围：本项需求/评审/D1快照/索引、交接增量、Unreleased与进度文件内`code-review-baseline`对象；其他任务对象和顶层元数据按语义比对保持。原有脏树与他项改动保留；共享文件采用写前重读、局部增量，不宣称文件锁或隔离环境已建立。
+- 没有执行：首轮业务代码审查、密钥/漏洞扫描、许可证核验、前后端测试/构建、浏览器、服务/数据库、工具安装、Git提交/推送或发布；四处发布版本仍0.7.0。本轮仅文档/输入哈希/引用及进度核对，进度检查器仍退出2（本项G1待确认）。
+
+## FINNS-24 G3：概要设计与实测完成，设计评审待授权（2026-10-25）
+
+用户授权进入 G3，并要求实测 Maven 工作目录、`.mvn` 查找、Flyway 对换行是否敏感、PostgreSQL 目录移动后的启动行为，只用副本和隔离库。已写 [概要设计](iterations/0.8.0/DESIGN_REPO_STRUCTURE.md)（设计修订 1，**设计评审未做，G3 未通过**）。
+
+- 实测（全部在会话临时目录：临时 Maven 项目、H2 内存库、临时 PostgreSQL 集群 54399 端口、临时 Git 仓库；未碰主库、真实 `data/`、仓库文件）：①从根目录 `mvn -f backend/pom.xml` 时 `.mvn/maven.config` 生效，但**相对的 `-s` 按当前目录解析而失败**，在 `backend/` 内运行正常；②`spring-boot:run` 与 surefire 的默认工作目录都是 `backend/`，`./data` 即 `backend/data`；③Flyway 10.20.1 对仓库 19 个迁移脚本的 LF/CRLF/BOM 副本校验和**完全相同**；④PostgreSQL 干净停止后移动目录可正常启动，异常终止（残留 pid）后移动目录能 redo 恢复且数据完整，残留 pid 指向存活无关进程时仍可启动（伪造键，单次）；⑤`.gitattributes`：`docs/** -text` 会让 CRLF 文档产生 CRLF blob 和整文件 diff，`* text=auto eol=lf` 且 docs 不单列则无内容差异。另发现 `pg_ctl start | tail` 管道会挂起，脚本须重定向到文件。
+- 设计要点：脚本统一在 `backend/` 内执行；`postgres.ps1` 在目标 `PG_VERSION` 缺失时拒绝 `initdb`；数据迁移用“复制+校验和+旧 `data/` 改名保留”，与脚本改动同属一个受控窗口；`static/` 不入库且 `test.ps1` 缺产物时自动构建；`start-local-main.ps1` 与 `start-account-preview.ps1` 的 `-WorkingDirectory` 原为根目录（已核对），须改到 `backend/`。完整入口表见设计 §5。
+- **需用户决定（设计 §9）**：T1 `test.ps1` 缺前端产物时自动构建还是报错；T2 数据迁移复制（多占约 770 MB）还是原地改名；T3 docs 换行规则表述（建议“docs 不单列规则”，因 `-text` 实测会破坏已登记文件）；T4 把需求 A13 从“恢复库上 Flyway 校验”降为“迁移脚本字节哈希相同”（改变已确认验收，须你决定）。
+- 遗留项：设计 §8 中 L7（Project Runner 条目核对方式）已上报并转入 G5，其余已交付。
+- **设计评审**需用户授权子代理；未授权前只能写“同作者自评，独立性有限”。进度文件 G3 保持 pending，设计文档作为背景证据登记。
+- 没有改动：业务源码、`pom.xml`、`scripts/`、`data/`、运行实例、Git 提交与推送、Plane。FINNS-23“整体修复”仍待用户说明范围，FINNS-25 由另一会话处理。
+- 清理：临时实验目录在会话临时区；实验用 PostgreSQL 进程均已停止，仅剩一个无命令行的已终止进程句柄（pid 30596），无端口。
+
+## FINNS-24：G1 通过，PLANE 检查点已完成，等待授权进入 G3；FINNS-23 待澄清（2026-10-25）
+
+用户明确确认评审后的修订号为**需求修订 6**并知情接受其未复核（ENG-D12、D14），U4/U12/U13/U14 单项确认（ENG-D13）。FINNS-24：**G1 通过、G2 豁免、PLANE 通过**，进度文件已登记；下一阶段 G3 概要设计与设计评审，需用户授权进入。
+- Plane（用户确认后写入并回读）：FINNS-24 正文更新到修订 6 要点，开始/截止日期清空；标题、状态、周期、父项、标签未动。详见 [P03′](requirements/REPO_BASELINE_PLANE_P01.md)。标题改 0.8.0 与关联 0.8.0 周期此前已由用户在界面完成（FINNS-24/25/26 均已入周期）。
+- **FINNS-23**：用户在界面已把标题改为“FINNS 0.8.0｜理清项目基础核心”并精简正文；本次对“是否增补正文”答复“整体修复 finns-23”，范围不明确，**未写入**（P02′ 待澄清）。
+- **另一会话**正在处理 FINNS-25（需求文件在 `docs/iterations/0.8.0/`，Plane 正文 11:31Z 已更新）。本会话曾覆盖其在 `delivery-progress.json` 里的 G0 证据路径、追加理由并改了修订号，已按其理由文字恢复（G0 证据=其自己的需规文件、修订号 1），**请该会话核对**。两个会话同时写进度文件与交接文档会互相覆盖，建议同一时间只让一个会话写。
+- 实施期细节转入后续门禁：U9 分支基点与命名、U1 提交分组与信息（须问明 `static/` 的删除、修改与新资产是否进封板提交）。
+- 没有改动：业务源码、`scripts/`、`data/`、运行实例、Git 提交与推送。
+
+## FINNS-24：第三轮复核完成（带条件通过），需求修订 6 待复核与用户单项确认（2026-10-25）
+
+用户答复：U2=B（`data/` 迁入 `backend/data`）、其余按推荐、豁免 G2（仅 FINNS-24）、授权复核。已做：决定记录 [ENG-D07–D11](requirements/REPO_BASELINE_DECISIONS.md)、[需求修订 6](requirements/REPO_BASELINE_REQUIREMENTS.md)、[评审记录第三轮](requirements/REQUIREMENT_REVIEW_REPO_STRUCTURE.md)。
+
+- 第三轮（只读子代理，独立性有限）结论：**带条件通过，不建议此刻标 G1**。新增 2 条阻断并已写入修订 6：①`scripts/postgres.ps1:35-39` 在 `PG_VERSION` 缺失时 `initdb` 并建空 `finns` 库，U2=B 下脚本先改而数据未迁入时会静默新建空主库（已复核）→脚本守卫、脚本与数据迁入同一受控窗口；②主站 PostgreSQL 集群是异常中断遗留状态（`data/postgres/postmaster.pid` 为 2026-10-21 陈旧文件，当前无进程，已复核；`pg_controldata` 的“在运行中”输出我未复核）→迁移前须先干净停止，并加强备份、回移演练、旧 `data/` 改名保留。
+- **修订 6 未复核**（三轮授权已用完）。**G1 仍未通过**，缺：用户明确确认评审后的修订号；对修订 6 的复核（需另行授权）；U4、U12、U13、U14 单项确认（第三轮指出它们是重要选择，不应由 AI 代填）；U9 分支基点与命名；U1 提交分组与信息（须问明 `static/` 的删除、修改与新资产是否进封板提交）。
+- G2：用户豁免，仅 FINNS-24，进度文件已记 `na` 并指向决定记录；FINNS-25/26 进入各自评审时再记录。
+- 进度文件：三个任务 G0 哈希刷新到修订 6；repo-structure 的 G1 仍 pending；证据失配仍只有既有的 `AI_HANDOFF.md`（本节写入交接文档后它依旧失配，已知且早于本轮）；检查器退出码为既有的 2。
+- **Plane 仍未写入**：FINNS-23 更新、FINNS-24/25/26 标题（含“0.7.0”）与 FINNS-24 日期不符、关联 0.8.0 周期，均待用户逐项确认（[P02–P06](requirements/REPO_BASELINE_PLANE_P01.md)）。`docs/iterations/0.8.0/PLAN.md`、`REQUIREMENTS.md`、`docs/RELEASE_ROADMAP.md` 仍是旧内容，未改。
+- 没有改动：业务源码、`pom.xml`、`frontend/`、`scripts/`、版本号、数据库与 `data/`、运行实例、Git 提交与推送；第三轮评审者只读（含 `pg_controldata`）。
+- 下一步需用户：①确认评审后的修订号（建议确认修订 6，或先授权复核修订 6）；②单项确认 U4、U12、U13、U14；③答复 U9 分支基点与命名、U1 提交分组与信息；④确认 Plane P02–P06。
+
+## FINNS-25：修订1已批准，P04正文已更新并回读（2026-10-25）
+
+用户本轮明确回复“确认需求修订1；确认差异并进行更新”。需求修订1获批准，目标0.8.0，采用增量＋文档加工具；两轮评审的范围阻断已解决，设计遗留STD-L01–L04保留。G1通过；不代表实施、验收或发布。
+
+- 权威资料：[需求修订1](iterations/0.8.0/REQUIREMENTS_CODE_STANDARDS.md)、[两轮评审及批准记录](iterations/0.8.0/REQUIREMENT_REVIEW_CODE_STANDARDS.md)、[P04执行回执](iterations/0.8.0/CODE_STANDARDS_PLANE_P01.md)。本次只更新批准/同步事实，未改变已确认范围或需求修订号。
+- P04执行一次，仅写FINNS-25正文；写前重读正文未变。用户本轮确认后，载荷批准状态据实写为“修订1确认、G1通过、未实施”。按ID回读正文一致，18项保护字段相等，Backlog保留；updated_at=2026-10-25T11:31:37.428150Z（本地19:31:37）。
+- 写前已发现FINNS-25现有0.8.0周期关联（74c326cb-9864-4405-89ed-8e1675483486），本轮保留，不执行关联写入；旧记录的“无Cycle”由此次实时核对取代。未操作其他工作项、项目或Release。API无条件更新，读写窗口仍存在，回读未发现保护字段覆盖。
+- 进度仅更新code-standards：G1、PLANE pass，G2 pending（本无UI任务不适用尚未独立确认）。下一步是在后续获授权推进时核对本项G2不适用及FINNS-24验收、0.7.0封板依赖；本轮不自动进入设计或实施。其他任务既有证据失配不在此次修复范围。
+- 文档JSON、证据哈希、链接及diff检查执行；进度检查器仍可能因G2及其他既有待办返回2，不能视为实施失败或上线。业务测试/构建/数据库/浏览器均未执行（本轮仅需求批准与远程正文同步）。
+- 无工具安装、业务修改、数据库连接、服务重启、Git提交/推送或发布；旧工程化同步记录P04待执行叙述由新回执取代，其他操作不自动批准。
+
+## FINNS-24：用户决定已写入需求修订 4，目标版本 0.8.0（2026-10-25）
+
+用户答复：U8=A 单仓库、目录拆分（“一个仓库，但是将结构拆分进行”）；U1=A 先提交未提交改动；U3=B `static/` 不入库；U9=A 先发布 0.7.0 并封板，再在新周期 0.8.0 完成本任务；并说“符合修订3；更新”。记录见 [决定记录](requirements/REPO_BASELINE_DECISIONS.md)（ENG-D01–D06），[需求修订 4](requirements/REPO_BASELINE_REQUIREMENTS.md) 已写入这些决定，并把 U3 带来的 R06、A02、A08 具体化。
+
+- **G1 仍未通过**：用户没有明确确认“评审后的修订号”（只说“符合修订3”），且修订 3、4 未经复核；U2、U4、U5、U7、U10–U14 仍待答复（U2 用户先问含义）。
+- 目标版本：0.8.0，Plane 周期“FINNS 0.8.0｜项目质量建立”（2026-10-25 读取：名称已是此，无日期，现含已取消的 FINNS-12、13）。**Plane 尚未写入**：FINNS-23 更新、FINNS-24/25/26 标题（含“0.7.0”）与 FINNS-24 日期（10-25 至 10-26）与决定不符、关联周期，均列为 [P02–P06](requirements/REPO_BASELINE_PLANE_P01.md) 待逐项确认；FINNS-23 状态是否由 In Progress 改 Backlog 也待决定。`docs/iterations/0.8.0/PLAN.md` 仍是旧的评价/租房规划，未改。
+- U1 的“先提交”是**尚未执行**的动作：AI 没有提交，需要用户指定分组与提交信息并授权；按 U9 它属于 0.7.0 封板前的收尾，不属本任务。
+- 进度文件：三个任务 `version`/`target_version`=0.8.0，G0 哈希刷新至修订 4，repo-structure 的 G1 仍 pending。检查器退出码仍为既有的 2，证据失配仍只有既有的 `AI_HANDOFF.md` 一项（本节改动交接文档后它依旧失配，已知且早于本轮）。
+- 没有改动：业务源码、`pom.xml`、`frontend/`、`scripts/`、版本号、数据库、运行实例、Git 提交与推送。
+
+## FINNS-24 需求评审两轮完成（均退回），修订 3 待复核与用户决定（2026-10-25）
+
+用户授权用只读子代理对 FINNS-24 做两轮需求评审（第一轮：与既有约束、现状源码的冲突；第二轮：可验收性与影响面；轮间修订；记录写“独立性有限”）。评审者是同模型子代理，我核对了关键条目后才采纳。
+
+- 结果：[评审记录](requirements/REQUIREMENT_REVIEW_REPO_STRUCTURE.md)；[需求草稿修订 3](requirements/REPO_BASELINE_REQUIREMENTS.md)。第一轮退回（3 阻断、10 重要）→修订 2；第二轮退回（3 阻断、9 重要，另有回退/停止条件缺失）→修订 3。**修订 3 尚未经复核**（授权只有两轮）。**G1 未通过**：缺用户确认评审后的修订号、U1–U14 答复、目标版本（U6）、对修订 3 的复核。
+- 评审发现、我已核实的几件事（建议用户重点知晓）：
+  1. `scripts/migrate-h2-dry-run.ps1` 会启动本机 PostgreSQL 并按默认配置连接主库 `127.0.0.1:5432/finns`（Flyway 开启）；未跟踪的 V19、V20 迁移尚未提交，按静态阅读可能被应用到主库（未实跑）。需求里规定验证只用 `finns_test_*` 与 H2 副本。
+  2. 搬到 `backend/` 后，`mvn` 在该目录启动会让 `./data/aitome` 变成 `backend/data`，可能静默新建空库；`.gitignore` 的 `data/` 不带锚点会掩盖它。
+  3. `docs/delivery-progress.json` 的证据按原始字节哈希：**整理前就已有 `docs/AI_HANDOFF.md` 一项失配**（早于本轮，我核对过）；本草稿作为三个新任务的 G0 证据，每次修订都需更新哈希并记录理由。检查器每任务只报第一个未满足门禁，不能当基线。
+  4. 若 `static/` 构建产物不再入库，新克隆连后端 H2 全量测试都过不了（`AiTomeApplicationTests` 要求 `/index.html`）。
+  5. 原要求“分别建立仓库”被我收窄为单仓库加 `backend/`，用户尚未明确选择，已列为 U8。
+- 本地登记：`docs/delivery-progress.json` 三个新任务 G0 哈希已更新为修订 3，repo-structure 的 G1 仍 pending 并引用评审记录；检查器退出码仍为既有的 2。
+- Plane：FINNS-24/25/26 已创建（正文写的是修订 1 时的草稿，未随修订 3 更新）；**FINNS-23 标题与正文的更新差异仍待用户确认，未写入**（见 [同步记录 P02](requirements/REPO_BASELINE_PLANE_P01.md)）。
+- 没有改动：业务源码、`pom.xml`、`frontend/`、`scripts/`、版本号、数据库、运行实例、Git 提交与推送。
+- 下一步需用户：①回答 U1–U14（最关键 U8 仓库形态、U1 未提交改动、U2 数据目录、U3 static 入库、U9 搬迁与发布先后）；②是否授权对修订 3 复核（只复核改动部分）；③确认 FINNS-23 更新差异，并决定 FINNS-24/25/26 的 Plane 正文是否同步到修订 3；④G2 是否豁免。
+
+## FINNS-23 工程化基线：子项已建，需求草稿待评审（2026-10-25）
+
+用户提供 Plane FINNS-23（拆分前后端，做初期维护）。讨论后范围由“分别建仓库”收窄为：**整理目录（后端移入 `backend/`，不拆成两个仓库、不改部署方式）+ 固定前后端代码与 SQL 规范 + 建立审查规则并做首轮审查**，并按五类（仓库结构与版本控制 / 代码与数据规范 / 审查与质量门禁 / 安全与依赖 / 可复现与文档）组织。用户确认了后端目录名 `backend`，并要求建三个子项。
+
+- Plane（2026-10-25，用户逐项确认后写入并回读）：FINNS-24 整理仓库结构与版本控制基线（高，10-25 至 10-26）、FINNS-25 固定代码与 SQL 规范及审查规则（高，无日期）、FINNS-26 首轮代码审查、安全依赖与可复现基线（中，无日期），均为 FINNS-23 子项、Backlog、标签 `base`、不挂周期。用户反馈界面里没立即看到，服务端按父项可读，原因未确定。**FINNS-23 的标题与正文尚未更新**：差异已列在 [P02](requirements/REPO_BASELINE_PLANE_P01.md)，待用户确认后才写。
+- 本地：需求草稿 [REPO_BASELINE_REQUIREMENTS.md](requirements/REPO_BASELINE_REQUIREMENTS.md)（修订 1，含现状事实、ENG-R01–R09、ENG-A01–A08、待决 U1–U7）；进度文件新增任务 `repo-structure`、`code-standards`、`code-review-baseline`，G0 pass、G1 pending，检查器退出码仍为既有的 2，三项下一步均为 G1。
+- **需求评审未开始**：规则要求先取得启动独立子代理的授权，并至少两轮、每轮换角度；评审记录将写为 `REQUIREMENT_REVIEW_REPO_STRUCTURE.md`。G1、Plane 检查点、G2（预计无界面，需用户书面豁免）均未满足。
+- 评审前盘点出的关键风险（已核对源码，详见需求草稿 §2、§5）：默认 H2 路径 `./data/aitome` 随启动目录解析，搬到 `backend/` 后可能静默新建空库；`scripts/` 多个脚本和未入库的 `.claude/launch.json` 引用旧路径与 `target/`；`static/` 构建产物被跟踪；工作区仍有约 131 项未提交改动；本机运行实例是否仍在运行未核实。
+- 没有改动：业务源码、`pom.xml`、`frontend/`、`scripts/`、版本号、数据库、运行实例、Git 提交与推送。唯一改动是新增上述两个 `docs/requirements/` 文件、`docs/delivery-progress.json` 新增 3 个任务及 `last_remote_check` 追加一句、本节。
+- 下一步需用户：①授权子代理做需求评审（建议两轮：与既有约束和现状事实的冲突检查 / 可验收性与影响面）；②确认 FINNS-23 更新差异；③回答 U1–U7（尤其 U1 未提交改动、U2 数据目录、U7 是否仍打进同一个 jar）。
+
+## 开发 skill 修复：需求评审先行（2026-10-24，仅流程文档）
+
+用户指出上一轮没有真正做需求评审，导致产出的需求、设计和原型质量差，要求撤回，并规定以后先评审需求、再升级设计原型、最后实现后端等。已撤回本会话全部产出（新增 20 个文件已删除，7 个被改文件已还原；撤回前版本备份在已忽略的 `target/reverted-session-20261024/`，含 README 说明恢复方式）。当时的结论（权限分析、概设 D4、4 轮评审、FINNS-REQ-021 需求与原型 R1）**均不再有效**，也未登记任何门禁；若要重做，按新流程从需求评审开始。
+
+skill 改动（`.agents/skills/`）：新增 `finns-delivery-workflow/references/requirement-review.md`（固定顺序、越级请求处理、评审维度、通过条件、规则生效前 G1 沿用）；同步改 `stage-gates.md`（G1 需评审记录、新增 PLANE 检查点行、G2 为“在现有原型和真实页面上升级”、阶段顺序守卫）、两个 `SKILL.md`、`task-planning.md`、`record-templates.md`（新增 REQUIREMENT_REVIEW 模板）、`progress-check.md`、`design-review.md`、`agents/openai.yaml`。检查：2 个只读子 agent（行为走查 7 个场景；一致性核对），意见已吸收；相对链接全部可达，`test_progress.py` 8 项通过，检查器退出码 2（既有任务待办，与本次无关）。
+
+未验证：没有用真实新需求完整走一遍新流程；`AGENTS.md` 未改（它仍写“先形成具体产品原型”，未提需求评审，可酌情补一句指向交付 skill）；评审者为同模型子 agent，独立性有限。你可调整的取舍：权限/身份/数据类需求评审默认“至少两轮”、“目标版本须由用户指定或明确暂不分配”才能通过 G1，二者是我加的细化，可放宽。
+
+## 本地邮件配置与重启（2026-10-24 12:18，Asia/Singapore）
+
+用户报告8094注册邮件失败，日志11:52:40显示SIGNUP/MailDeliveryException；根因为本轮验收启动脚本强制`FINNS_MAIL_MODE=disabled`。用户本轮要求指出配置并重启，已复用Windows用户环境变量中的现有SMTP配置（只检查存在性，不记录凭据），为`target/finns-19-implementation/start-verification.ps1`增加`-RealMail`及只预检的`-CheckOnly`；默认仍disabled，显式RealMail才启用smtp并固定邮件链接前缀`http://127.0.0.1:8094`。
+
+SMTP真实TLS/认证预检通过，未发送测试邮件。核对PID与隔离数据库后仅重启8094，当前PID33812，12:18:38启动成功，首页、`/api/stats`与5200前端均200，保留原隔离库数据，主库与主站未动。之前失败请求不会自动补发，用户须重新请求验证邮件；真实收件箱投递尚未验证。本次没有业务源码、版本、Git提交或Plane变化。原日志保存在`target/finns-19-implementation/verification-app-before-smtp.log`。
+
+配置定义：`src/main/resources/application.yml`的`finns.mail`，实际值为Windows用户环境变量`FINNS_MAIL_*`，不在仓库存储密码。以后需要真实邮件时使用`target/finns-19-implementation/start-verification.ps1 -RealMail`；先检查/停止匹配的本轮PID，脚本拒绝覆盖占用端口。此脚本与预检辅助文件在已忽略target中，可能被清理；不是正式部署脚本。下方“邮件disabled”为此前验收环境历史。
+
+## FINNS-19 实现及本轮验收完成（2026-10-24）
+
+5199原型已接真实业务：三步向导与编辑统一、元数据/封面/分类/SEO、结构化人群、共享阅读器、定时冻结发布、取消/撤回/删除/自选保留及权限并发防护。[实施与命令](iterations/0.7.0/IMPLEMENTATION_COLLECTION.md)、[26项验收](iterations/0.7.0/ACCEPTANCE_RESULT_COLLECTION.md)、[最终源码/测试/产物哈希](iterations/0.7.0/COLLECTION_VALIDATION_SHA256.json)为当前权威；下方前端mock和待实现描述属历史。
+
+最终H2全量202、PostgreSQL全量202、最后SEO/开关PG回归13、前端86全通过，Vue/Maven打包成功。真实Chrome390/768/桌面、持久化/导入/刷新/历史及公开读取已验；EXIF/重启补发/迁移/旧包基础读写演练通过。未执行实体手机/触摸、跨浏览器、屏幕阅读器、生产备份恢复与负载；G8发布pending，不影响本轮实施与验收交接。
+
+当前目录release/0.7.0，保留既有脏工作树，无Git提交/推送。8094为本轮真实应用、5200为Vite，127.0.0.1:55439为本轮PostgreSQL，均只连finns_test_*或finns_restore_check_*，邮件disabled；主库与主站未动。复启专用脚本在target/finns-19-implementation/start-verification.ps1，原始日志/截图/测试数据同目录，已忽略且可能被清理；勿用scripts/run.ps1重启本轮隔离环境。定时与章节样式默认关闭，测试实例显式开启。后续仅在发布授权后做真机/备份/环境开关与部署核查。Plane FINNS-19已更新Done并刷新读回，正文历史与保护字段保持，详见[COLLECTION-SYNC-P05](requirements/FOUNDATION_COLLECTION_PLANE_P05.md)；不能用旧P03/P04的历史状态覆盖。
+
+## 向导第二步按参考图4重排（2026-10-23，PUBLISH-D20）
+
+用户给出第4张参考图并要求按 solo-dev-quality 技能做。**首版把中间做成了按章节分组的列表（理解有误）；用户纠正后改为“顶部固定封面 + 可自由拖动/缩放模块的画布”。**第二步为“导航 | 内容结构+模块库+导入中心 | 画布 | 属性设置”，顶栏含标题输入与 保存草稿/预览/发布专题（见需规 COL-R13i）。新增/改动：`components/collection-wizard/StepContent.vue` 重写，`CollectionWizardPage.vue` 顶栏（内容步骤专用）与导入补充入口，`lib/collectionWizard.js` 的 MODULES/画布宽度/缩放，`collection-wizard.css` 第二步样式。仍是前端；条目类型不变；轮播/评分榜/时间轴/视频/卡片列表、样式/显示设置、图层、导入HTML为占位。
+- 画布：模块位置 x/w 为百分比、y/h 为像素，允许重叠，移动不改变阅读顺序；位置只暂存本浏览器（`finns.collection-wizard.layout.<id>`，按章节→条目顺序下标，条目数量变化时不套用旧位置），保存请求不带布局，公开页仍按阅读顺序。
+- 验证（本地模拟接口，非真实后端）：前端 69/69、构建成功；浏览器1500宽走通：新建→第二步插入富文本/步骤卡片/引用并在属性面板编辑、删除→撤销→重做、复制、手机宽度画布、自由拖动开关隐藏拖拽手柄、占位模块提示、自动保存、清空正文后点发布回到第二步并聚焦正文框；768与375宽无横向溢出且画布排在前；块可键盘聚焦并用Enter选中。技能要求的“场景+样本”用“AI 让学习更高效”样例（标题/简介/章节/笔记）；参考图已给方向，未跑 ui-ux-pro-max 设计搜索。
+- 画布验证补充（浏览器1500宽）：真实鼠标拖动模块（位置变化、允许与简介重叠、仅布局变化不触发服务端保存）、手柄缩放、方向键与Shift+方向键、属性面板数值输入、撤销四次回到原位、刷新后位置恢复、关闭自由拖动后回到顺序排列且隐藏缩放手柄、服务端草稿不含 layout；375宽默认关闭自由布局、768宽保持开启，均无横向溢出。新增4项布局纯逻辑测试，前端共73项。
+- **未验：** 真实后端联调、触屏拖动（触屏仅标题栏可拖，未真机验）、画布缩放(75/125%)下拖动的精度、页面宽度760/手机宽度下的拖动、封面更换交互、触屏、跨浏览器、屏幕阅读器；撤销/重做不覆盖逐字输入；预览中Markdown在模拟环境为原文回退；属性面板在窄屏位于画布之后（需滚动）。Plane P04（D20 对正文的差异）未提、未写。
+- 用户看过画布版后（2026-10-23）又要求：①创建专题时去掉最上面的站点导航栏——向导三步路由加 `meta.bare`，`App.vue` 据此不渲染 `.site-header`（页脚未动，未被要求）；顶栏/吸顶位置随之改为从页面顶部算起；②左侧导航、内容结构+模块库、属性设置三列均可折叠为窄栏，折叠状态存 `finns.collection-wizard.columns`，点“编辑”/插入模块/发布问题定位时自动展开属性设置。浏览器1600宽验证：站点顶栏不存在、三步顶栏贴顶、三列折叠后各约43px、画布由817px变宽到1200px（受页面宽度上限）、点“编辑”自动展开属性面板；前端73项测试与构建通过。未验：折叠态在768/375宽的实际体验、真机。
+- 三列折叠的美观优化（2026-10-23，用户要求“思考折叠前后的美观程度”）：问题=三个折叠按钮各自为政的小药丸、字符箭头、折叠态不统一（左栏透明/右栏卡片/导航几乎空条）、展开时结构/模块库/导入是三张碎卡片、折叠无过渡。改为：每列一张完整卡片，顶部“面板栏”=标题+30px矢量箭头按钮；结构、模块库、导入在同一卡片内用分隔线分区；折叠态=同款48px窄卡片（箭头+竖排标签，整张可点展开，悬停高亮）；左侧导航折叠=纯图标（带tooltip），宽屏(≥1700px)默认展开文字、窄一些默认图标；列宽用CSS变量加0.22s过渡并尊重 prefers-reduced-motion；窄屏(≤900)折叠成横条，≤1180隐藏左侧导航。验证：1440宽展开/折叠截图与度量（rail 59px、side/props 47px、画布1135px）、768宽无溢出、折叠条高48px；顺手修了新样式盖掉“窄屏隐藏导航”的回归。前端73项测试与构建通过。
+- 用户看过折叠优化后的截图又批注三点（2026-10-23）：①去掉最左侧导航栏；②去掉“内容结构”面板，只留模块库；③模块库标题旁的“全部/收起”按钮不应存在，放到下面，且“全部”应进入“模块市场”。已改：第二步为“模块库 | 画布 | 属性设置”三栏；模块库底部“进入模块市场 ›”打开对话框（全部/可直接使用/即将开放；Esc/点遮罩/关闭按钮关闭；添加后关闭并聚焦新模块字段；占位项只提示不关闭；额外列出“导入 HTML 模块”占位）；原来靠结构树做的章节管理挪到属性面板“专题首页”页（改名、上下移、删除、添加）、点画布模块的章节标签进入章节设置、模块“所属章节”下拉新增“＋新建章节…”；“导入补充资料”移到画布工具栏“导入资料”。删除了 rail/结构树/导入中心相关代码与样式；折叠状态只剩模块库与属性设置两项。三栏下限降到1000px（≤1180时列宽232/284），更窄才堆叠。验证（1440宽）：左栏/结构树/标题旁按钮均不存在；模块市场共14项、可用8/占位6、焦点进入对话框、占位项点击出提示且不关闭、添加“检查清单”后关闭并新增模块、Esc关闭；章节添加/改名/上移/删除/撤销、点章节标签进章节设置、新建章节均通过；1100宽三栏无溢出。前端73项测试与构建通过。未验：模块市场触屏/屏幕阅读器、375与768宽下模块市场与章节管理的实际体验、真实后端。
+
+## 专题创建向导（前端）：按参考图实现，引子待后续整体接入（2026-10-23）
+
+用户给出三张参考图（基础信息 / 内容编排 / 预览发布），要求仿造并对未实现功能先留前端引子。**FINNS-19 此前按 PUBLISH-D12 延期；本页是用户直接要求的实施，当时未走门禁。2026-10-23 用户随后要求登记需规并选定：目标 0.7.0；保留封面上传、标签+分类、定时发布、SEO+内容模块；发布渠道不做。已登记为[专题需规修订4](requirements/FOUNDATION_COLLECTION_REQUIREMENTS.md)的 COL-R13/R13a–e、PUBLISH-D16、验收 COL-A19/A20，delivery-progress 的 G2 仍 pending（原型尚未经用户评审）；Plane 检查点 P02 已于 2026-10-23 逐项确认并写入 FINNS-19 正文、回读通过（[记录](requirements/FOUNDATION_COLLECTION_PLANE_P02.md)；未建子工作项）。**
+
+- 路由：`/me/collections/new`（尚未建草稿的第一步）→ 点“保存并继续”创建私人草稿 → `/me/collections/:id/compose/{basic|content|publish}`；原 `CollectionNewPage` 移到 `/me/collections/quick`；`/me/collections/:id/edit` 经典编辑页未动。SpaController 已覆盖 `/me/**` 刷新。
+- 新文件：`pages/CollectionWizardPage.vue`（状态、自动保存 1.2s、离开保护、发布流程，复用 `draftSaveQueue`/`sessionGuard`/`reviewText`）、`components/collection-wizard/Step{Basic,Content,Publish}.vue`、`lib/collectionWizard.js`、`assets/collection-wizard.css`（沿用站点绿色主题，未照搬参考图蓝色）、`tests/collectionWizard.test.js`。
+- 真实落库（既有接口）：标题、简介（≤260）、适用人群（多选以“、”拼入 `audience`）、发布目标（四选一写入 `goal`）、章节/条目（笔记、链接、我的文章，可拖拽/按钮排序）、可见范围（公开/受限，受限需 `content.restricted`）、发布/更新发布（沿用 PENDING/AUTO_REJECTED 提示）。发布前问题 = 基础信息四项 + `publicationIssues`，点击回到对应步骤并聚焦。
+- 前端引子（标“即将开放”）：封面上传（仅当前页预览，校验 JPG/PNG、5MB）、标签与分类与 SEO 标题（`localStorage` 键 `finns.collection-wizard.<id>`，不入库）、定时发布、模块“专题封面/引用/卡片列表/图片轮播/评分榜/时间轴”（点击只提示）。接入时需要：专题表加封面/标签/分类/SEO/定时字段与上传接口、内容块模型。
+- 验证：`node --test tests/*.test.js` 69/69（含新增 9 项，仅覆盖 `lib/collectionWizard.js` 纯逻辑，页面本身无自动化测试）；`vite build` 输出到临时目录成功（未写 `src/main/resources/static`，该目录原有未提交变更未动）。浏览器：用本地 mock API（非真实后端）在 1440 与 375 宽走通 三步、创建、自动保存、模块插入、引子提示、校验失败回跳并聚焦正文框、发布成功、刷新直达，无控制台错误、无横向溢出。**未验：** 真实后端/数据库联调、受限可见范围实际保存、拖拽排序（仅代码，未实测）、封面选择交互、768px、真实触屏、跨浏览器。mock 下 Vditor 资源未提供，预览里 Markdown 显示的是“排版组件未加载”的原文回退，真实站点用正式 vite 配置/打包会加载。
+- 未做：未打包、未部署、未提交 Git、未改版本号、未碰主库/Plane。`target` 外临时文件在 scratchpad，服务已停。
+- 已按用户选择从页面移除“发布渠道”与“指定成员”（后者用户未选，按暂缓处理，待确认）。
+- A1–A6 已答（PUBLISH-D17）：编辑也进向导（COL-R13f，待概设，经典页承接后下线）、适用人群结构化（COL-R13g，需迁移，待概设）、四项必填、发布目标覆盖 goal、第一步即建草稿；“内容起点”模板选择已从页面去掉（新建一律空白，创建时传 templateKey=BLANK）。B1–B5 已答（PUBLISH-D18：预览复用公开页 COL-R13h、手机预览收窄够用、完整度仅纳入必填项、定时发布=提交时检测/到点公开/人工审核较晚则审核通过时公开、受限文案不变，均待概设）；C1–D1 待回答；Plane P03（需规新增差异）尚未提出。
+- C1–C4/D1/分类（2026-10-23，PUBLISH-D19）：用户 `/goal` 授权不再逐项问，经三位只读子agent两轮讨论、AI裁决定稿（[讨论记录](iterations/0.7.0/DISCUSSION_COLLECTION_WIZARD_R1.md)）：封面=数据库独立表+服务端裁16:9+≤2MB+不自动审查；标签≤6只展示（点击筛选归开关集）、分类8项单选选填；引用/卡片/时间轴做成Markdown/章节layout列，轮播与评分榜暂缓；定时发布=scheduled_at+@Scheduled轮询；里程碑M0–M6；门禁“范围不变、验收后对外开启”；D1最小集含回滚0.6.0包冒烟与真机手测。验收新增COL-A24–A26。**这些不是用户逐项回答，用户可否决；与D16的偏差见讨论记录§4。** 页面已同步（封面2MB、标签≤6、8个分类、移除轮播/评分榜/专题封面模块入口）。Plane P03（[差异稿修订3](requirements/FOUNDATION_COLLECTION_PLANE_P03.md)）已由三位子agent两轮评审并修订，已于2026-10-23按用户“直接写入”写入FINNS-19正文并回读通过（updated_at=2026-10-23T11:48:21Z；保护字段不变；未建子工作项；正文中D19各条仍标“AI拟定，待确认”）。
+- 评审清单（需确认点 A1–D1 与分类清单初稿）：[PROTOTYPE_COLLECTION_WIZARD_R2.md](iterations/0.7.0/PROTOTYPE_COLLECTION_WIZARD_R2.md)。
+- 下一步需用户：评审参考图/向导页面作为原型；给出分类清单；说明内容模块（评分榜）与暂缓的评价榜单的关系；经典编辑页是否保留。AI 在确认后进概设并按引子逐项出契约。
+
+## 前端与原型同步：仅同步可兼容部分（2026-10-23）
+
+用户要求“以原型为主”同步并选了“全部覆盖”。核对后发现多数 overlay 是旧源码快照或绑定模拟接口，整体覆盖会降级或无法运行，故只同步兼容部分：`CollectionDetailPage` 笔记正文改用 `MarkdownView` 渲染（原型为 SafeMarkdown，正式已替换）；`CollectionOutlineEditor` 增加可选 `refs` 属性与“引用失效”提示（后端不传时无变化）。**未同步**：`App.vue`/`PersonalNav`/`DiscoverPage`（原型为旧快照，正式页头搜索、个人中心侧栏、评论登录保护更新）、`MyContentPage`（原型用 `/api/content/mine`）、`CollectionEditorPage`（需要 `/withdraw`、`/cancel`、`flows` 等后端接口，FINNS-19 延期未批准）、文章编辑/预览（原型用模拟的统一内容接口）。验证：前端 60/60，`vite build` 通过（输出到临时目录，未重建 `src/main/resources/static`）；未做浏览器检查。改动前的 `frontend/src` 备份在会话临时目录。
+
+## 文章 Vditor 编辑器与外链图片：C1–C5 已实施（2026-10-23）
+
+按[契约](iterations/0.7.0/CONTRACT_CONTENT_IMAGES.md)与授权 PUBLISH-D15 实施，[实施记录](iterations/0.7.0/IMPLEMENTATION_CONTENT_IMAGES.md)为入口。前端 60/60、后端 H2 全量 189/189、构建通过；本机 8092 浏览器检查编辑/预览/图片/安全/375px 通过（验证实例已停止）。正式产物已生成到 `src/main/resources/static`（含 `vendor/vditor` 白名单 5 文件）。**未做**：发现页公开阅读实测（需站长启用规则）、懒加载实际效果、768px、真人手机、用户验收；未发布、未提交 Git、未写 Plane。注意：`target/finns-0.7.0.jar` 被已有 Java 进程（PID 2204）占用，打包需先由用户确认该进程可停止。
+
+## 文章外链图片：设计已选定，原型已实现（2026-10-22）
+
+用户允许外链 Markdown 图片（PUBLISH-D13，文章需规修订5，CT-A17）并在[设计备选](iterations/0.7.0/DESIGN_CONTENT_IMAGES.md)中选 A1+B1+D1+E1（PUBLISH-D14）。原型 `VditorView.vue`/`VditorEditor.vue` 已实现并在浏览器验证（见设计§6）。**正式代码未改**：正式实施需替换 `frontend` 的 SafeMarkdown、引入 Vditor 并自托管资源、服务端文章页 `Referrer-Policy` 头、确认检测输入含图片语法，需另行授权；Plane 未同步。FINNS-19 专题仍延期（PUBLISH-D12）。
+
+## FINNS-19 延期；文章编辑器原型改用 Vditor（2026-10-22）
+
+用户决定（[PUBLISH-D12](requirements/PUBLISHING_DECISIONS.md)）：专题创建暂停延期（原型R1及多轮修订保留在 `docs/prototypes/site-access`，未获确认，勿进入概设）；先修文章创建，编辑器选 Vditor 4.0.1（MIT）。已在原型落地：`components/VditorEditor.vue`（阅读模式=Vditor即时渲染；源码模式=Markdown文本框，因 Vditor sv 模式重建后内容为空）、`components/VditorView.vue`（私人预览同引擎、sanitize），`ContentEditorPage`/`ContentPreviewPage` 已接入；原型专用 `package.json`/`package-lock.json`（node_modules 已加入 .gitignore），资源经 vite 中间件以 `/vendor/vditor` 本地提供。安装经本机代理 7898、指定 registry.npmjs.org（本机默认 registry 为公司 artifactory，返回502）。
+验证：原型测试86/86、构建通过；浏览器1280：阅读模式渲染/输入、源码↔阅读往返、保存、预览渲染一致；注入 `<script>`、`onerror`、`javascript:` 被清除。**图片已决定**：用户允许外链 Markdown 图片（PUBLISH-D13，文章需规修订5，CT-A17/CT-L06），正式代码尚未改。**未做**：窄屏、截图、文章列表以外页面的回归、正式 frontend 改动。
+
+## FINNS-19：需求对接完成，原型R1已制作待评审（2026-10-22）
+
+用户要求“先对接需求，明确后直接制作原型”。对接两项取舍已回答并记录（[PUBLISH-D11](requirements/PUBLISHING_DECISIONS.md)）：专题可删除从未公开的私人草稿（COL-R11）；撤回期间读者自选记录保留但隐藏、重发后恢复（COL-R12，取代现状“归档清空自选”）。[需规修订3增量](requirements/FOUNDATION_COLLECTION_REQUIREMENTS.md)与验收COL-A17/A18已回写。
+
+原型：[PROTOTYPE_COLLECTION_R1.md](iterations/0.7.0/PROTOTYPE_COLLECTION_R1.md)，入口 <http://127.0.0.1:4175/me/posts?type=COLLECTION>（预览服务由AI启动，可停止；先载入创作样例）。新增`mock/collections.js`、`overlays/CollectionOutlineEditor.vue`、重做`overlays/CollectionEditorPage.vue`与我的内容专题页签、演示面板专题场景、`tests/collections.test.mjs`。验证：原型测试84/84、`vite build`退出0、浏览器检查主路径与390px无溢出。**未验**：768px、截图、若干异常横幅/离开弹窗、模板/导入/复制与读者自选页的浏览器走查、真人手机；真实服务端一切未覆盖。
+
+状态：G1/PLANE既有通过（修订3增量未单独同步Plane，需逐项确认）；**G2 pending等用户评审原型**，勿进入概设/实施。原型提议三项待确认（撤回框显示自选人数、选择器只列已公开文章、失效引用对读者隐藏标题与备注）。未改业务源码/四处版本/Git提交/主站/Plane；检查器显示foundation-collection下一门禁G2。
+
 ## FINNS-18：开发与自动化验证完成，待发布前事项（2026-10-22）
 
 **一句话**：FINNS-18（F02 文章草稿及发布 + 话题整体移除）开发完成并自动化验证；未发布、未部署、未提交 Git、未改版本号；主库与 `data/postgres` 未触碰。

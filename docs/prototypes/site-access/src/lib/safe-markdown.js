@@ -30,7 +30,7 @@ export function markdownBlocks(source = '') {
     if (/^\s*```/.test(line)) { flush(); if (inCode) { blocks.push({ k: 'code', text: code.join('\n') }); code = [] } inCode = !inCode; continue }
     if (inCode) { code.push(line); continue }
     if (!line.trim()) { flush(); continue }
-    const heading = line.match(/^(#{1,3})\s+(.+)$/)
+    const heading = line.match(/^(#{1,6})\s+(.+)$/)
     if (heading) { flush(); blocks.push({ k: 'h', level: heading[1].length, inline: inlineTokens(heading[2], notes) }); continue }
     if (/^[-*]\s+/.test(line)) { flush(); blocks.push({ k: 'li', inline: inlineTokens(line.replace(/^[-*]\s+/, ''), notes) }); continue }
     if (/^>\s?/.test(line)) { flush(); blocks.push({ k: 'quote', inline: inlineTokens(line.replace(/^>\s?/, ''), notes) }); continue }

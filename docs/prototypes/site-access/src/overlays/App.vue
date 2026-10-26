@@ -18,7 +18,7 @@ const logoutBusy = ref(false)
 let toastTimer
 
 const activePath = computed(() => route.path)
-const contentContext = computed(() => route.path.startsWith('/me/posts'))
+const contentContext = computed(() => route.path.startsWith('/me/posts') || route.path.startsWith('/me/collections'))
 const reviewContext = computed(() => ['/admin/reviews', '/admin/sensitive-rules', '/me/submissions', '/review/reading'].some(path => route.path.startsWith(path) || String(route.query.next || '').startsWith(path)))
 const managementPath = computed(() => can('admin.users') ? '/admin/users' : '/admin/reviews')
 // 0.7.0：页面按角色展示；无权限时保留地址并显示拒绝页（直达/刷新一致）。
@@ -69,14 +69,12 @@ watch(() => route.query.create, (value) => { if (value === 'post' || value === '
       <RouterLink class="brand" to="/" aria-label="FINNS 首页"><span class="brand-mark">F</span><span>FINNS</span></RouterLink>
       <nav class="main-nav" aria-label="主导航">
         <RouterLink :class="{ active: activePath === '/' }" to="/">发现</RouterLink>
-        <RouterLink :class="{ active: activePath === '/collections' }" to="/collections">专题</RouterLink>
-        <RouterLink :class="{ active: activePath === '/me/posts' && route.query.type === 'SELECTED' }" to="/me/posts?type=SELECTED">自选专题</RouterLink>
-        <RouterLink v-if="can('admin.users') || can('content.review')" :class="{ active: activePath.startsWith('/admin') }" :to="managementPath">管理</RouterLink>
+                        <RouterLink v-if="can('admin.users') || can('content.review')" :class="{ active: activePath.startsWith('/admin') }" :to="managementPath">管理</RouterLink>
       </nav>
       <div class="header-actions"><button class="icon-btn" aria-label="回到顶部" @click="router.push('/')">⌕</button><button v-if="!user" class="btn btn-ghost" @click="openAuth()">登录</button><template v-else><RouterLink class="btn btn-ghost user-button" to="/me">个人中心</RouterLink><span class="proto-role-chip" :title="`当前角色：${user.roleLabel}`">{{ user.roleLabel }}</span><button class="btn btn-ghost logout-button" :disabled="logoutBusy" @click="logout">退出</button></template><button v-if="!user || can('post.create')" class="btn btn-primary" @click="showWrite">开始创作 <span>↗</span></button></div>
     </header>
 
-    <div class="account-prototype-bar"><span>{{ contentContext ? 'FINNS 0.7.0 · 文章创作原型 R1（需规修订3）· 仅浏览器模拟' : reviewContext ?'FINNS 0.7.0 · 内容审核原型 R3（需规修订6）· 仅浏览器模拟' : 'FINNS 0.7.0 · 用户管理原型 R3 / 账号 R2.1 · 仅浏览器模拟' }}</span><RouterLink class="rv-entry-link" to="/review/reading">体验内容审核 →</RouterLink><RouterLink v-if="!reviewContext && !contentContext" to="/admin/users">用户管理 →</RouterLink><RouterLink v-if="!contentContext" to="/me/posts" class="rv-entry-link">体验文章创作 →</RouterLink></div>
+    <div class="account-prototype-bar"><span>{{ contentContext ? 'FINNS 0.7.0 · 文章 R1 / 专题创作原型 R1（FINNS-19 需规修订3）· 仅浏览器模拟' : reviewContext ?'FINNS 0.7.0 · 内容审核原型 R3（需规修订6）· 仅浏览器模拟' : 'FINNS 0.7.0 · 用户管理原型 R3 / 账号 R2.1 · 仅浏览器模拟' }}</span><RouterLink class="rv-entry-link" to="/review/reading">体验内容审核 →</RouterLink><RouterLink v-if="!reviewContext && !contentContext" to="/admin/users">用户管理 →</RouterLink><RouterLink v-if="!contentContext" to="/me/posts" class="rv-entry-link">体验文章创作 →</RouterLink></div>
     <main>
       <section v-if="forbidden" class="page-hero personal-hero proto-forbidden" role="alert">
         <span class="kicker">403 · 无访问权限</span>
@@ -87,7 +85,7 @@ watch(() => route.query.create, (value) => { if (value === 'post' || value === '
       <RouterView v-else :user="user" @toast="showToast" @write="showWrite" @user-updated="user = { ...user, ...$event }" />
     </main>
 
-    <footer><RouterLink class="brand" to="/" aria-label="FINNS 首页"><span class="brand-mark">F</span><span>FINNS</span></RouterLink><p>为独立思考与开放创造而生。</p><div class="footer-links"><RouterLink to="/collections">专题广场</RouterLink><RouterLink to="/vps">VPS 指南</RouterLink><RouterLink to="/me">个人中心</RouterLink><RouterLink v-if="can('admin.users')" to="/admin/users">管理</RouterLink></div><span>© 2026 FINNS</span></footer>
+    <footer><RouterLink class="brand" to="/" aria-label="FINNS 首页"><span class="brand-mark">F</span><span>FINNS</span></RouterLink><p>为独立思考与开放创造而生。</p><div class="footer-links"><RouterLink to="/me">个人中心</RouterLink><RouterLink v-if="can('admin.users')" to="/admin/users">管理</RouterLink></div><span>© 2026 FINNS</span></footer>
 
     <div v-if="composerOpen" class="overlay" @click.self="composerOpen = false"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="create-title"><button class="modal-close" aria-label="关闭" @click="composerOpen = false">×</button><span class="kicker">CREATE</span><h2 id="create-title">想创作什么？</h2><div class="ct-create-choices"><button class="ct-create-choice" @click="composerOpen = false; router.push('/me/posts/new')"><strong>写文章</strong><small>先存私人草稿，想好了再发布。</small></button><button v-if="can('collection.manage')" class="ct-create-choice" @click="composerOpen = false; router.push('/me/collections/new')"><strong>创建专题</strong><small>用模板或现成内容整理成专题。</small></button><button v-if="can('ai.use')" class="ct-create-choice" @click="composerOpen = false; router.push('/me/collections/ai/new')"><strong>AI 创建专题</strong><small>由 AI 生成私人稿，之后再整理。</small></button></div></section></div>
     <div v-if="toastMessage" class="toast show" role="status">{{ toastMessage }}</div>

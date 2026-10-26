@@ -3,7 +3,7 @@
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { api } from '@finns/lib/api'
-import SafeMarkdown from '../components/SafeMarkdown.vue'
+import VditorView from '../components/VditorView.vue'
 import ContentShell from '../components/ContentShell.vue'
 const route = useRoute(), doc = ref(null), loading = ref(true), error = ref(''), mode = ref('draft'), reader = ref(null), readerError = ref('')
 const label = computed(() => '文章')
@@ -31,12 +31,12 @@ onBeforeUnmount(() => { window.removeEventListener('finns-content-scene', load);
         <div class="rr-content-label"><span>{{ label }} · 仅你自己可见</span><small>这是已保存的工作稿，尚未公开；预览与发布后的阅读使用同一套安全渲染。</small></div>
         <h1 class="ct-title">{{ doc.draft.title || '（未填写标题）' }}</h1>
         <p v-if="doc.draft.summary" class="rr-abstract">{{ doc.draft.summary }}</p>
-        <SafeMarkdown :source="doc.draft.body" />
+        <VditorView :source="doc.draft.body" />
       </article>
       <article v-else class="rr-content ct-article">
         <template v-if="reader">
           <div class="rr-content-label"><span>{{ label }} · 公开版 v{{ reader.version }}</span><small>这是读者现在看到的内容，与工作稿可能不同。</small></div>
-          <h1 class="ct-title">{{ reader.title }}</h1><p v-if="reader.summary" class="rr-abstract">{{ reader.summary }}</p><SafeMarkdown :source="reader.body" />
+          <h1 class="ct-title">{{ reader.title }}</h1><p v-if="reader.summary" class="rr-abstract">{{ reader.summary }}</p><VditorView :source="reader.body" />
         </template>
         <div v-else class="rv-empty"><h2>读者看不到这条内容</h2><p>{{ readerError }}</p></div>
       </article>
