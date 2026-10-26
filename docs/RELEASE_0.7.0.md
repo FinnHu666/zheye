@@ -112,3 +112,31 @@
 
 用户随后说明不要停用该账号，只处理代码里写死的演示密码。处理：①主库恢复该账号为正常（`status_version` 3，写入 RESTORE 操作记录），并把密码哈希替换为不可匹配的锁定值（原公开密码 `aitome123` 登录现返回 401；账号、资料及其名下 4 篇文章/7 个专题保持不变；回读：站点统计 2 创作者/4 内容/3 专题）；②代码：`DemoData`（仅开发用 H2 库执行，生产不执行）改为随机密码、README 去掉公开密码（H2 全量 107/107）。该账号邮箱不是真实邮箱，无法走邮件找回；如需重新使用，须由站长在库里设置新的密码哈希或转移内容后再处理。上一节“已停用”的结论以本更正为准。生产站运行的仍是 2026-10-18 的包（仅数据变化，代码变更下次打包生效）。
 
+
+## 封板补充发布（2026-10-26）：内容敏感审查、文章草稿与发布、传统专题向导
+
+**授权**：用户 2026-10-26 要求“先将 0.7.0 封板，完成部署”，并决定：封板范围＝FINNS-10/11/15/16（已于 10-17/18 部署）+ 17/18/19，FINNS-20/21/22 未开始、移出 0.7.0；授权本地分组提交（不推送）；授权 P0（冷拷贝并恢复崩溃遗留的主集群）与备份；在主库盘点结果出来后逐类确认删除 1 条历史话题；确认现在切换主站（决定 D22–D25，见 [DECISIONS](iterations/0.7.0/DECISIONS.md)）。四处版本本就是 0.7.0，不再变更；CHANGELOG 已拆出 `[0.7.0] - 2026-10-26` 节。
+
+**源码与构建**：分支 `release/0.7.0`，部署时 HEAD `c70c841`（六个本地提交 `0ba4273` … `c70c841`，**未推送 origin**）。`scripts/package.ps1`：后端 H2 全量 202/202（第一次全量 1 项 `TopicBuilderTests` 返回 504，属交接里已记录的本机桩服务 1 秒超时抖动，单独重跑 2 次各 8 项通过，完整重跑 202/202）；前端 85/85（移除 1 个依赖已下线“导入补充资料”入口的过时测试）。JAR `finns-0.7.0.jar`，SHA256 `8BE9C363579CC04A030AE5BB8CB75E466C450DF521D2AFF14F495E41F07B4999`（构建后源码仅有测试与文档变更，JAR 内容未变）。
+
+**发布目录** `data/deployments/20261026-seal-content-collection-0.7.0/`：JAR、`VERSION`、JAR 与 dump 的 SHA256、`rowcounts-main-vs-restore.txt`、`topic-inventory-on-restore-copy.txt`、`topic-removal-exec.sql`（SHA256 `AF8A99C1…0D01`）、`topic-removal-main-run.txt`、`post-release-checks.txt`、两次演练与两次主站启动日志。
+
+**P0 与备份**：主集群为 2026-10-21 异常中断遗留（`pg_controldata`=`in production`，陈旧 `postmaster.pid`）。先冷拷贝 `data/postgres`（13537 个文件，逐文件 SHA256 比对 0 差异，清单 `cold-copy.sha256`）到 `E:\tools\finns-runtime\backups\20261026-pre-0.7.0-seal\cold-copy\postgres`（仓库与 `data/` 之外），再直接 `pg_ctl` 启动恢复（redo 约 200 字节，数据库可用）。`pg_dump -Fc finns`＝80,601 字节，SHA256 `A8E73EE677CDBF81016F0D458CFF3F800FD19AC12BA67684297257BAA069028E`；`pg_restore -l` 177 项；恢复到 `finns_restore_check_070_seal_20261026`，24 张表逐表行数 **0 差异**。
+
+**演练（8094，恢复库）**：新 JAR 启动成功，Flyway 在 V14 之上应用 V15–V20 共 6 个迁移全部成功；关键页面与接口符合预期，游客受保护接口 401、无 CSRF 登录 403。**演练暴露了问题**：恢复库里有 1 条历史话题，`GET /api/posts` 返回 500（`No enum constant ContentPost.Type.TOPIC`）。
+
+**话题处理**：只读盘点（恢复副本）：话题 1 条（演示账号作者，2026-09-10，VISIBLE），点赞 4，评论 0、审核留痕 0、专题引用 0、快照提及 0、指向话题的草稿 0。用户逐类确认后，用 `topic-removal-exec.sql`（期望数量 1/0/0，不符整体回滚）先在恢复副本演练（`DELETE 1`，`/api/posts` 恢复 200、日志 0 错误），再在主库执行：执行前 ARTICLE 3、TOPIC 1，执行后 ARTICLE 3。回退＝从上述 `pg_dump` 恢复，脚本无法撤销。
+
+**切换主站**：8080 此前未运行。第一次启动因 `FINNS_PUBLIC_BASE_URL` 在用户级变量中未设置而失败（smtp 模式必需；日志 `main-server-attempt1-missing-base-url.log`），失败的启动已把 V15–V20 应用到主库（迁移幂等）。随后按 DEPLOYMENT.md 把用户级 `FINNS_MAIL_*` 读入进程环境，并把 `FINNS_PUBLIC_BASE_URL` 设为 `http://127.0.0.1:8080`（仅本机访问时的做法，**邮件链接只能在本机打开**，与 10-18 发布一致），重新运行 `scripts/start-local-main.ps1`。当前实例：PID 30428（`main.pid`），命令行指向本发布目录，监听 `127.0.0.1:8080`，邮件模式 smtp，主集群运行在 5432。
+
+**发布后核对**：`flyway_schema_history` 最高版本 20，成功；`/`、`/admin/users`、`/auth/login`、`/api/stats`、`/api/posts`（3 篇）、`/api/collections`、`/me/posts`、`/collections` 均 200；游客 `/api/admin/users`、`/api/auth/me` 为 401；无 CSRF 登录 403；入口资源 `index-BL22oeqT.js`、`index-B1I-NJHc.css` 200 且在 JAR 内；日志 0 个 ERROR/Exception；8080 监听进程＝`main.pid`；账号 2 个。
+
+**未做/未验**：
+- 前端“后期调整”未复验：FINNS-19 验证清单（2026-10-24 11:43）之后，`collection-wizard.css`、`styles.css`、`StepContent.vue`、`StepPublish.vue`、`MyContentPage.vue` 被修改（`StepContent.vue` 已没有“导入补充资料”入口，仅余 HTML 模块导入），交接与 CHANGELOG 此前未记录；用户决定按现状处理，**这批调整未经浏览器复验**，未做真机/触摸、跨浏览器、屏幕阅读器、负载验证。
+- 真实邮件送达在本次发布后未再验证；`FINNS_BOOTSTRAP_ADMIN_EMAIL` 用户级变量未设置（主站已有站长，不影响）。
+- 未推送 origin，未同步 Plane（FINNS-17/18/19 状态与 FINNS-20/21/22 移出 0.7.0 均需另行逐项确认）；`data/deployments` 与冷拷贝含敏感数据（密码哈希、加密的 AI Key），按受控位置保管。
+- 实验残留：`finns_restore_check_070_seal_20261026` 恢复库仍在主集群内（保留作演练证据，需要时可删除）；此前 10-24 的其他 `finns_test_*`/`finns_restore_check_*` 库未清理。
+
+## 回退
+
+仍**不支持回退到更早的程序包**。出问题时前向修复；需要恢复数据时，用本目录的 `pg_dump` 恢复到新库并核对，不覆盖主库；冷拷贝是崩溃态的原始 `data/postgres`，仅在 dump 不足时使用。
