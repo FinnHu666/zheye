@@ -105,17 +105,18 @@ public class ContentController {
 
     @GetMapping("/collections") @PublicEndpoint("公开专题；受限专题按权限过滤")
     public CollectionPage collections(@RequestParam(defaultValue = "0") int page,
-                                      @RequestParam(defaultValue = "20") int size, jakarta.servlet.http.HttpServletRequest request) {
+                                      @RequestParam(defaultValue = "20") int size, @RequestParam(defaultValue="") String category, jakarta.servlet.http.HttpServletRequest request) {
+        if (!category.isEmpty()&&!CollectionMetadata.CATEGORIES.contains(category)) throw new ApiProblem(HttpStatus.BAD_REQUEST,"分类不正确");
         boolean restricted = access.current(request).has(com.aitome.access.Permission.CONTENT_RESTRICTED);
         int safePage = Math.max(0, Math.min(page, 10_000));
         int safeSize = Math.max(1, Math.min(size, 50));
         long offset = (long) safePage * safeSize;
         List<CollectionView> items = jdbc.query(
-                "select c.id,p.name,p.description,p.owner_name,p.updated_at,p.item_count " +
-                        "from community_collections c join collection_publications p on p.collection_id=c.id where c.status='PUBLISHED' and c.moderation_state='VISIBLE' and (p.visibility='PUBLIC' or ?) order by p.updated_at desc,c.id desc limit ? offset ?",
-                (rs, row) -> new CollectionView(rs.getLong("id"), rs.getString("name"), rs.getString("description"), rs.getString("owner_name"), rs.getInt("item_count"), rs.getTimestamp("updated_at").toInstant()),
-                restricted, safeSize, offset);
-        Long total = jdbc.queryForObject("select count(*) from community_collections c join collection_publications p on p.collection_id=c.id where c.status='PUBLISHED' and c.moderation_state='VISIBLE' and (p.visibility='PUBLIC' or ?)", Long.class, restricted);
+                "select c.id,p.name,p.description,p.owner_name,p.updated_at,p.item_count,p.document " +
+                        "from community_collections c join collection_publications p on p.collection_id=c.id where c.status='PUBLISHED' and c.moderation_state='VISIBLE' and (p.visibility='PUBLIC' or ?) and (?='' or p.category=?) order by p.updated_at desc,c.id desc limit ? offset ?",
+                (rs, row) -> new CollectionView(rs.getLong("id"), rs.getString("name"), rs.getString("description"), rs.getString("owner_name"), rs.getInt("item_count"), rs.getTimestamp("updated_at").toInstant(),publications.coverId(rs.getString("document"))),
+                restricted, category,category,safeSize, offset);
+        Long total = jdbc.queryForObject("select count(*) from community_collections c join collection_publications p on p.collection_id=c.id where c.status='PUBLISHED' and c.moderation_state='VISIBLE' and (p.visibility='PUBLIC' or ?) and (?='' or p.category=?)", Long.class, restricted,category,category);
         return new CollectionPage(items, safePage, safeSize, total == null ? 0 : total);
     }
 
@@ -158,6 +159,8 @@ public class ContentController {
     public record PostPage(List<ContentPostSummary> items, int page, int size, long total) {}
     public record CollectionPostsPage(List<ContentPostSummary> items, int page, int size, long total) {}
     public record CollectionRequest(@NotBlank @Size(max = 80) String name, @NotBlank @Size(max = 260) String description) {}
-    public record CollectionView(Long id, String name, String description, String ownerName, int itemCount, java.time.Instant updatedAt) {}
+    public record CollectionView(Long id, String name, String description, String ownerName, int itemCount, java.time.Instant updatedAt,String coverId) {
+        public CollectionView(Long id,String name,String description,String ownerName,int itemCount,java.time.Instant updatedAt){this(id,name,description,ownerName,itemCount,updatedAt,null);}
+    }
     public record CollectionPage(List<CollectionView> items, int page, int size, long total) {}
 }

@@ -24,6 +24,11 @@ public class CommunityCollection {
     @Column(nullable=false) private long revision=0;
     @Enumerated(EnumType.STRING) @Column(name="editor_type",nullable=false,length=16) private EditorType editorType=EditorType.OUTLINE;
     private Instant publishedAt;
+    @Column(name="wizard_metadata",columnDefinition="text") private String wizardMetadata;
+    @Column(name="scheduled_at") private Instant scheduledAt;
+    @Column(name="scheduled_document",columnDefinition="text") private String scheduledDocument;
+    @Column(name="scheduled_visibility",length=12) private String scheduledVisibility;
+    @Column(name="scheduled_ready") private Boolean scheduledReady;
     /** 工作稿中的可见范围（PUBLIC/RESTRICTED），发布时复制到公开版本（FINNS-11）。 */
     @Column(nullable=false,length=12) private String visibility="PUBLIC";
     @Column(name = "moderation_state", nullable = false, length = 10, columnDefinition = "varchar(10) default 'VISIBLE' not null") private String moderationState = "VISIBLE";

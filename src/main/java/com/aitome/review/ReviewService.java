@@ -93,6 +93,16 @@ public class ReviewService {
         return process(authorId, authorName, COLLECTION, "COLLECTION:" + collectionId, requestId, outlineTexts(outline), ReviewText.cut(outline.collection().name(), 120), snapshot, revision, published != null && published > 0, collectionId, null);
     }
 
+    public SubmitResult collectionReplay(long authorId,long collectionId,String requestId,long version) {
+        if(requestId==null||requestId.isBlank())return null;
+        List<String> receipts=jdbc.queryForList("select r.response_json from review_receipts r join review_content_state s on s.id=r.state_id where s.author_id=? and s.content_type='COLLECTION' and s.target_id=? and r.request_id=?",String.class,authorId,collectionId,requestId);
+        if(receipts.isEmpty())return null;
+        SubmitResult result=fromJson(receipts.get(0));
+        Long original=jdbc.queryForObject("select snapshot_version from review_flows where id=?",Long.class,result.flowId());
+        if(original!=version)throw new ApiProblem(HttpStatus.CONFLICT,"同一请求标识不能用于不同提交版本");
+        return result.asReplay();
+    }
+
     private SubmitResult process(long authorId, String authorName, String type, String key, String requestId, List<String> texts, String title, Map<String, Object> snapshot,
                                  long snapshotVersion, boolean initialApproved, Long initialTarget, Publisher publisher) {
         Detection detection = rules.detect(texts); // 检测不可用时在建立任何状态前返回 503
@@ -129,7 +139,8 @@ public class ReviewService {
                 event(flowId, "ROUTE", low ? "放行并留痕" : "直接发布", low ? "低敏感不需要人工审核，已记录供站长事后查看" : "无需人工审核", "", null, null);
                 if (publisher != null) target = publisher.publish(null);
                 setFlowStatus(flowId, "PUBLISHED");
-                event(flowId, "RESULT", "已发布", "发布版 v" + snapshotVersion, "", null, null);
+                boolean planned=COLLECTION.equals(type)&&snapshot.get("outline") instanceof PublicOutline o&&o.scheduledAt()!=null;
+                event(flowId, "RESULT", planned?"检测通过，待定时公开":"已发布", "提交版 v" + snapshotVersion, "", null, null);
                 if (low) insertNoted(type, target, authorId, title, words);
                 result = new SubmitResult("PUBLISHED", level, List.of(), flowId, null, target, low ? "内容已发布；检测到低敏感内容，已留痕。" : "敏感检测通过，内容已发布。", false);
             }
@@ -266,6 +277,20 @@ public class ReviewService {
         audit.write(ReviewAudit.Row.of("DELETE_DRAFT", authorId, authorName).content(authorId, "DRAFT", draftId, null, null, null).note("", "删除私人草稿"));
     }
 
+    @Transactional
+    public void deleteCollectionTraces(long authorId,String authorName,long collectionId) {
+        List<Long> ids=jdbc.queryForList("select id from review_content_state where author_id=? and content_type='COLLECTION' and target_id=? for update",Long.class,authorId,collectionId);
+        for (Long stateId:ids) {
+            if (jdbc.queryForObject("select count(*) from review_submissions where state_id=? and status='PENDING'",Integer.class,stateId)>0) throw new ApiProblem(HttpStatus.CONFLICT,"待处理提交的专题不能删除");
+            jdbc.update("delete from review_flow_events where flow_id in (select id from review_flows where state_id=?)",stateId);
+            jdbc.update("delete from review_flows where state_id=?",stateId);
+            jdbc.update("delete from review_submissions where state_id=?",stateId);
+            jdbc.update("delete from review_receipts where state_id=?",stateId);
+            jdbc.update("delete from review_content_state where id=?",stateId);
+        }
+        audit.write(ReviewAudit.Row.of("DELETE_DRAFT",authorId,authorName).content(authorId,COLLECTION,collectionId,null,null,null).note("","删除私人专题草稿"));
+    }
+
     // ------------------------------------------------------------------ 审批决定
 
     /** REVIEW 任务：APPROVE / REJECT；RECHECK 任务：UPHOLD（维持不通过）/ OVERTURN（判定误判并放行，发布提交快照）。 */
@@ -333,12 +358,12 @@ public class ReviewService {
                 default -> {
                     long collectionId = state.targetId();
                     List<Map<String, Object>> rows = jdbc.queryForList("select owner_id,moderation_state,status from community_collections where id=?", collectionId);
-                    if (rows.isEmpty() || !Objects.equals(((Number) rows.get(0).get("owner_id")).longValue(), state.authorId()) || "TAKEN_DOWN".equals(rows.get(0).get("moderation_state")) || "ARCHIVED".equals(rows.get(0).get("status")))
+                    if (rows.isEmpty() || !Objects.equals(((Number) rows.get(0).get("owner_id")).longValue(), state.authorId()) || "TAKEN_DOWN".equals(rows.get(0).get("moderation_state")))
                         throw new ApiProblem(HttpStatus.CONFLICT, "专题已不可发布，请让作者重新提交。", "STALE", null);
                     try {
-                        publications.publishFrozen(collectionId, json.treeToValue(snapshot.get("outline"), PublicOutline.class), snapshot.path("visibility").asText("PUBLIC"));
+                        boolean immediate = publications.activate(collectionId, json.treeToValue(snapshot.get("outline"), PublicOutline.class), snapshot.path("visibility").asText("PUBLIC"));
+                        if (immediate) jdbc.update("update community_collections set status='PUBLISHED',published_at=coalesce(published_at,current_timestamp) where id=?", collectionId);
                     } catch (JsonProcessingException e) { throw new IllegalStateException("Cannot read submission snapshot", e); }
-                    jdbc.update("update community_collections set status='PUBLISHED',published_at=current_timestamp where id=?", collectionId);
                 }
             }
             jdbc.update("update review_submissions set status=?,result_note=?,operator_id=?,operator_name=?,closed_at=? where id=?", status, cleaned.isEmpty() ? "审核通过" : cleaned, operator.userId(), cut(operator.displayName(), 40), now, taskId);
@@ -346,11 +371,13 @@ public class ReviewService {
             if (flowId > 0) {
                 event(flowId, "REVIEW", title, cleaned.isEmpty() ? "审核员已处理" : cleaned, "", operator.userId(), operator.displayName());
                 setFlowStatus(flowId, "PUBLISHED");
-                event(flowId, "RESULT", "已发布", "发布版 v" + version, "", null, null);
+                boolean planned=COLLECTION.equals(state.type())&&jdbc.queryForObject("select scheduled_at from community_collections where id=?",Timestamp.class,state.targetId())!=null;
+                event(flowId, "RESULT", planned?"审批通过，待定时公开":"已发布", "提交版 v" + version, "", null, null);
             }
             saveState(state, state.generation() + 1, target, true);
             message = "审批通过，已发布提交版本 v" + version + "。";
         } else {
+            if (COLLECTION.equals(state.type()) && state.targetId()!=null) publications.clearSchedule(state.targetId());
             jdbc.update("update review_submissions set status=?,result_note=?,operator_id=?,operator_name=?,closed_at=? where id=?", status, cleaned, operator.userId(), cut(operator.displayName(), 40), now, taskId);
             if (flowId > 0) {
                 event(flowId, "REVIEW", title, cleaned, "", operator.userId(), operator.displayName());
@@ -421,13 +448,16 @@ public class ReviewService {
     @Transactional
     public Map<String, Object> withdrawTask(long authorId, String authorName, long taskId) {
         Map<String, Object> task = loadTask(taskId);
+        State peek = stateById(((Number)task.get("state_id")).longValue());
+        if (COLLECTION.equals(peek.type()) && peek.targetId()!=null) jdbc.queryForObject("select id from community_collections where id=? for update",Long.class,peek.targetId());
         if (((Number) task.get("author_id")).longValue() != authorId) throw new ApiProblem(HttpStatus.NOT_FOUND, "未找到属于当前账号的提交。");
         State state = lockStateById(((Number) task.get("state_id")).longValue());
         task = loadTask(taskId);
         if (!"PENDING".equals(task.get("status"))) throw new ApiProblem(HttpStatus.CONFLICT, "该提交已处理或失效。", "STALE", null);
-        if (ARTICLE.equals(state.type()) && "RECHECK".equals(String.valueOf(task.get("kind"))))
+        if ((ARTICLE.equals(state.type()) || COLLECTION.equals(state.type())) && "RECHECK".equals(String.valueOf(task.get("kind"))))
             throw new ApiProblem(HttpStatus.CONFLICT, "高敏感内容已自动不通过并转人工复核，不能取消；可以修改后重新提交。", "RECHECK_NOT_CANCELLABLE", null);
         invalidatePending(state.id(), null, "作者已撤回，私人原稿保留。");
+        if (COLLECTION.equals(state.type()) && state.targetId()!=null) publications.clearSchedule(state.targetId());
         saveState(state, state.generation() + 1, state.targetId(), state.approvedOnce());
         audit.write(ReviewAudit.Row.of("WITHDRAW", authorId, authorName).content(authorId, state.type(), state.targetId(), taskId, null, null).note("", "作者撤回待审提交"));
         return Map.of("message", "已撤回，私人原稿保留。");
@@ -668,6 +698,10 @@ public class ReviewService {
             row.put("status", rs.getString(6)); row.put("startedAt", rs.getTimestamp(7).toInstant());
             return row;
         }, flowId);
+        if (COLLECTION.equals(flow.get("type")) && "PUBLISHED".equals(flow.get("status"))) {
+            List<Timestamp> due=jdbc.queryForList("select c.scheduled_at from community_collections c join review_content_state s on s.target_id=c.id and s.content_type='COLLECTION' join review_flows f on f.state_id=s.id where f.id=? and c.scheduled_ready=true and f.id=(select max(f2.id) from review_flows f2 where f2.state_id=s.id)",Timestamp.class,flowId);
+            if(!due.isEmpty()&&due.get(0)!=null){flow.put("status","SCHEDULED");flow.put("scheduledAt",due.get(0).toInstant());}
+        }
         boolean high = "HIGH".equals(flow.get("level"));
         List<Map<String, Object>> events = jdbc.query("select id,stage,title,note,detail,actor_name,occurred_at from review_flow_events where flow_id=? order by occurred_at,id", (rs, n) -> {
             Map<String, Object> e = new LinkedHashMap<>();
@@ -888,6 +922,8 @@ public class ReviewService {
     static List<String> outlineTexts(PublicOutline outline) {
         List<String> texts = new ArrayList<>();
         texts.add(outline.collection().name()); texts.add(outline.collection().description());
+        texts.add(outline.collection().audience()); texts.add(outline.collection().goal());
+        if (outline.metadata()!=null) { texts.add(outline.metadata().seoTitle());texts.addAll(outline.metadata().tags());texts.addAll(outline.metadata().audiences()); }
         for (PublicSection section : outline.sections()) {
             texts.add(section.title()); texts.add(section.description());
             for (PublicEntry entry : section.entries()) { texts.add(entry.title()); texts.add(entry.annotation()); texts.add(entry.body()); }

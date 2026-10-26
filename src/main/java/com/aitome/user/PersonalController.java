@@ -58,13 +58,14 @@ public class PersonalController {
 
     @GetMapping("/collections")
     @RequirePermission(Permission.COLLECTION_MANAGE)
-    public PageView<CollectionView> myCollections(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size, @RequestParam(required=false) String editorType, HttpSession session) {
+    public PageView<CollectionView> myCollections(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size, @RequestParam(required=false) String editorType, @RequestParam(defaultValue="") String q, @RequestParam(defaultValue="") String state, HttpSession session) {
+        if(q.length()>80 || !List.of("","DRAFT","PUBLISHED","ARCHIVED").contains(state))throw new ApiProblem(HttpStatus.BAD_REQUEST,"搜索或状态不正确");
         if(editorType!=null&&!List.of("OUTLINE","BUILDER").contains(editorType))throw new ApiProblem(HttpStatus.BAD_REQUEST,"编辑器类型不支持");
         int safeSize = Math.max(1, Math.min(size, 50));
         int safePage = Math.max(0, Math.min(page, 10_000));
-        List<CollectionView> rows = jdbc.query("select c.id,c.name,c.description,c.owner_name,c.updated_at,c.format,c.status,c.revision,c.editor_type,case when c.editor_type='BUILDER' then c.item_count else count(ce.id) end as item_count from community_collections c left join collection_entries ce on ce.collection_id=c.id where c.owner_id=? and (? = '' or c.editor_type=?) group by c.id order by c.updated_at desc,c.id desc limit ? offset ?",
+        List<CollectionView> rows = jdbc.query("select c.id,c.name,c.description,c.owner_name,c.updated_at,c.format,c.status,c.revision,c.editor_type,case when c.editor_type='BUILDER' then c.item_count else count(ce.id) end as item_count from community_collections c left join collection_entries ce on ce.collection_id=c.id where c.owner_id=? and (? = '' or c.editor_type=?) and (?='' or c.status=?) and (?='' or lower(c.name) like ?) group by c.id order by c.updated_at desc,c.id desc limit ? offset ?",
                 (rs, row) -> new CollectionView(rs.getLong("id"), rs.getString("name"), rs.getString("description"), rs.getString("owner_name"), rs.getInt("item_count"), rs.getTimestamp("updated_at").toInstant(), rs.getString("format"), rs.getString("status"), rs.getLong("revision"), rs.getString("editor_type")),
-                currentUser(session).getId(), editorType==null?"":editorType, editorType==null?"":editorType, safeSize + 1, (long) safePage * safeSize);
+                currentUser(session).getId(), editorType==null?"":editorType, editorType==null?"":editorType, state,state,q.trim(),"%"+q.trim().toLowerCase(java.util.Locale.ROOT)+"%",safeSize + 1, (long) safePage * safeSize);
         return page(rows, safePage, safeSize);
     }
 

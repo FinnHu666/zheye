@@ -18,4 +18,5 @@ public class CollectionPublication {
     /** 公开版本的可见范围；所有公开查询按它过滤。 */
     @Column(nullable = false, length = 12) private String visibility = "PUBLIC";
     protected CollectionPublication() {}
+    @Column(length=24) private String category;
 }

@@ -41,6 +41,11 @@ public class CollectionWorkspaceController {
     private final CollectionPublicationService publications;
     private final AccessService access;
     private final ReviewService review;
+    @org.springframework.beans.factory.annotation.Value("${finns.collections.layouts-enabled:false}") private boolean layoutsEnabled;
+    @org.springframework.beans.factory.annotation.Value("${finns.collections.scheduling-enabled:false}") private boolean schedulingEnabled;
+
+    @GetMapping("/api/me/collections/capabilities")
+    public Map<String,Boolean> capabilities() { return Map.of("layoutsEnabled",layoutsEnabled,"schedulingEnabled",schedulingEnabled); }
 
     public CollectionWorkspaceController(CollectionRepository collections, ContentPostRepository posts, UserRepository users, JdbcTemplate jdbc, CollectionPublicationService publications, AccessService access, ReviewService review) {
         this.access = access;
@@ -74,6 +79,7 @@ public class CollectionWorkspaceController {
         if (!blank(request.initialContent())) {
             insertEntry(saved.getId(), firstSection, new EntryInput(null, CollectionEntry.Kind.NOTE, "", "", request.initialContent(), null, ""), 0);
         }
+        activity(saved.getId(),"CREATE");
         return draft(saved.getId(), user.getId());
     }
 
@@ -96,12 +102,18 @@ public class CollectionWorkspaceController {
     }
 
     public DraftDocument saveDocument(long id, SaveDraftRequest request, long userId) {
+        lock(id);
         OwnedCollection owned = owned(id, userId);
         validateDocument(request, userId);
+        CollectionMetadata metadata = request.metadata() == null ? null : request.metadata().normalized();
+        if(metadata!=null && metadata.coverId()!=null) jdbc.queryForList("select id from collection_covers where id=? for update",String.class,metadata.coverId());
+        if (metadata != null && !layoutsEnabled && metadata.sectionLayouts().stream().anyMatch(x -> !"LIST".equals(x))) throw bad("章节展示样式尚未开启");
+        if (metadata != null && metadata.coverId() != null && jdbc.queryForObject("select count(*) from collection_covers v join community_collections c on c.id=v.collection_id where v.id=? and c.owner_id=?", Integer.class, metadata.coverId(), userId) == 0) throw bad("封面不存在或不属于当前作者");
         int updated = jdbc.update("update community_collections set name=?,description=?,format=?,audience=?,goal=?,visibility=coalesce(?,visibility),updated_at=current_timestamp,revision=revision+1 where id=? and owner_id=? and revision=?",
                 request.name().trim(), cleanOptional(request.description()), request.format().name(), cleanOptional(request.audience()), cleanOptional(request.goal()),
                 request.visibility(), id, userId, request.revision());
         if (updated == 0) throw new ApiProblem(HttpStatus.CONFLICT, "专题已在其他页面更新，请刷新后重试（当前版本 " + owned.revision() + "）");
+        if (metadata != null) jdbc.update("update community_collections set wizard_metadata=? where id=?", metadata.toJson(), id);
 
         jdbc.update("delete from collection_entries where collection_id=?", id);
         jdbc.update("delete from collection_sections where collection_id=?", id);
@@ -111,6 +123,7 @@ public class CollectionWorkspaceController {
             int entryOrder = 0;
             for (EntryInput entry : section.entries()) insertEntry(id, sectionId, entry, entryOrder++);
         }
+        activity(id,"SAVE");
         return draft(id, userId);
     }
 
@@ -119,9 +132,11 @@ public class CollectionWorkspaceController {
     public ResponseEntity<Object> publish(@PathVariable long id, @Valid @RequestBody PublishRequest request, HttpSession session) {
         UserAccount user = currentUser(session);
         OwnedCollection row = owned(id, user.getId());
-        jdbc.queryForObject("select id from community_collections where id=? for update", Long.class, id);
+        lock(id);
         if ("RESTRICTED".equals(visibilityOf(id)) && !"RESTRICTED".equals(publishedVisibilityOf(id)) && !canRestrict(session))
             throw new ApiProblem(HttpStatus.FORBIDDEN, "当前角色不能发布受限专题");
+        SubmitResult replay = review.collectionReplay(user.getId(),id,request.requestId(),request.revision());
+        if (replay!=null) return "PUBLISHED".equals(replay.outcome())?ResponseEntity.ok(draft(id,user.getId())):ContentController.respond(replay,()->null,HttpStatus.OK);
         DraftDocument document = draft(id, user.getId());
         List<String> problems = publishProblems(document);
         if (!problems.isEmpty()) throw bad(String.join("；", problems));
@@ -132,13 +147,20 @@ public class CollectionWorkspaceController {
         Long currentRevision = jdbc.queryForObject("select revision from community_collections where id=?", Long.class, id);
         if (currentRevision == null || currentRevision != request.revision()) throw new ApiProblem(HttpStatus.CONFLICT, "专题版本已变化，请刷新后重试（当前版本 " + currentRevision + "）");
         // 敏感检测与首次审批（FINNS-17）：只有“已发布”时才执行下面的原有发布流程；转人工时发布稿保持原样
-        SubmitResult result = review.submitCollection(user.getId(), user.getDisplayName(), id, request.requestId(), publications.capture(id), visibilityOf(id), request.revision());
-        if ("PUBLISHED".equals(result.outcome()) && result.replay()) return ResponseEntity.ok(draft(id, user.getId()));
+        PublicOutline captured = publications.capture(id);
+        publications.validateSchedule(request.scheduledAt());
+        PublicOutline frozen = new PublicOutline(captured.collection(), captured.sections(), captured.metadata(), request.scheduledAt());
+        publications.assertReferences(frozen);
+        SubmitResult result = review.submitCollection(user.getId(), user.getDisplayName(), id, request.requestId(), frozen, visibilityOf(id), request.revision());
+        if (result.replay()) return "PUBLISHED".equals(result.outcome()) ? ResponseEntity.ok(draft(id, user.getId())) : ContentController.respond(result, () -> null, HttpStatus.OK);
+        publications.clearSchedule(id);
+        if ("PENDING".equals(result.outcome()) && request.scheduledAt() != null) publications.schedule(id, frozen, visibilityOf(id), false);
         if (!"PUBLISHED".equals(result.outcome())) return ContentController.respond(result, () -> null, HttpStatus.OK);
-        int updated = jdbc.update("update community_collections set status='PUBLISHED',published_at=current_timestamp,updated_at=current_timestamp,revision=revision+1 where id=? and owner_id=? and revision=?",
+        if (request.scheduledAt() != null) { publications.schedule(id, frozen, visibilityOf(id), true); return ResponseEntity.ok(draft(id, user.getId())); }
+        int updated = jdbc.update("update community_collections set status='PUBLISHED',published_at=coalesce(published_at,current_timestamp),updated_at=current_timestamp,revision=revision+1 where id=? and owner_id=? and revision=?",
                 id, user.getId(), request.revision());
         if (updated == 0) throw new ApiProblem(HttpStatus.CONFLICT, "专题版本已变化，请刷新后重试（当前版本 " + row.revision() + "）");
-        publications.publishSnapshot(id);
+        publications.publishFrozen(id,frozen,visibilityOf(id));
         return ResponseEntity.ok(draft(id, user.getId()));
     }
 
@@ -146,13 +168,47 @@ public class CollectionWorkspaceController {
     @Transactional
     public DraftDocument archive(@PathVariable long id, @Valid @RequestBody VersionRequest request, HttpSession session) {
         UserAccount user = currentUser(session);
+        lock(id);
         OwnedCollection row = owned(id, user.getId());
         int updated = jdbc.update("update community_collections set status='ARCHIVED',updated_at=current_timestamp,revision=revision+1 where id=? and owner_id=? and revision=?",
                 id, user.getId(), request.revision());
         if (updated == 0) throw new ApiProblem(HttpStatus.CONFLICT, "专题版本已变化，请刷新后重试（当前版本 " + row.revision() + "）");
-        jdbc.update("delete from user_collection_selections where collection_id=?", id);
+        publications.cancelSchedule(id);
         review.collectionWithdrawn(id, user.getId(), user.getDisplayName());
+        activity(id,"WITHDRAW");
         return draft(id, user.getId());
+    }
+
+    @PostMapping("/api/me/collections/{id}/cancel") @Transactional
+    public DraftDocument cancel(@PathVariable long id, @RequestBody VersionRequest request, HttpSession session) {
+        UserAccount user = currentUser(session);
+        lock(id);
+        OwnedCollection row = owned(id, user.getId());
+        if (row.revision() != request.revision()) throw new ApiProblem(HttpStatus.CONFLICT, "版本已变化，请刷新后重试");
+        List<Long> tasks = jdbc.queryForList("select id from review_submissions where content_type='COLLECTION' and author_id=? and status='PENDING' and state_id in (select id from review_content_state where target_id=? and content_type='COLLECTION')", Long.class, user.getId(), id);
+        if (tasks.isEmpty() && jdbc.queryForObject("select scheduled_at from community_collections where id=?", java.sql.Timestamp.class, id) == null) throw new ApiProblem(HttpStatus.CONFLICT,"没有可取消的送审或定时发布");
+        for (Long task : tasks) review.withdrawTask(user.getId(), user.getDisplayName(), task);
+        publications.cancelSchedule(id);
+        jdbc.update("update community_collections set revision=revision+1 where id=?", id);
+        activity(id,"CANCEL");
+        return draft(id, user.getId());
+    }
+
+    @DeleteMapping("/api/me/collections/{id}/draft") @Transactional
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteDraft(@PathVariable long id, @RequestParam long revision, HttpSession session) {
+        UserAccount user = currentUser(session);
+        lock(id);
+        OwnedCollection row = owned(id, user.getId());
+        if (row.revision() != revision) throw new ApiProblem(HttpStatus.CONFLICT,"版本已变化，请刷新后重试");
+        if (row.publishedAt() != null || row.status() != CommunityCollection.Status.DRAFT || jdbc.queryForObject("select count(*) from collection_publications where collection_id=?",Integer.class,id)>0 || !"VISIBLE".equals(jdbc.queryForObject("select moderation_state from community_collections where id=?",String.class,id))) throw new ApiProblem(HttpStatus.CONFLICT,"只能删除从未公开的私人草稿");
+        review.deleteCollectionTraces(user.getId(), user.getDisplayName(), id);
+        jdbc.update("delete from collection_import_operations where collection_id=?",id);
+        jdbc.update("delete from collection_activity where collection_id=?",id);
+        jdbc.update("delete from collection_covers where collection_id=?",id);
+        jdbc.update("delete from collection_entries where collection_id=?",id);
+        jdbc.update("delete from collection_sections where collection_id=?",id);
+        jdbc.update("delete from community_collections where id=?",id);
     }
 
     @GetMapping("/api/collections/{id}/outline")
@@ -192,7 +248,9 @@ public class CollectionWorkspaceController {
         List<SectionView> sections = sectionViews(id, true);
         return new DraftDocument(row.id(), row.name(), row.description(), row.format(), row.status(), row.audience(), row.goal(),
                 row.ownerName(), row.revision(), row.updatedAt(), row.publishedAt(), sections, visibilityOf(id),
-                row.status() == CommunityCollection.Status.PUBLISHED ? publishedVisibilityOf(id) : null);
+                row.status() == CommunityCollection.Status.PUBLISHED ? publishedVisibilityOf(id) : null,
+                CollectionMetadata.parse(jdbc.queryForObject("select wizard_metadata from community_collections where id=?", String.class, id)),
+                jdbc.queryForObject("select scheduled_at from community_collections where id=?", java.sql.Timestamp.class,id) == null ? null : jdbc.queryForObject("select scheduled_at from community_collections where id=?",java.sql.Timestamp.class,id).toInstant());
     }
 
     private OwnedCollection owned(long id, long userId) {
@@ -217,7 +275,7 @@ public class CollectionWorkspaceController {
 
     private List<EntryView> entryViews(long collectionId, long sectionId, boolean draft) {
         return jdbc.query("select e.id,e.kind,e.sort_order,e.title,e.annotation,e.body,e.post_id,e.external_url,p.title as post_title " +
-                        "from collection_entries e left join content_posts p on p.id=e.post_id where e.collection_id=? and e.section_id=? order by e.sort_order,e.id",
+                        "from collection_entries e left join content_posts p on p.id=e.post_id and p.moderation_state='VISIBLE' where e.collection_id=? and e.section_id=? order by e.sort_order,e.id",
                 (rs, n) -> new EntryView(rs.getLong("id"), CollectionEntry.Kind.valueOf(rs.getString("kind")), rs.getInt("sort_order"),
                         rs.getString("title"), rs.getString("annotation"), rs.getString("body"), (Long) rs.getObject("post_id"),
                         rs.getString("post_title"), rs.getString("external_url")), collectionId, sectionId);
@@ -310,6 +368,10 @@ public class CollectionWorkspaceController {
     }
 
     private UserAccount currentUser(HttpSession session) { return AuthController.requireUser(session, users); }
+    private void activity(long id,String action) { jdbc.update("insert into collection_activity(collection_id,action,revision,occurred_at) select id,?,revision,current_timestamp from community_collections where id=?",action,id); }
+    @GetMapping("/api/me/collections/{id}/activity")
+    public List<Map<String,Object>> activity(@PathVariable long id,HttpSession session) { owned(id,currentUser(session).getId());return jdbc.queryForList("select action,revision,occurred_at as at from collection_activity where collection_id=? order by id desc limit 100",id); }
+    private void lock(long id) { if(jdbc.queryForList("select id from community_collections where id=? for update",Long.class,id).isEmpty())throw new ApiProblem(HttpStatus.NOT_FOUND,"专题不存在"); }
     private boolean canRestrict(HttpSession session) { return access.resolve(session).has(com.aitome.access.Permission.CONTENT_RESTRICTED); }
     private String visibilityOf(long id) { return jdbc.queryForObject("select visibility from community_collections where id=?", String.class, id); }
     private String publishedVisibilityOf(long id) { return jdbc.query("select visibility from collection_publications where collection_id=?", (rs, n) -> rs.getString(1), id).stream().findFirst().orElse(null); }
@@ -330,9 +392,10 @@ public class CollectionWorkspaceController {
                                    @NotNull CommunityCollection.Format format,
                                    @Size(max = 160) String audience, @Size(max = 300) String goal,
                                    @NotNull @Size(max = MAX_SECTIONS) List<SectionInput> sections,
-                                   /** PUBLIC/RESTRICTED；为空表示保持当前值（导入等内部调用）。 */ String visibility) {
+                                   /** PUBLIC/RESTRICTED；为空表示保持当前值（导入等内部调用）。 */ String visibility, CollectionMetadata metadata) {
+        public SaveDraftRequest(long revision, String name, String description, CommunityCollection.Format format, String audience, String goal, List<SectionInput> sections, String visibility) { this(revision,name,description,format,audience,goal,sections,visibility,null); }
         public SaveDraftRequest(long revision, String name, String description, CommunityCollection.Format format, String audience, String goal, List<SectionInput> sections) {
-            this(revision, name, description, format, audience, goal, sections, null);
+            this(revision, name, description, format, audience, goal, sections, null, null);
         }
     }
     public record SectionInput(Long id, @NotBlank @Size(max = 80) String title, @Size(max = 500) String description,
@@ -341,21 +404,23 @@ public class CollectionWorkspaceController {
                              @Size(max = 1000) String annotation, @Size(max = 4000) String body,
                              Long postId, @Size(max = 2000) String externalUrl) {}
     public record VersionRequest(long revision) {}
-    public record PublishRequest(long revision, @Size(max = 64) String requestId) {}
+    public record PublishRequest(long revision, @Size(max = 64) String requestId, Instant scheduledAt) {}
     private record OwnedCollection(long id, String name, String description, Long ownerId, String ownerName,
                                    CommunityCollection.Format format, CommunityCollection.Status status, String audience,
                                    String goal, long revision, Instant updatedAt, Instant publishedAt) {}
     public record DraftDocument(long id, String name, String description, CommunityCollection.Format format,
                                 CommunityCollection.Status status, String audience, String goal, String ownerName,
                                 long revision, Instant updatedAt, Instant publishedAt, List<SectionView> sections,
-                                String visibility, String publishedVisibility) {}
+                                String visibility, String publishedVisibility, CollectionMetadata metadata, Instant scheduledAt) {}
     public record SectionView(long id, String title, String description, int sortOrder, List<EntryView> entries) {}
     public record EntryView(long id, CollectionEntry.Kind kind, int sortOrder, String title, String annotation,
                             String body, Long postId, String postTitle, String externalUrl) {}
     public record PublicCollection(long id, String name, String description, String ownerName,
                                    CommunityCollection.Format format, String audience, String goal,
                                    Instant updatedAt, Instant publishedAt) {}
-    public record PublicOutline(PublicCollection collection, List<PublicSection> sections) {}
+    public record PublicOutline(PublicCollection collection, List<PublicSection> sections, CollectionMetadata metadata, Instant scheduledAt) {
+        public PublicOutline(PublicCollection collection,List<PublicSection> sections) { this(collection,sections,CollectionMetadata.empty(),null); }
+    }
     public record PublicSection(long id, String title, String description, int sortOrder, List<PublicEntry> entries) {}
     public record PublicEntry(long id, CollectionEntry.Kind kind, int sortOrder, String title, String annotation,
                               String body, Long postId, String postTitle, String postSummary, String postAuthor,

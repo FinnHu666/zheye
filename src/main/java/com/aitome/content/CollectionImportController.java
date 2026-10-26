@@ -127,13 +127,19 @@ public class CollectionImportController {
         SaveDraftRequest input=input(original);
         List<SectionInput> sections=request.structureOnly()?input.sections().stream().map(s->new SectionInput(null,s.title(),"",List.<EntryInput>of())).toList():input.sections();
         CommunityCollection saved=collections.saveAndFlush(new CommunityCollection(original.name().substring(0,Math.min(76,original.name().length()))+"（副本）",request.structureOnly()?"":original.description(),user.getDisplayName(),user.getId(),original.format(),CommunityCollection.Status.DRAFT,request.structureOnly()?"":original.audience(),request.structureOnly()?"":original.goal()));
-        return workspace.saveDocument(saved.getId(),new SaveDraftRequest(0,saved.getName(),saved.getDescription(),saved.getFormat(),saved.getAudience(),saved.getGoal(),sections),user.getId());
+        CollectionMetadata metadata=request.structureOnly()?null:original.metadata();
+        if (metadata!=null && metadata.coverId()!=null) {
+            String coverId=UUID.randomUUID().toString();
+            int copied=jdbc.update("insert into collection_covers(id,collection_id,image_bytes,created_at,removed) select ?,?,image_bytes,current_timestamp,removed from collection_covers where id=?",coverId,saved.getId(),metadata.coverId());
+            metadata=new CollectionMetadata(metadata.tags(),metadata.category(),metadata.seoTitle(),metadata.audiences(),copied>0?coverId:null,metadata.sectionLayouts());
+        }
+        return workspace.saveDocument(saved.getId(),new SaveDraftRequest(0,saved.getName(),saved.getDescription(),saved.getFormat(),saved.getAudience(),saved.getGoal(),sections,null,metadata),user.getId());
     }
 
     public static SaveDraftRequest input(DraftDocument d) {
-        return new SaveDraftRequest(d.revision(),d.name(),d.description(),d.format(),d.audience(),d.goal(),d.sections().stream().map(s->new SectionInput(null,s.title(),s.description(),s.entries().stream().map(e->new EntryInput(null,e.kind(),e.title(),e.annotation(),e.body(),e.postId(),e.externalUrl())).toList())).toList());
+        return new SaveDraftRequest(d.revision(),d.name(),d.description(),d.format(),d.audience(),d.goal(),d.sections().stream().map(s->new SectionInput(null,s.title(),s.description(),s.entries().stream().map(e->new EntryInput(null,e.kind(),e.title(),e.annotation(),e.body(),e.postId(),e.externalUrl())).toList())).toList(),d.visibility(),d.metadata());
     }
-    private SaveDraftRequest withRevision(SaveDraftRequest d,long revision){return new SaveDraftRequest(revision,d.name(),d.description(),d.format(),d.audience(),d.goal(),d.sections());}
+    private SaveDraftRequest withRevision(SaveDraftRequest d,long revision){return new SaveDraftRequest(revision,d.name(),d.description(),d.format(),d.audience(),d.goal(),d.sections(),d.visibility(),d.metadata());}
     private String begin(long userId,String action,CommitRequest request){
         if(request.idempotencyKey()==null || !request.idempotencyKey().matches("[a-zA-Z0-9-]{8,80}"))throw bad("缺少有效的提交标识");
         jdbc.queryForObject("select id from user_accounts where id=? for update",Long.class,userId);

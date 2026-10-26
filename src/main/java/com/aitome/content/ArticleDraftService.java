@@ -255,7 +255,7 @@ public class ArticleDraftService {
         Map<String, Object> status = status(d, info);
         Map<String, Object> row = new LinkedHashMap<>();
         row.put("id", d.getId()); row.put("postId", d.getPostId()); row.put("title", d.getTitle()); row.put("summary", d.getSummary());
-        row.put("version", d.getVersion()); row.put("status", status); row.put("updatedAt", d.getUpdatedAt());
+        row.put("version", d.getVersion()); row.put("status", status); row.put("createdAt", d.getCreatedAt()); row.put("updatedAt", d.getUpdatedAt());
         row.put("hasPublished", info.post != null); row.put("publicTitle", info.post == null ? null : info.post.title());
         row.put("canCancel", info.pending != null && "REVIEW".equals(info.pending.kind()));
         row.put("canWithdraw", "LIVE".equals(status.get("publicState")));
