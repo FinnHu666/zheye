@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { api } from './lib/api'
 import { reportSiteEntry } from './lib/siteVisit'
@@ -9,6 +9,7 @@ const router = useRouter()
 const route = useRoute()
 const composerOpen = ref(false)
 const toastMessage = ref('')
+const searchInput = ref(null)
 const logoutBusy = ref(false)
 let toastTimer
 
@@ -20,6 +21,8 @@ const showWrite = () => {
   if (!user.value) { openAuth(); return }
   composerOpen.value = true
 }
+const searchSoon = () => showToast('搜索功能暂未开放')
+const focusSearch = (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); searchInput.value?.focus() } }
 const showToast = (message) => { toastMessage.value = message; clearTimeout(toastTimer); toastTimer = setTimeout(() => { toastMessage.value = '' }, 2400) }
 const openAuth = (register = false) => router.push({ path: register ? '/auth/register' : '/auth/login', query: route.path.startsWith('/auth') ? {} : { next: route.fullPath } })
 const logout = async () => {
@@ -34,7 +37,8 @@ const logout = async () => {
   } catch (error) { showToast(error.message) }
   finally { logoutBusy.value = false }
 }
-onMounted(() => { reportSiteEntry(); refreshSession() })
+onMounted(() => { reportSiteEntry(); refreshSession(); window.addEventListener('keydown', focusSearch) })
+onBeforeUnmount(() => window.removeEventListener('keydown', focusSearch))
 // 旧入口 /?create=post|topic 统一进入创作选择（普通话题已下线）
 watch(() => route.query.create, (value) => { if (value === 'post' || value === 'topic') { composerOpen.value = true; router.replace({ path: route.path, query: { ...route.query, create: undefined } }) } }, { immediate: true })
 const choose = (path) => { composerOpen.value = false; router.push(path) }
@@ -43,15 +47,27 @@ const choose = (path) => { composerOpen.value = false; router.push(path) }
 <template>
   <div class="app-shell">
     <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
-    <header class="site-header">
-      <RouterLink class="brand" to="/" aria-label="FINNS 首页"><span class="brand-mark">F</span><span>FINNS</span></RouterLink>
+    <header v-if="!route.meta.bare" class="site-header">
+      <RouterLink class="brand" to="/" aria-label="FINNS 首页"><span class="brand-mark"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><path d="M16 8 2 22"/><path d="M17.5 15H9"/></svg></span><span>FINNS</span></RouterLink>
       <nav class="main-nav" aria-label="主导航">
         <RouterLink :class="{ active: activePath === '/' }" to="/">发现</RouterLink>
         <RouterLink :class="{ active: activePath === '/collections' }" to="/collections">专题</RouterLink>
-        <RouterLink :class="{ active: activePath === '/me/posts' && route.query.type === 'SELECTED' }" to="/me/posts?type=SELECTED">自选专题</RouterLink>
-        <RouterLink v-if="can('admin.users')" :class="{ active: activePath.startsWith('/admin') }" to="/admin/users">管理</RouterLink>
       </nav>
-      <div class="header-actions"><button class="icon-btn" aria-label="回到顶部" @click="router.push('/')">⌕</button><button v-if="!user" class="btn btn-ghost" @click="openAuth()">登录</button><template v-else><RouterLink class="btn btn-ghost user-button" to="/me">个人中心</RouterLink><button class="btn btn-ghost logout-button" :disabled="logoutBusy" @click="logout">退出</button></template><button v-if="!user || can('post.create')" class="btn btn-primary" @click="showWrite">开始创作 <span>↗</span></button></div>
+      <form class="header-search" role="search" @submit.prevent="searchSoon">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input ref="searchInput" type="search" placeholder="搜索文章、专题或内容…" aria-label="搜索文章、专题或内容" autocomplete="off" />
+        <kbd aria-hidden="true">Ctrl K</kbd>
+      </form>
+      <div class="header-actions">
+        <button class="bell-btn" type="button" aria-label="消息（暂未开放）" title="消息" @click="showToast('消息功能暂未开放')"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg></button>
+        <button v-if="!user" class="btn btn-ghost" @click="openAuth()">登录</button>
+        <template v-else>
+          <RouterLink class="btn btn-ghost user-button" to="/me">个人中心</RouterLink>
+          <RouterLink v-if="can('admin.users')" class="btn btn-ghost manage-button" :class="{ active: activePath.startsWith('/admin') }" to="/admin/users">管理</RouterLink>
+          <button class="btn btn-ghost logout-button" :disabled="logoutBusy" @click="logout">退出</button>
+        </template>
+        <button v-if="!user || can('post.create')" class="btn btn-primary create-button" @click="showWrite"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><path d="M16 8 2 22"/><path d="M17.5 15H9"/></svg>开始创作</button>
+      </div>
     </header>
 
     <main>

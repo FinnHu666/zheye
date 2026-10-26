@@ -46,6 +46,7 @@ async function act(action, acknowledge = false) {
   } finally { busy.value = false }
 }
 const goTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'instant', block: 'start' })
+const removeCover = async () => { const reason=window.prompt('请填写移除封面的原因（1–200字）');if(!reason?.trim())return;busy.value=true;try{await api(`/api/admin/collection-covers/${shown.value.coverId}`,{method:'DELETE',body:JSON.stringify({reason})});message.value='封面已移除，正文保留。';await load()}catch(e){saveError.value=e.message}finally{busy.value=false} }
 onUpdated(() => { if (!observer) { const end = document.getElementById('rr-end'); if (end) { observer = new IntersectionObserver((entries) => { nearEnd.value = entries.some((e) => e.isIntersecting) }, { threshold: 0.2 }); observer.observe(end) } } })
 watch(() => route.fullPath, () => { if (!route.path.startsWith('/admin/reviews/')) return; if (route.params.id && data.value && String(data.value.id) !== String(route.params.id)) { view.value = 'SUBMITTED'; note.value = ''; message.value = ''; load() } })
 onMounted(load)
@@ -76,7 +77,7 @@ onBeforeRouteLeave(() => !note.value.trim() || window.confirm('处理说明尚�
           <article id="rr-content" class="rr-content">
             <div class="rr-content-label"><span>{{ publication ? '待处置发布内容' : view === 'PUBLISHED' ? '当前已发布内容' : '本次送审内容' }}</span><small>完整正文</small></div>
             <p v-if="shown.summary" class="rr-abstract">{{ shown.summary }}</p>
-            <ReviewDocument :text="shown.body" :terms="view === 'SUBMITTED' ? (data.matches || matchedTerms) : []" />
+            <div v-if="shown.coverId"><img :src="`/api/collection-covers/${shown.coverId}`" alt="提交快照封面" style="max-width:100%;max-height:240px;object-fit:contain" @error="$event.target.hidden=true" /><button type="button" :disabled="busy" @click="removeCover">仅移除封面</button></div><ReviewDocument :text="shown.body" :terms="view === 'SUBMITTED' ? (data.matches || matchedTerms) : []" />
             <div id="rr-end" class="rr-end">— 正文结束 —</div>
           </article>
           <aside id="rr-decision" class="rr-decision">

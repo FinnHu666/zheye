@@ -1,9 +1,9 @@
 <script setup>
-// FINNS-18：私人预览（读取已保存的工作稿）；可切换到“读者现在看到”，说明二者可能不同。与公开阅读共用 SafeMarkdown。
+// FINNS-18：私人预览（读取已保存的工作稿）；可切换到“读者现在看到”，说明二者可能不同。与公开阅读共用 MarkdownView（Vditor 渲染）。
 import { ref, computed, onMounted } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import PersonalLayout from '../components/PersonalLayout.vue'
-import SafeMarkdown from '../components/SafeMarkdown.vue'
+import MarkdownView from '../components/MarkdownView.vue'
 import { articles, errorText } from '../lib/articles'
 
 const route = useRoute()
@@ -33,12 +33,12 @@ onMounted(load)
         <div class="rr-content-label"><span>文章 · 仅你自己可见</span><small>这是已保存的工作稿，尚未公开；预览与发布后的阅读使用同一套安全渲染。</small></div>
         <h1 class="ct-title">{{ doc.title || '（未填写标题）' }}</h1>
         <p v-if="doc.summary" class="rr-abstract">{{ doc.summary }}</p>
-        <SafeMarkdown :source="doc.body" />
+        <MarkdownView :source="doc.body" />
       </article>
       <article v-else class="rr-content ct-article">
         <template v-if="reader">
           <div class="rr-content-label"><span>文章 · 公开版 v{{ reader.version }}</span><small>这是读者现在看到的内容，与工作稿可能不同。</small></div>
-          <h1 class="ct-title">{{ reader.title }}</h1><p v-if="reader.summary" class="rr-abstract">{{ reader.summary }}</p><SafeMarkdown :source="reader.body" />
+          <h1 class="ct-title">{{ reader.title }}</h1><p v-if="reader.summary" class="rr-abstract">{{ reader.summary }}</p><MarkdownView :source="reader.body" />
         </template>
         <div v-else class="rv-empty"><h2>读者看不到这篇文章</h2><p>未公开、已撤回或已被下架。</p></div>
       </article>

@@ -7,7 +7,7 @@ export const levelClass = (value) => ({ HIGH: 'danger', MEDIUM: 'amber', LOW: 'n
 // 作者侧一次提交的当前状态 → [文案, 徽标样式]
 export function flowChip(flow) {
   if (!flow) return ['草稿', 'neutral']
-  return ({ IN_REVIEW: ['待审核', 'amber'], AUTO_REJECTED: ['未通过 · 复核中', 'danger'], REJECTED: ['未通过', 'danger'], UPHELD: ['未通过', 'danger'], PUBLISHED: ['已发布', 'green'], INVALID: ['已失效', 'neutral'] }[flow.status] || ['处理中', 'neutral'])
+  return ({ IN_REVIEW: ['待审核', 'amber'], SCHEDULED: ['待定时公开', 'amber'], AUTO_REJECTED: ['未通过 · 复核中', 'danger'], REJECTED: ['未通过', 'danger'], UPHELD: ['未通过', 'danger'], PUBLISHED: ['已发布', 'green'], INVALID: ['已失效', 'neutral'] }[flow.status] || ['处理中', 'neutral'])
 }
 
 // 专题冻结快照 → 文本：章节作 ## 标题，条目标题作 ### 标题，其余按原文。
@@ -30,7 +30,11 @@ export function outlineText(outline) {
 // 统一为 { title, summary, body, visibility }。
 export function readable(type, content) {
   if (!content) return null
-  if (type === 'COLLECTION') return { title: content.name, summary: content.description, body: outlineText(content.outline), visibility: content.visibility }
+  if (type === 'COLLECTION') {
+    const m=content.outline?.metadata,c=content.outline?.collection
+    const extra=[c?.audience && `适用人群：${c.audience}`,c?.goal && `目标：${c.goal}`,m?.seoTitle && `SEO：${m.seoTitle}`,m?.tags?.length && `标签：${m.tags.join('、')}`].filter(Boolean).join('\n')
+    return { title: content.name, summary: content.description, body: extra+'\n'+outlineText(content.outline), visibility: content.visibility,coverId:m?.coverId }
+  }
   if (type === 'COMMENT') return { title: '评论', summary: '', body: content.body, visibility: 'PUBLIC' }
   return { title: content.title, summary: content.summary, body: content.body, visibility: 'PUBLIC' }
 }

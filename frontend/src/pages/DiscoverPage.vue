@@ -7,7 +7,7 @@ import { can } from '../lib/session'
 import { useSessionGuard } from '../lib/sessionGuard'
 import { submitNotice, outcomeNotice } from '../lib/reviewText'
 import ReauthPanel from '../components/ReauthPanel.vue'
-import SafeMarkdown from '../components/SafeMarkdown.vue'
+import MarkdownView from '../components/MarkdownView.vue'
 const emit = defineEmits(['write', 'toast'])
 const props = defineProps({ user: { type: Object, default: null } })
 const route = useRoute()
@@ -165,7 +165,7 @@ onMounted(() => { loadPosts(true); loadStats() })
       <div class="detail-meta">{{ detail.authorName }} · {{ dateLabel(detail.createdAt) }}<template v-if="detail.updatedAt"> · <span class="ct-updated" :title="new Date(detail.updatedAt).toLocaleString('zh-CN')">更新于 {{ dateLabel(detail.updatedAt) }}</span></template> · <span v-if="user && !can('post.interact')" class="like-count">♡ {{ detail.likes }}</span><button v-else class="like-button" @click="like">♡ {{ detail.likes }}</button></div>
       <div v-if="detailLoading" class="loading">正在加载正文…</div>
       <p v-else-if="detailError" class="form-error" role="alert">{{ detailError }} <button type="button" class="btn btn-outline" @click="retryDetail">重试加载正文</button></p>
-      <div v-else class="detail-body"><SafeMarkdown :source="detail.body" :show-notes="false" /></div>
+      <div v-else class="detail-body"><MarkdownView :source="detail.body" /></div>
       <section v-if="user && can('post.interact')" class="collection-add"><div><h3>收录到我的专题</h3><p v-if="!ownCollections.length">先创建一个专题，再整理相关内容。<RouterLink to="/me/collections">创建专题 →</RouterLink></p><form v-else @submit.prevent="addToCollection"><select v-model="selectedCollectionId" aria-label="选择专题"><option v-for="item in ownCollections" :key="item.id" :value="item.id">{{ item.name }}</option></select><button class="btn btn-outline">加入专题</button></form><span v-if="collectionMessage" class="collection-feedback" role="status">{{ collectionMessage }}</span></div></section>
       <section class="discussion" aria-live="polite">
         <h3>讨论 <span v-if="commentsTotal">({{ commentsTotal }})</span></h3>

@@ -1,7 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { countChars, overLimit, missingForPublish, isBlank, sameFields, publicChip, workChip, publishLabel, errorKind, errorText, LIMITS } from '../src/lib/articles.js'
-import { markdownBlocks, inlineTokens, noteText } from '../src/lib/safeMarkdown.js'
 
 test('length counts code points, not UTF-16 units, and limits match the contract', () => {
   assert.equal(countChars('😀😀'), 2)
@@ -40,28 +39,4 @@ test('error codes map to page reactions and texts', () => {
   assert.match(errorText({ status: 401 }), /输入仍保留/)
   assert.match(errorText({ status: 503, code: 'DETECTION_UNAVAILABLE' }), /不会重复提交/)
   assert.equal(errorText({ status: 400, code: 'VALIDATION', message: '请补全标题' }), '请补全标题')
-})
-
-test('safe markdown: HTML and scripts stay text, images are never tokens that load, unsafe links are blocked', () => {
-  const { blocks, notes } = markdownBlocks('# 大标题\n<script>alert(1)</script>\n![x](http://a/b.png)\n[坏](javascript:alert(1)) [坏2](//evil.com) [好](https://ok.com) [内部](/collections/1) [锚](#a)')
-  assert.equal(blocks[0].k, 'h'); assert.equal(blocks[0].level, 1)
-  const inline = blocks[1].inline
-  assert.ok(inline.some((t) => t.k === 'text' && t.text.includes('<script>')), '脚本只作为文本')
-  assert.ok(!inline.some((t) => t.k === 'link' && /javascript:|\/\/evil/.test(t.href)))
-  assert.deepEqual(inline.filter((t) => t.k === 'link').map((t) => t.href), ['https://ok.com', '/collections/1', '#a'])
-  assert.equal(inline.filter((t) => t.k === 'blocked').length, 2)
-  assert.equal(inline.filter((t) => t.k === 'image').length, 1)
-  assert.ok(notes.html >= 1 && notes.images === 1 && notes.links === 2)
-  assert.equal(noteText(notes).length, 3)
-})
-
-test('safe markdown: nested-parenthesis javascript links cannot slip through, code fences keep their text', () => {
-  const tokens = inlineTokens('[点我](javascript:alert(document.cookie))')
-  assert.equal(tokens.filter((t) => t.k === 'link').length, 0)
-  assert.equal(tokens[0].k, 'blocked')
-  const { blocks } = markdownBlocks('```\n<img src=x onerror=alert(1)>\n```\n- 项一\n> 引用')
-  assert.deepEqual(blocks.map((b) => b.k), ['code', 'li', 'quote'])
-  assert.match(blocks[0].text, /onerror/)
-  assert.deepEqual(markdownBlocks('').blocks, [])
-  assert.deepEqual(markdownBlocks(null).blocks, [])
 })

@@ -3,9 +3,9 @@
 // 登录失效/换号沿用 useSessionGuard：输入原位保留，不代存代发。
 import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { RouterLink, useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
-import PersonalLayout from '../components/PersonalLayout.vue'
 import FlowTimeline from '../components/FlowTimeline.vue'
 import ReauthPanel from '../components/ReauthPanel.vue'
+import MarkdownEditor from '../components/MarkdownEditor.vue'
 import { useSessionGuard } from '../lib/sessionGuard'
 import { timeLabel } from '../lib/reviewText'
 import {
@@ -14,6 +14,9 @@ import {
 } from '../lib/articles'
 
 const route = useRoute(), router = useRouter()
+// 正文编辑模式：阅读模式（Vditor 即时渲染）/ 源码；在地址里，切换不触发离开保护
+const editMode = computed(() => route.query.mode === 'source' ? 'source' : 'read')
+const setMode = (m) => { bypass = true; router.replace({ query: { ...route.query, mode: m === 'source' ? 'source' : undefined } }).finally(() => { bypass = false }) }
 const guard = useSessionGuard()
 const isNew = computed(() => !route.params.id)
 const doc = ref(null), form = ref(pickFields()), base = ref(pickFields())
@@ -85,7 +88,7 @@ async function save() {
       const created = await articles.create(form.value)
       adopt(created)
       bypass = true
-      try { await router.replace(`/me/posts/${created.id}/edit`) } finally { bypass = false }
+      try { await router.replace({ path: `/me/posts/${created.id}/edit`, query: route.query.mode ? { mode: route.query.mode } : {} }) } finally { bypass = false }
     } else adopt(await articles.save(doc.value.id, form.value, doc.value.version))
     say(`私人草稿已保存（工作稿 v${doc.value.version}），尚未公开${live.value ? '；读者看到的仍是旧公开版' : ''}。`)
     return true
@@ -152,55 +155,48 @@ onBeforeUnmount(() => { window.removeEventListener('beforeunload', beforeUnload)
 </script>
 
 <template>
-  <PersonalLayout kicker="MY CONTENT" :title="isNew ? '新建文章' : (doc?.title || '未命名文章')" desc="私人草稿、已提交版本与公开版分开管理；保存不会公开。">
-    <template #actions><div class="heading-actions"><RouterLink class="btn btn-ghost" to="/me/posts">← 返回列表</RouterLink><RouterLink v-if="doc" class="btn btn-outline" :to="`/me/posts/${doc.id}/preview`">私人预览</RouterLink></div></template>
-    <div v-if="loading" class="rv-empty" role="status"><span class="rv-spinner"></span><h2>正在读取文章</h2></div>
-    <div v-else-if="loadFailed" class="rv-empty"><h2>无法打开这篇文章</h2><p role="alert">{{ error }}</p><RouterLink class="btn btn-primary" to="/me/posts">回到我的内容</RouterLink></div>
+  <section class="ae-page">
+    <nav class="ae-crumb" aria-label="面包屑"><RouterLink to="/">首页</RouterLink><span aria-hidden="true">›</span><RouterLink to="/me/posts">我的内容</RouterLink><span aria-hidden="true">›</span><span aria-current="page">{{ isNew ? '新建文章' : (doc?.title || '编辑文章') }}</span></nav>
+    <div v-if="loading" class="ae-card"><div class="rv-empty" role="status"><span class="rv-spinner"></span><h2>正在读取文章</h2></div></div>
+    <div v-else-if="loadFailed" class="ae-card"><div class="rv-empty"><h2>无法打开这篇文章</h2><p role="alert">{{ error }}</p><RouterLink class="btn btn-primary" to="/me/posts">回到我的内容</RouterLink></div></div>
     <template v-else>
-      <header class="ct-head">
-        <div v-if="status" class="rv-tags" aria-label="当前状态"><span class="rv-badge" :class="publicChip(status)[1]">{{ publicChip(status)[0] }}</span><span class="rv-badge" :class="workChip(status)[1]">{{ workChip(status)[0] }}</span></div>
-        <div v-else class="rv-tags"><span class="rv-badge neutral">尚未保存</span></div>
-      </header>
-      <ReauthPanel :guard="guard" />
-      <p v-if="guard.expired.value" class="rv-notice amber" role="alert">登录已失效或账号已变化。输入已保留，不会代存或代发。</p>
-      <p v-if="status?.publicState === 'DOWN'" class="rv-notice danger" role="status">这篇文章已被人工下架。保存、更新或撤回都不能解除下架，需要另一位审批者复核后恢复；你仍可继续编辑私人稿。</p>
-      <p v-else-if="status?.publicState === 'WITHDRAWN'" class="rv-notice" role="status">你已撤回这篇文章，现在只有你自己可见。重新公开会重新检测。</p>
-      <p v-if="notice" class="rv-notice" :class="noticeTone" role="status">{{ notice }}</p>
-      <p v-if="error" class="rv-notice danger" role="alert">{{ error }}</p>
-      <div v-if="conflict" class="rv-notice amber" role="alert">别处保存了不同的版本（v{{ conflict.version }}）。你的输入仍在下面。<button type="button" class="text-link" @click="keepMine">以我的为准</button> · <button type="button" class="text-link" @click="takeServerVersion">载入别处的版本（放弃我的输入）</button></div>
-      <div class="ct-grid">
-        <form class="rv-editor ct-form" novalidate @submit.prevent="publish">
-          <div class="rv-editor-top"><span class="rv-badge">文章</span><span>{{ doc ? `工作稿 v${doc.version}` : '新稿' }} · {{ dirty ? '有未保存的修改' : doc ? '已保存' : '未保存' }}</span></div>
-          <label class="rv-field" :class="{ bad: missing.includes('title') || over.includes('title') }">标题<input v-model="form.title" data-field="title" :aria-invalid="missing.includes('title') || over.includes('title')" autocomplete="off" /><span class="ct-count" :class="{ over: over.includes('title') }">{{ countChars(form.title) }}/{{ LIMITS.title }}</span></label>
-          <label class="rv-field" :class="{ bad: missing.includes('summary') || over.includes('summary') }">摘要<textarea v-model="form.summary" data-field="summary" rows="3" :aria-invalid="missing.includes('summary') || over.includes('summary')" /><span class="ct-count" :class="{ over: over.includes('summary') }">{{ countChars(form.summary) }}/{{ LIMITS.summary }}</span></label>
-          <label class="rv-field" :class="{ bad: missing.includes('body') || over.includes('body') }">正文<textarea v-model="form.body" data-field="body" rows="14" :aria-invalid="missing.includes('body') || over.includes('body')" /><span class="ct-count" :class="{ over: over.includes('body') }">{{ countChars(form.body) }}/{{ LIMITS.body }}</span></label>
-          <p class="rv-footnote">支持安全 Markdown：<code># 标题</code>、<code>- 列表</code>、<code>**粗体**</code>、<code>`代码`</code>、<code>[链接](https://…)</code>。HTML、脚本和图片不会生效。草稿可以缺字段；发布时标题、摘要、正文都必填。长度按字符数计算。</p>
-          <div class="rv-editor-actions ct-actions">
-            <button type="button" class="btn btn-ghost" :disabled="locked || (empty && !doc)" @click="save()">{{ busy === 'save' ? '保存中…' : '保存草稿' }}</button>
-            <button type="button" class="btn btn-ghost" :disabled="locked || (empty && !doc)" @click="preview">私人预览</button>
-            <button class="btn btn-primary" :disabled="locked">{{ busy === 'publish' ? '处理中…' : publishLabel(doc) }}</button>
-          </div>
-          <p class="ct-hint">保存只是私人存稿，不会公开也不会送审。{{ publishHint(doc) }}</p>
-          <div v-if="doc && (doc.canCancel || doc.canWithdraw)" class="ct-danger-row">
-            <button v-if="doc.canCancel" type="button" class="text-link" :disabled="locked" @click="cancelSubmission">取消本次送审（保留工作稿和旧公开版）</button>
-            <button v-if="doc.canWithdraw" type="button" class="text-link danger" :disabled="locked" @click="dialog = 'withdraw'">撤回公开（保留私人稿）</button>
-          </div>
-        </form>
-        <aside class="ct-side" aria-label="版本与流转">
-          <section class="ct-versions">
-            <h2>三个版本</h2>
-            <article class="ct-version" :class="{ on: doc?.published }"><small>读者现在看到</small><template v-if="doc?.published"><strong>公开版 v{{ doc.published.version }}</strong><p>{{ doc.published.title }}</p></template><template v-else><strong>读者看不到</strong><p>{{ doc?.status?.publicState === 'DOWN' ? '已被人工下架。' : doc?.status?.publicState === 'WITHDRAWN' ? '已撤回，仅你自己可见。' : '还没有公开版本。' }}</p></template></article>
-            <article class="ct-version" :class="{ on: doc?.submitted }"><small>已提交 · 等待处理</small><template v-if="doc?.submitted"><strong>提交版 v{{ doc.submitted.version }}</strong><p>{{ doc.submitted.title }}</p><em>{{ doc.submitted.kind === 'RECHECK' ? '高敏感：已自动不通过，人工复核中。' : '中敏感：已送审，等待另一位审批者。' }}之后的修改不会替换它，重新提交才会使它作废。</em></template><template v-else><strong>没有待处理的提交</strong><p>保存、继续编辑都不会产生提交。</p></template></article>
-            <article class="ct-version on"><small>我的工作稿</small><strong>工作稿 {{ doc ? `v${doc.version}` : '（未保存）' }}</strong><p>{{ dirty ? '输入里有尚未保存的修改。' : doc ? '输入与已保存的草稿一致。' : '保存后才会出现在“我的内容”。' }}</p></article>
-          </section>
-          <section class="rv3-flow ct-flow" aria-label="流转过程"><div class="rv3-flow-head"><h2>流转过程</h2></div>
-            <p v-if="!latest" class="rv-footnote">还没有提交记录。保存草稿不会出现在这里；点击“发布”后，检测、分流和人工处理的每一步都会显示。</p>
-            <template v-else><p class="rv-footnote">最近一次提交 v{{ latest.version }}（{{ timeLabel(latest.startedAt) }}）。{{ latest.level === 'HIGH' ? '高敏感内容不显示具体命中词。' : '' }}</p><FlowTimeline :flow="latest" audience="author" lit /><details v-if="older.length" class="rv-history"><summary>更早的提交（{{ older.length }}）</summary><div v-for="flow in older" :key="flow.id" class="rv3-older"><strong>提交版 v{{ flow.version }}</strong><FlowTimeline :flow="flow" audience="author" compact lit /></div></details></template>
-          </section>
-        </aside>
-      </div>
+      <form class="ae-card" novalidate @submit.prevent="publish">
+        <header class="ae-head">
+          <span class="ae-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><path d="M16 8 2 22"/><path d="M17.5 15H9"/></svg></span>
+          <div class="ae-head-text"><h1>{{ isNew ? '新建文章' : '编辑文章' }}</h1><p>记录你的想法、经验和知识，让更多人看到你的内容</p></div>
+          <div class="ae-head-side"><small>保存草稿不丢内容</small><RouterLink class="ae-back" to="/me/posts">‹ 返回列表</RouterLink></div>
+        </header>
+        <div class="ae-chips" aria-label="当前状态">
+          <template v-if="status"><span class="ae-chip" :class="publicChip(status)[1]">{{ publicChip(status)[0] }}</span><span class="ae-chip" :class="workChip(status)[1]">{{ workChip(status)[0] }}</span></template>
+          <span v-else class="ae-chip neutral">尚未保存</span>
+        </div>
+        <ReauthPanel :guard="guard" />
+        <p v-if="guard.expired.value" class="rv-notice amber" role="alert">登录已失效或账号已变化。输入已保留，不会代存或代发。</p>
+        <p v-if="status?.publicState === 'DOWN'" class="rv-notice danger" role="status">这篇文章已被人工下架。保存、更新或撤回都不能解除下架，需要另一位审批者复核后恢复；你仍可继续编辑私人稿。</p>
+        <p v-else-if="status?.publicState === 'WITHDRAWN'" class="rv-notice" role="status">你已撤回这篇文章，现在只有你自己可见。重新公开会重新检测。</p>
+        <p v-if="notice" class="rv-notice" :class="noticeTone" role="status">{{ notice }}</p>
+        <p v-if="error" class="rv-notice danger" role="alert">{{ error }}</p>
+        <div v-if="conflict" class="rv-notice amber" role="alert">别处保存了不同的版本（v{{ conflict.version }}）。你的输入仍在下面。<button type="button" class="text-link" @click="keepMine">以我的为准</button> · <button type="button" class="text-link" @click="takeServerVersion">载入别处的版本（放弃我的输入）</button></div>
+        <label class="ae-field" :class="{ bad: missing.includes('title') || over.includes('title') }"><span class="ae-label">标题 <b class="ae-req" aria-hidden="true">*</b></span><input v-model="form.title" data-field="title" placeholder="请输入一个吸引人的标题…" :aria-invalid="missing.includes('title') || over.includes('title')" autocomplete="off" /><span class="ae-count" :class="{ over: over.includes('title') }">{{ countChars(form.title) }}/{{ LIMITS.title }}</span></label>
+        <label class="ae-field" :class="{ bad: missing.includes('summary') || over.includes('summary') }"><span class="ae-label">摘要 <b class="ae-req" aria-hidden="true">*</b></span><textarea v-model="form.summary" data-field="summary" rows="3" placeholder="简单介绍一下这篇文章的主要内容…" :aria-invalid="missing.includes('summary') || over.includes('summary')" /><span class="ae-count" :class="{ over: over.includes('summary') }">{{ countChars(form.summary) }}/{{ LIMITS.summary }}</span></label>
+        <div class="ae-field" :class="{ bad: missing.includes('body') || over.includes('body') }"><span class="ae-label">正文 <b class="ae-req" aria-hidden="true">*</b></span><div data-field="body" tabindex="-1" :aria-invalid="missing.includes('body') || over.includes('body')"><MarkdownEditor v-model="form.body" :mode="editMode" :disabled="locked" /></div><span class="ae-count" :class="{ over: over.includes('body') }">{{ countChars(form.body) }}/{{ LIMITS.body }}</span></div>
+        <div v-if="doc && (doc.canCancel || doc.canWithdraw)" class="ct-danger-row">
+          <button v-if="doc.canCancel" type="button" class="text-link" :disabled="locked" @click="cancelSubmission">取消本次送审（保留工作稿和旧公开版）</button>
+          <button v-if="doc.canWithdraw" type="button" class="text-link danger" :disabled="locked" @click="dialog = 'withdraw'">撤回公开（保留私人稿）</button>
+        </div>
+        <div class="ae-foot">
+          <span class="ae-saved" role="status"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/></svg>{{ dirty ? '有未保存的修改' : doc ? `已保存${doc.updatedAt ? '于 ' + timeLabel(doc.updatedAt) : ''}（手动保存）` : '尚未保存' }}</span>
+          <span class="ae-actions">
+            <button type="button" class="ae-btn" :disabled="locked || (empty && !doc)" @click="preview">预览</button>
+            <button type="button" class="ae-btn" :aria-pressed="editMode === 'read'" :title="editMode === 'read' ? '点击切换到 Markdown 源码' : '点击切换到阅读模式'" @click="setMode(editMode === 'read' ? 'source' : 'read')">{{ editMode === 'read' ? '阅读模式' : '源码模式' }}</button>
+            <button type="button" class="ae-btn" :disabled="locked || (empty && !doc)" @click="save()">{{ busy === 'save' ? '保存中…' : '保存草稿' }}</button>
+            <button class="ae-btn primary" :disabled="locked">{{ busy === 'publish' ? '处理中…' : publishLabel(doc) }}</button>
+          </span>
+        </div>
+        <p class="ct-hint">保存只是私人存稿，不会公开也不会送审。{{ publishHint(doc) }}</p>
+      </form>
     </template>
     <div v-if="dialog === 'leave'" class="ct-overlay" @click.self="answer('stay')"><section class="ct-modal" role="dialog" aria-modal="true" aria-labelledby="ct-leave-title"><h2 id="ct-leave-title">还有没保存的修改</h2><p>离开前要怎么处理这些修改？保存只会存为私人草稿，不会公开。</p><div class="ct-modal-actions"><button class="btn btn-primary" @click="answer('save')">保存并离开</button><button class="btn btn-ghost" @click="answer('discard')">放弃修改</button><button class="btn btn-ghost" @click="answer('stay')">继续编辑</button></div></section></div>
     <div v-if="dialog === 'withdraw'" class="ct-overlay" @click.self="dialog = ''"><section class="ct-modal" role="dialog" aria-modal="true" aria-labelledby="ct-withdraw-title"><h2 id="ct-withdraw-title">撤回公开？</h2><p>撤回后读者、列表、搜索和收藏里都看不到这篇文章，待处理的提交也会作废；私人稿会保留，之后重新发布会重新检测。</p><div class="ct-modal-actions"><button class="btn btn-primary" @click="withdraw">确认撤回</button><button class="btn btn-ghost" @click="dialog = ''">先不撤回</button></div></section></div>
-  </PersonalLayout>
+  </section>
 </template>

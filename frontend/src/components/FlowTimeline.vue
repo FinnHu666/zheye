@@ -4,7 +4,7 @@ import { computed } from 'vue'
 const props = defineProps({ flow: Object, audience: { type: String, default: 'author' }, compact: Boolean, lit: Boolean })
 const time = value => new Date(value).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })
 const stageLabel = { SUBMIT: '提交', CHECK: '检测', ROUTE: '分流', REVIEW: '人工', RESULT: '结果' }
-const pendingKind = computed(() => props.flow?.status === 'IN_REVIEW' ? '等待审核员处理' : props.flow?.status === 'AUTO_REJECTED' ? '人工复核中' : '')
+const pendingKind = computed(() => props.flow?.status === 'SCHEDULED' ? '检测与审核已通过，等待定时公开' : props.flow?.status === 'IN_REVIEW' ? '等待审核员处理' : props.flow?.status === 'AUTO_REJECTED' ? '人工复核中' : '')
 const waiting = computed(() => !!pendingKind.value)
 const tone = event => event.stage === 'RESULT' ? (/已发布/.test(event.title) ? 'ok' : /失效|撤回|删除|取消/.test(event.title) ? 'muted' : 'bad') : event.stage === 'ROUTE' && /送审|不通过/.test(event.title) ? 'warn' : event.stage === 'REVIEW' ? 'info' : 'plain'
 </script>

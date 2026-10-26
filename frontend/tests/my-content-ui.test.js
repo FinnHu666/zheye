@@ -60,18 +60,19 @@ test('my content: article tab lists drafts from /api/me/articles with filters in
     assert.ok(calls.includes('GET /api/me/articles?state=ALL&q=&page=0&size=20'))
     assert.ok(!calls.some((u) => u.includes('/api/me/posts') || u.includes('/api/review/mine/unpublished')), '文章页签不再读旧接口')
     assert.match(text(), /我的草稿/); assert.match(text(), /已公开文章/); assert.match(text(), /审核中文章/)
-    const rows = [...document.querySelectorAll('.mc-row')]
-    const actions = (row) => [...row.querySelectorAll('.mc-actions .btn')].map((e) => e.textContent.replace(/\s+/g, ''))
+    const rows = [...document.querySelectorAll('.mc-trow')]
+    const actions = (row) => [...row.querySelectorAll('.mc-ops a, .mc-menu button')].map((e) => e.getAttribute('aria-label') || e.textContent.replace(/\s+/g, ''))
     assert.deepEqual(actions(rows[0]), ['编辑', '私人预览', '删除草稿'])
     assert.deepEqual(actions(rows[1]), ['编辑', '私人预览', '撤回'])
     assert.deepEqual(actions(rows[2]), ['编辑', '私人预览', '取消送审'])
     assert.ok(document.querySelector('a[href="/me/posts/new"]'), '写文章入口')
 
-    buttonByText('已公开').click(); await flush()
+    const sel = document.querySelector('.mc-filter select'); sel.value = 'LIVE'; sel.dispatchEvent(new window.Event('change', { bubbles: true })); await flush()
+    document.querySelector('.mc-filter').dispatchEvent(new window.Event('submit', { cancelable: true, bubbles: true })); await flush()
     assert.equal(router.currentRoute.value.query.state, 'LIVE')
     assert.ok(calls.includes('GET /api/me/articles?state=LIVE&q=&page=0&size=20'), '状态筛选由服务端完成')
-    await setValue('.ct-search input', '测试')
-    document.querySelector('.ct-toolbar').dispatchEvent(new window.Event('submit', { cancelable: true, bubbles: true })); await flush()
+    await setValue('.mc-search input', '测试')
+    document.querySelector('.mc-filter').dispatchEvent(new window.Event('submit', { cancelable: true, bubbles: true })); await flush()
     assert.equal(router.currentRoute.value.query.q, '测试')
     assert.ok(calls.some((u) => u.includes('state=LIVE') && u.includes('q=' + encodeURIComponent('测试'))))
 
@@ -132,10 +133,10 @@ test('editor: publish creates the draft first, a detection outage retries with t
   }
   document.cookie = 'XSRF-TOKEN=test'
   currentUser.value = { id: 1, permissions: ['profile.manage', 'post.create'] }
-  const { app, router } = await mount(editorRoutes, '/me/posts/new')
+  const { app, router } = await mount(editorRoutes, '/me/posts/new?mode=source')
   try {
     assert.ok(buttonByText('保存草稿').disabled, '空稿不能保存')
-    await setValue('[data-field=title]', '标题'); await setValue('[data-field=summary]', '摘要'); await setValue('[data-field=body]', '正文')
+    await setValue('[data-field=title]', '标题'); await setValue('[data-field=summary]', '摘要'); await setValue('[data-field=body] .md-source', '正文')
     assert.match(text(), /2\/120/, '长度按字符计')
     buttonByText('发布').click(); await flush()
     assert.equal(calls.filter((c) => c.method === 'POST' && c.url === '/api/me/articles').length, 1, '发布前先建稿')
@@ -146,9 +147,9 @@ test('editor: publish creates the draft first, a detection outage retries with t
     const second = calls.filter((c) => c.url === '/api/me/articles/5/publish')[1]
     assert.equal(second.body.requestId, first.body.requestId, '重试沿用同一 requestId')
     assert.equal(second.body.expectedVersion, 2, '重试前刷新到服务端版本')
-    assert.match(text(), /已发布/); assert.match(text(), /公开版v2/)
+    assert.match(text(), /已发布/); assert.match(text(), /已公开/, '状态胶囊显示已公开')
 
-    await setValue('[data-field=body]', '正文改了')
+    await setValue('[data-field=body] .md-source', '正文改了')
     const stayed = router.push('/me/posts'); await flush()
     assert.ok(document.querySelector('.ct-modal'), '有未保存修改时先询问')
     buttonByText('继续编辑').click(); await flush()
@@ -202,20 +203,17 @@ test('editor: a 401 keeps the input, shows the re-login panel and does not save'
   } finally { app.unmount() }
 })
 
-test('preview and public reading share the safe renderer: HTML shows as text, images do not load, unsafe links are not clickable', async () => {
-  const source = '# 标题\n<script>alert(1)</script>\n![图](http://x/y.png)\n[坏](javascript:alert(1)) [好](https://example.com) **粗**'
+test('preview and public reading render through MarkdownView with self-hosted assets only (browser checks cover the rendered result)', async () => {
+  const source = ['# 标题', '<script>alert(1)</script>', '![图](https://x.example/y.png)'].join(String.fromCharCode(10))
   globalThis.fetch = async (url) => url === '/api/me/articles/8' ? json(articleView(8, { title: '预览', body: source })) : json({})
   document.cookie = 'XSRF-TOKEN=test'
   currentUser.value = { id: 1, permissions: ['profile.manage'] }
   const { app } = await mount(editorRoutes, '/me/posts/8/preview')
   try {
-    const md = document.querySelector('.ct-md')
-    assert.ok(md && !md.querySelector('script') && !md.querySelector('img'), '无脚本、无图片元素')
-    assert.match(md.textContent, /<script>alert\(1\)<\/script>/, '脚本原样显示为文字')
-    const links = [...md.querySelectorAll('a')]
-    assert.deepEqual(links.map((a) => a.getAttribute('href')), ['https://example.com'])
-    assert.match(links[0].getAttribute('rel'), /noopener/)
-    assert.ok(md.querySelector('.ct-md-blocked')); assert.ok(md.querySelector('.ct-md-image'))
+    const view = document.querySelector('.md-view')
+    assert.ok(view, '预览使用 MarkdownView'); assert.equal(view.querySelectorAll('script').length, 0)
+    const external = [...document.querySelectorAll('script[src], link[href]')].map((e) => e.getAttribute('src') || e.getAttribute('href')).filter((u) => /^(https?:)?\/\//.test(u))
+    assert.deepEqual(external, [], '不从外部 CDN 加载资源')
   } finally { app.unmount() }
 })
 
@@ -240,20 +238,20 @@ test('my content: direct load restores filters from the address, back/forward fo
     assert.match(text(), /正在加载内容/, '加载态')
     assert.ok(calls.includes('/api/me/articles?state=REVIEW&q=none&page=0&size=20'), '直达地址带出筛选')
     release(); mode = 'ok'; await flush()
-    assert.equal(document.querySelector('.ct-search input').value, 'none', '搜索框回填')
-    assert.equal(document.querySelector('.ct-chips .on').textContent.trim(), '审核相关')
+    assert.equal(document.querySelector('.mc-search input').value, 'none', '搜索框回填')
+    assert.equal(document.querySelector('.mc-filter select').selectedOptions[0].textContent.trim(), '审核相关')
     assert.match(text(), /没有符合条件的文章/, '筛选后为空')
     buttonByText('清除筛选').click(); await flush()
     assert.equal(router.currentRoute.value.fullPath, '/me/posts')
     assert.match(text(), /甲/)
-    buttonByText('已公开').click(); await flush()
+    await router.push('/me/posts?state=LIVE'); await flush()
     assert.equal(router.currentRoute.value.query.state, 'LIVE')
     router.back(); await flush()
     assert.equal(router.currentRoute.value.fullPath, '/me/posts')
-    assert.equal(document.querySelector('.ct-chips .on').textContent.trim(), '全部', '后退恢复筛选')
+    assert.equal(document.querySelector('.mc-filter select').selectedOptions[0].textContent.trim(), '全部', '后退恢复筛选')
     router.forward(); await flush()
-    assert.equal(document.querySelector('.ct-chips .on').textContent.trim(), '已公开', '前进恢复筛选')
-    mode = 'fail'; buttonByText('全部').click(); await flush()
+    assert.equal(document.querySelector('.mc-filter select').selectedOptions[0].textContent.trim(), '已公开', '前进恢复筛选')
+    mode = 'fail'; await router.push('/me/posts?state=DRAFT'); await flush()
     assert.match(text(), /服务暂时不可用/); assert.ok(buttonByText('重试'), '失败可重试')
     mode = 'empty'; buttonByText('重试').click(); await flush()
     assert.match(text(), /还没有文章|没有符合条件/)

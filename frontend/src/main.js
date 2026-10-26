@@ -15,6 +15,7 @@ import ArticlePreviewPage from './pages/ArticlePreviewPage.vue'
 import CollectionDetailPage from './pages/CollectionDetailPage.vue'
 import CollectionImportPage from './pages/CollectionImportPage.vue'
 import CollectionNewPage from './pages/CollectionNewPage.vue'
+import CollectionWizardPage from './pages/CollectionWizardPage.vue'
 import CollectionEditorPage from './pages/CollectionEditorPage.vue'
 import TopicBuilderPage from './pages/TopicBuilderPage.vue'
 import AdminUsersPage from './pages/admin/AdminUsersPage.vue'
@@ -29,6 +30,7 @@ import './assets/account.css'
 import './assets/admin.css'
 import './assets/review.css'
 import './assets/content.css'
+import './assets/collection-wizard.css'
 
 // meta.perm：页面所需权限（FINNS-11）。无权限时 App 保留地址显示 403；接口另由服务端检查。
 const own = { requiresAuth: true, perm: 'collection.manage' }
@@ -43,6 +45,7 @@ const router = createRouter({
     { path: '/private/tools', component: LocalToolsPage },
     ...['login', 'register', 'forgot', 'pending', 'verify', 'reset', 'setup'].map((mode) => ({ path: '/auth/' + mode, component: AccountFlowPage, meta: { accountMode: mode } })),
     { path: '/me', component: PersonalPage, meta: { requiresAuth: true } },
+    { path: '/me/profile/edit', component: PersonalPage, meta: { requiresAuth: true, profileEdit: true } },
     { path: '/me/security', component: AccountSecurityPage, meta: { requiresAuth: true } },
     { path: '/me/ai-settings', component: AiSettingsPage, meta: { requiresAuth: true, perm: 'ai.use' } },
     { path: '/me/posts', component: MyContentPage, meta: { requiresAuth: true } },
@@ -55,8 +58,10 @@ const router = createRouter({
     { path: '/me/collections/:id(\\d+)/builder/preview', component: TopicBuilderPage, meta: { ...own, perm: 'ai.use', builderPreview: true } },
     { path: '/me/collections/import', component: CollectionImportPage, meta: own },
     { path: '/me/collections/:id(\\d+)/preview', component: CollectionDetailPage, meta: { ...own, privatePreview: true } },
-    { path: '/me/collections/new', component: CollectionNewPage, meta: own },
-    { path: '/me/collections/:id(\\d+)/edit', component: CollectionEditorPage, meta: own },
+    { path: '/me/collections/new', component: CollectionWizardPage, meta: { ...own, bare: true } },
+    { path: '/me/collections/:id(\\d+)/compose/:step(basic|content|publish)', component: CollectionWizardPage, meta: { ...own, bare: true } },
+    { path: '/me/collections/quick', component: CollectionNewPage, meta: own },
+    { path: '/me/collections/:id(\\d+)/edit', redirect: to => `/me/collections/${to.params.id}/compose/content` },
     { path: '/my/collections', redirect: { path: '/me/posts', query: { type: 'SELECTED' } } },
     { path: '/admin', redirect: '/admin/users' },
     { path: '/admin/users', component: AdminUsersPage, meta: admin },

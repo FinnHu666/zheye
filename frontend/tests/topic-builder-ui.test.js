@@ -289,16 +289,16 @@ test('profile saves only changes and preserves concurrent edits and failures', a
     }
     return {ok:true,status:200,json:async()=>({...persisted})}
   }
-  const router=createRouter({history:createMemoryHistory(),routes:[{path:'/me',component:PersonalPage}]})
-  await router.push('/me')
+  const router=createRouter({history:createMemoryHistory(),routes:[{path:'/me',component:PersonalPage},{path:'/me/profile/edit',component:PersonalPage}]})
+  await router.push('/me/profile/edit')
   const app=createApp(PersonalPage);app.use(router);app.mount('#test-app');await flush()
   try {
-    assert.equal(button('保存资料'),undefined)
-    input('input[maxlength="40"]','新昵称');await flush();assert.ok(button('保存资料'))
-    input('input[maxlength="40"]','原昵称');await flush();assert.equal(button('保存资料'),undefined)
+    assert.ok(button('保存修改').disabled, '无修改时保存按钮不可用')
+    input('input[maxlength="40"]','新昵称');await flush();assert.equal(button('保存修改').disabled,false)
+    input('input[maxlength="40"]','原昵称');await flush();assert.ok(button('保存修改').disabled)
     input('input[maxlength="40"]','提交昵称');await flush();document.querySelector('form').dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));await flush()
     input('textarea','保存期间继续编辑');release();await flush()
-    assert.equal(document.querySelector('textarea').value,'保存期间继续编辑');assert.ok(button('保存资料'))
+    assert.equal(document.querySelector('textarea').value,'保存期间继续编辑');assert.equal(button('保存修改').disabled,false)
     fail=true;document.querySelector('form').dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));await flush();release();await flush()
     assert.equal(document.querySelector('textarea').value,'保存期间继续编辑');assert.match(document.querySelector('[role=alert]').textContent,/保存失败/)
   } finally {app.unmount()}
